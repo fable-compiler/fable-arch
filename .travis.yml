@@ -6,3 +6,4 @@ deploy:
   on:
     tags: true
     repo: fable-compiler/fable-virtualdom
+script: echo "Overriding default build"
