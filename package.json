@@ -1,10 +1,10 @@
 {
   "name": "fable-import-virtualdom",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "description": "Fable bindings for virtual-dom",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fable-compiler/Fable/import/virtualdom"
+    "url": "https://github.com/fable-compiler/fable-virtualdom"
   },
   "license": "Apache-2.0",
   "author": "Tomas Jansson",
