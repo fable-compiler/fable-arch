@@ -6,4 +6,6 @@ deploy:
   on:
     tags: true
     repo: fable-compiler/fable-virtualdom
+before_script:
+- npm install -g npm@'>=3'
 script: echo "Overriding default build"
