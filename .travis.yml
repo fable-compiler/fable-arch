@@ -1,3 +1,5 @@
+before_deploy:
+  - cd src/Fable.Import.Virtualdom
 deploy:
   provider: npm
   email: tomas.jansson@gmail.com
