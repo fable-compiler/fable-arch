@@ -250,3 +250,7 @@ paket-files/
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+**/static/js/*
+!**/static/js/.keep
+out/
