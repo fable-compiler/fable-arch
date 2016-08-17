@@ -1,0 +1,10 @@
+{
+    "module": "amd",
+    "sourceMaps": true,
+    "projFile": "./clock.fsx",
+    "outDir": "out",
+    "scripts": {
+        "prebuild": "npm install",
+        "postbuild": "node node_modules/webpack/bin/webpack"
+    }
+}
