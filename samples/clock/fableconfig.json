@@ -5,6 +5,6 @@
     "outDir": "out",
     "scripts": {
         "prebuild": "npm install",
-        "postbuild": "webpack"
+        "postbuild": "node node_modules/webpack/bin/webpack"
     }
 }
