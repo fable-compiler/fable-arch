@@ -5,12 +5,12 @@
     "outDir": "out",
     "scripts": {
         "prebuild": "npm install",
-        "postbuild": "webpack"
+        "postbuild": "node node_modules/webpack/bin/webpack"
     },
     "targets": {
         "watch": {
             "scripts": {
-                "postbuild": "webpack --watch"
+                "postbuild": "node node_modules/webpack/bin/webpack --watch"
             }
         }
     }
