@@ -1,6 +1,6 @@
 {
   "name": "fable-import-virtualdom",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "description": "Fable bindings for virtual-dom",
   "repository": {
     "type": "git",
@@ -14,5 +14,8 @@
     "fsharp",
     "F#"
   ],
+  "devDependencies": {
+      "fable-core": "^0.5.4"
+  },
   "homepage": "https://github.com/fable-compiler/Fable#readme"
 }
