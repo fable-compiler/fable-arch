@@ -1,1 +1,3 @@
-samples/
+*/
+*.fsproj
+paket.references
