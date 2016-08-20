@@ -257,3 +257,5 @@ out/
 deploy/
 build/
 .paket/paket.exe
+
+public/
