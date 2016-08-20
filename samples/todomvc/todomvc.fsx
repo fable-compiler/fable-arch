@@ -233,39 +233,3 @@ createApp initModel view update
 |> (withSubscriber "modellogger" (printfn "%A"))
 |> withStartNodeSelector "#todoapp"
 |> start renderer
-
-(**
-First we initiate the model by checking the local storage if there are any items
-there. The to add support for local storage we add a subscriber. A subscriber is
-a function that handles `AppEvents`, they can be `ModelChanged` or `ActionReceived`.
-For the storage we are only interested in model changes, so that is what we act on
-and store the list of items in the local storage when the model was changed. For
-the logger we just logs everything.
-
-We also start the application on the `#todo` element in the document.
-
-### Creating custom elements
-
-If some tag or you want to create a custom helper function that represent some
-html element it is easy to extend the dsl with your needs. To add a custom html
-node where you set the css class directly you write something like:
-*)
-
-let inline myDiv className = elem "div" [attribute "class" className]
-
-(**
-
-Creating svg nodes are as easy as regular html nodes:
-
-*)
-
-let inline redRect x = svgElem "rect" ((fill "red")::x)
-
-(**
-
-As you see the only difference is that you use `svgElem` instead of `elem`. 
-You do this to add the correct namespace to the svg nodes. To see more
-example of how to define your own tags just look at the source code, 
-the dsl is not that complex.
-
-*)
