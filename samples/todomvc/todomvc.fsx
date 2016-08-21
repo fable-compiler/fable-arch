@@ -1,3 +1,11 @@
+(**
+ - title: Todo MVC
+ - tagline: The famous todo mvc implemented in fable-virtualdom
+ - app-style: width:800px; margin:20px auto 50px auto;
+ - intro: Todo MVC implemented to show a more realistic example.
+*)
+
+
 #r "node_modules/fable-core/Fable.Core.dll"
 #load "node_modules/fable-import-virtualdom/Fable.Helpers.Virtualdom.fs"
 

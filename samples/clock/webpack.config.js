@@ -5,8 +5,8 @@ var cfg = {
   devtool: "source-map",
   entry: "./out/clock.js",
   output: {
-    path: path.join(__dirname, "static/js/"),
-    filename: "clock.js"
+    path: path.join(__dirname, "public"),
+    filename: "bundle.js"
   },
   module: {
     preLoaders: [
