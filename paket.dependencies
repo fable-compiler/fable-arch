@@ -1,2 +1,11 @@
 source https://www.nuget.org/api/v2
 nuget FAKE
+nuget FSharp.Core
+
+group Docs
+  source https://www.nuget.org/api/v2
+
+  nuget FAKE
+  nuget Suave
+  nuget DotLiquid
+  nuget FSharp.Formatting 2.14.4

@@ -258,4 +258,11 @@ deploy/
 build/
 .paket/paket.exe
 
+
 public/
+
+# Generated documentation folder
+docs/output/
+
+# temp folder
+temp/
