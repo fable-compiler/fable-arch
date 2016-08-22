@@ -1,3 +1,9 @@
+(**
+ - title: Sudoku - the game sudoku implemented in fable-virtualdom
+ - tagline: Sudoku - the game sudoku implemented in fable-virtualdom
+ - app-style: width:800px; margin:20px auto 50px auto;
+ - intro: A port of https://github.com/forki/react-sudoku
+*)
 
 // Load Fable.Core and bindings to JS global objects
 #r "node_modules/fable-core/Fable.Core.dll"

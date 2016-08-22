@@ -12,3 +12,7 @@ request [for the samples directory](https://github.com/fable-compiler/fable-virt
 
 * [Hello world - simple application with one input](samples/helloworld/index.html)
 * [Clock - demo of how to have the app consume events from outside the app using a producer](samples/clock/index.html)
+* [Nesting - how to nest modules/apps together](samples/nesting/index.html)
+* [Subscriber demo - sample that shows how to log everyting from the app to the console](samples/subscriberexample/index.html)
+* [Sudoku - port of https://github.com/forki/react-sudoku for comparison with fable-react](samples/sudoku/index.html)
+* [Todo MVC - the famous Todo MVC](samples/todomvc/index.html)

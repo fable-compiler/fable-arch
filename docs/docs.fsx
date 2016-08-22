@@ -284,7 +284,7 @@ let generateSamplePages siteRoot recompile () =
   traceImportant "Updating sample pages"
   let lastEdit path = Directory.GetFiles(path) |> Seq.map File.GetLastWriteTime |> Seq.fold max DateTime.MinValue
   printfn "Samples: %A" (samples |> Seq.toList)
-  for sample in (samples |> Seq.take 1) do
+  for sample in samples do
     let outOfDate =
         if Directory.Exists(output </> "samples" </> Path.GetFileName(sample)) |> not
         then true
