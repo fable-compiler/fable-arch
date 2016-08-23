@@ -3,6 +3,7 @@ var webpack = require('webpack');
 var merge = require('webpack-merge');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var poststylus = require('poststylus');
 
 var TARGET_ENV = process.env.npm_lifecycle_event === 'build' ? 'production' : 'development';
@@ -12,7 +13,7 @@ var commonConfig = {
   output: {
     path: path.join(__dirname, "public"),
     publicPath: "",
-    filename: "bundle.js"
+    filename: "[hash].js"
   },
   module: {
     preLoaders: [
@@ -103,10 +104,7 @@ if ( TARGET_ENV === 'production' ) {
         {
           from: 'src/static/img/',
           to:   'static/img/'
-        },
-        {
-          from: 'src/static/favicon.ico'
-        },
+        }
       ]),
 
       new webpack.optimize.OccurenceOrderPlugin(),
