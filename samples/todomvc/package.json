@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "fable",
+    "build": "cp node_modules/todomvc-common/base.css public/base.css;cp node_modules/todomvc-app-css/index.css public/index.css;fable",
     "watch": "fable -w --target watch"
   },
   "dependencies": {

@@ -1,3 +1,10 @@
+(**
+ - title: A simple clock - producer demo
+ - tagline: Clock implemented with fable-virtualdom
+ - app-style: width:800px; margin:20px auto 50px auto;
+ - require-paths: `'virtual-dom':'lib/virtual-dom'`
+ - intro: This demo shows how you can add a producers of actions to fable-virtualdom.
+*)
 
 // Load Fable.Core and bindings to JS global objects
 #r "node_modules/fable-core/Fable.Core.dll"

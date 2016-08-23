@@ -1,7 +1,7 @@
 {
     "module": "amd",
     "sourceMaps": true,
-    "projFile": "./react-sudoku.fsx",
+    "projFile": "./sudoku.fsx",
     "outDir": "out",
     "scripts": {
         "prebuild": "npm install",

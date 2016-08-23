@@ -258,5 +258,11 @@ deploy/
 build/
 .paket/paket.exe
 
+
 public/
-!samplesdemo_hmr/out/index.html
+
+# Generated documentation folder
+docs/output/
+
+# temp folder
+temp/
