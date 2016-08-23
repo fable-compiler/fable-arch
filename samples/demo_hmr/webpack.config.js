@@ -22,16 +22,16 @@ var cfg = {
         include: "path.join(__dirname, 'public')"
       }
     ]
-    ,
-    loaders: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        loaders: [
-          'webpack-module-hot-accept' // add this last
-        ]
-      }
-    ]
+    // ,
+    // loaders: [
+    //   {
+    //     test: /Entry\.js$/,
+    //     exclude: /node_modules/,
+    //     loaders: [
+    //       'webpack-module-hot-accept' // add this last
+    //     ]
+    //   }
+    // ]
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),

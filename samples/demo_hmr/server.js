@@ -18,5 +18,9 @@ var server = new WebpackDevServer(compiler, {
   stats: {
     colors: true,
   },
+  watchOptions: {
+    aggregateTimeout: 300,
+    poll: 1000
+  }
 });
 server.listen(8080, 'localhost', function() {});

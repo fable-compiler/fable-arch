@@ -16,34 +16,32 @@ open System
 open Herebris
 
 
-// [<Emit("module")>]
-// type Module =
-//   abstract hot: obj with get, set
+[<Emit("module")>]
+type Module =
+  abstract hot: obj with get, set
 
-// let [<Global>] [<Emit("module")>] Module : Module = failwith "JS only"
+let [<Global>] [<Emit("module")>] Module : Module = failwith "JS only"
 
-// if (Module.hot <> null) then
-//   Module.hot?accept() |> ignore
-//   console.log("module.hot: Found")
+if (Module.hot <> null) then
+  Module.hot?accept() |> ignore
 
-//   let appNode = document.getElementById "app"
+  let appNode = document.getElementById "app"
 
-//   Module.hot?dispose(fun _ ->
-//     appNode.removeChild(appNode.firstChild) |> ignore
-//   ) |> ignore
+  Module.hot?dispose(fun _ ->
+    appNode.removeChild(appNode.firstChild) |> ignore
+  ) |> ignore
 
 type Model =
   { Input: string
     Messages: string list}
   static member initial =
-    // if (unbox window?test <> null) then
-    //   let model = (unbox<string> window?storage)
-    //   ofJson<Model> model
-    // else
+    if (unbox window?storage <> null) then
+      unbox window?storage
+    else
       let model =
         { Input = ""
           Messages = []}
-      window?test <- toJson model
+      window?storage <- model
       model
 
 type Action =
@@ -56,7 +54,6 @@ let webSocket =
   WebSocket.Create("wss://echo.websocket.org")
 
 let update (model: Model) action =
-  coucou()
   let model', action' =
     match action with
     | ReceivedEcho msg ->
@@ -73,6 +70,8 @@ let update (model: Model) action =
     | SendEcho -> webSocket.send(model.Input)
     | _ -> ()
 
+  window?storage <- model'
+
   model', action'
 
 let inline onInput x = onEvent "oninput" (fun e -> x (unbox e?target?value))
@@ -88,6 +87,7 @@ let viewMessage msg =
     ]
 
 let view model =
+  Main.coucou()
   div
     []
     [ div
@@ -134,7 +134,3 @@ createApp Model.initial view update
 |> withStartNodeSelector "#app"
 |> withProducer webSocketProducer
 |> start renderer
-
-
-
-

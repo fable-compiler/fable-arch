@@ -259,4 +259,4 @@ build/
 .paket/paket.exe
 
 public/
-!samples/web_socket(with_auto_refresh)/out/index.html
+!samplesdemo_hmr/out/index.html

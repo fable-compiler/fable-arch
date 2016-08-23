@@ -107,4 +107,4 @@ module Herebris
     // createApp Model.initial view update
     // |> withProducer webSocketProducer
     // |> start renderer
-    let coucou () = console.log "maxime22"
+    let coucou () = console.log "maxime"
