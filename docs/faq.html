@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Tomas Jansson">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <link href='https://fonts.googleapis.com/css?family=Josefin+Sans:400,300,600,700|Roboto+Mono' rel='stylesheet' type='text/css'>
+    <link href="/content/custom.css" rel='stylesheet' type='text/css'>
+    <script src="/content/tips.js"></script>
+    <link rel="stylesheet" type="text/css" href="/content/snippets.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <script language="javascript" type="text/javascript">
+      function init() {
+          try {
+            websocket = new WebSocket("ws://"+window.location.host+"/websocket");
+            websocket.onmessage = function(evt) { location.reload(); };
+          } catch(e) { /* For local development only */ }
+      }
+      window.addEventListener("load", init, false);
+    </script>
+    
+  <title>FAQ - F# |> BABEL</title>
+  <meta name="description" content="Frequently asked questions about Fable">
+
+</head>
+<body>
+
+  <div class="fb-navbar">
+  <div class="container">
+  <nav class="navbar navbar-default">
+    <div class="navbar-wrapper">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="//fable-compiler.github.io/fable-virtualdom">Fable</a>
+      </div>
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li class=""><a href="//fable-compiler.github.io/fable-virtualdom">home</a></li>
+          <!--<li class=""><a href="//fable-compiler.github.io/fable-virtualdom/samples.html">samples</a></li>-->
+<!--          <li class=""><a href="//fable-compiler.github.io/fable-virtualdom/docs.html">docs</a></li>-->
+          <li><a href="https://github.com/fable-compiler/fable-virtualdom">source</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  </div>
+  </div>
+
+  <div class="fb-content-wrapper">
+  
+<div class="fb-heading">
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12">
+      <h1>FAQ</h1>
+      <p>Frequently asked questions about Fable</p>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="container fb-content">
+  <div class="row">
+    <div class="col-md-1 col-lg-2"></div>
+    <div class="col-sm-12 col-md-10 col-lg-8">
+      <h2><a name="How-does-this-relate-to-FunScript" class="anchor" href="#How-does-this-relate-to-FunScript">How does this relate to FunScript?</a></h2>
+<p>Fable takes a lot from FunScript and probably it wouldn't have been possible if FunScript didn't come first.
+But besides that it's completely a different project, the main differences are:</p>
+<ul>
+<li>
+Fable uses F# Compiler Services to generate the AST instead of quotations. This means it's not necessary to
+compile to .NET bytecode first.
+</li>
+<li>
+Fable doesn't generate JS code directly, rather transforms the F# AST into a new one which is passed to
+Babel.js. This way it's easier to target different EcmaScript versions or module systems when needed.
+</li>
+<li>
+One of the main goals of FunScript was to keep the full F# semantics, like generics or structural comparison.
+Fable sacrifices some of the semantics to generate cleaner and more idiomatic JS code.
+</li>
+<li>
+The generated code is structured using ES6 modules, making it much easier to interact with other JS
+development tools.
+</li>
+<li>
+Like FunScript, Fable <em>translates</em> TypeScript definition files to build foreign interfaces, but the latter uses
+plain .fs files instead of .dll assemblies, making it easier to edit the files if needed.
+</li>
+</ul>
+<p>In any case, I want to show my admiration to FunScript (which was created before the F# compiler and Babel
+exposed the language AST) and my gratitude to @ZachBray for his work :)</p>
+<h2><a name="What-was-the-best-moment-during-development" class="anchor" href="#What-was-the-best-moment-during-development">What was the best moment during development?</a></h2>
+<p>The best moment was when, after going through three different AST and JSON serialization,
+the compiler correctly transformed <code>1 + 1</code> into <code>1 + 1</code>.</p>
+<h2><a name="What-lessons-have-you-learned-developing-the-project" class="anchor" href="#What-lessons-have-you-learned-developing-the-project">What lessons have you learned developing the project?</a></h2>
+<p>While I was coding I prepared a cup of tea and drank it too quickly, burning my tongue.
+I learnt I must check first the temperature of the cup before drinking.</p>
+
+
+
+    </div>
+    <div class="col-md-1 col-lg-2"></div>
+  </div>
+</div>
+
+  </div>
+
+  <a class="gh-forkme" href="https://github.com/fable-compiler/Fable"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+</body>
+</html>
