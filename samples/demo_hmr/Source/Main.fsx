@@ -23,17 +23,19 @@ module Main =
       Messages: string list}
 
     static member initial =
+      #if DEV_HMR
       // This section is used to maintain state between HMR
       if isNotNull (unbox window?storage) then
         unbox window?storage
       else
         let model =
-          {
-            Input = ""
-            Messages = []
-          }
+          { Input = ""
+            Messages = [] }
         window?storage <- model
         model
+      #else
+      { Input = ""; Messages = [] }
+      #endif
 
   // Action support by the application
   type Action =
@@ -62,8 +64,10 @@ module Main =
       | SendEcho -> webSocket.send(model.Input)
       | _ -> ()
 
+    #if DEV_HMR
     // Update the model in storage
     window?storage <- model'
+    #endif
 
     model', action'
 

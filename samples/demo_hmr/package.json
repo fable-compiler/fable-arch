@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "fable-build": "node_modules/.bin/fable",
-    "fable-watch": "npm run fable-build -- -w",
+    "fable-watch": "npm run fable-build -- -w --symbols DEV_HMR",
     "wp-server": "node server.js",
     "dev": "node_modules/.bin/concurrently \"npm run fable-watch\" \"npm run wp-server\"",
-    "build": ""
+    "build": "rimraf public && \"node_modules/.bin/webpack\""
   },
   "author": "Maxime Mangel <mangel.maxime@outlook.com>",
   "license": "ISC",
@@ -31,6 +31,8 @@
     "webpack": "^1.13.2",
     "webpack-dev-server": "^1.15.0",
     "webpack-merge": "^0.14.1",
+    "rimraf": "^2.5.4",
+    "extract-text-webpack-plugin": "^1.0.1"
   },
   "dependencies": {
     "core-js": "^2.4.1",

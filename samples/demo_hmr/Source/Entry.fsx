@@ -9,12 +9,16 @@ open Fable.Import.Browser
 open Fable.Core.JsInterop
 open Helpers
 
+
+let contentNode = "#app"
+
+#if DEV_HMR
+
 type IModule =
   abstract hot: obj with get, set
 
 let [<Global>] [<Emit("module")>] Module : IModule = failwith "JS only"
 
-let contentNode = "#app"
 let node = document.querySelector contentNode
 
 if isNotNull Module.hot then
@@ -23,5 +27,6 @@ if isNotNull Module.hot then
   Module.hot?dispose(fun _ ->
     node.removeChild(node.firstChild) |> ignore
   ) |> ignore
+#endif
 
 Herebris.Main.start contentNode ()
