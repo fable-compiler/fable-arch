@@ -7,7 +7,8 @@
     "fable-build": "node_modules/.bin/fable",
     "fable-watch": "npm run fable-build -- -w",
     "wp-server": "node server.js",
-    "dev": "node_modules/.bin/concurrently \"npm run fable-watch\" \"npm run wp-server\""
+    "dev": "node_modules/.bin/concurrently \"npm run fable-watch\" \"npm run wp-server\"",
+    "build": ""
   },
   "author": "Maxime Mangel <mangel.maxime@outlook.com>",
   "license": "ISC",
@@ -25,11 +26,11 @@
     "poststylus": "^0.2.3",
     "source-map-loader": "^0.1.5",
     "style-loader": "^0.13.1",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^2.3.1",
     "webpack": "^1.13.2",
     "webpack-dev-server": "^1.15.0",
-    "webpack-module-hot-accept": "^1.0.4",
-    "stylus-loader": "^2.3.1",
-    "stylus": "^0.54.5"
+    "webpack-merge": "^0.14.1",
   },
   "dependencies": {
     "core-js": "^2.4.1",

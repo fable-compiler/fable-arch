@@ -1,16 +1,14 @@
 var path = require('path');
 var webpack = require('webpack');
+var merge = require('webpack-merge');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var poststylus = require('poststylus');
 
-var cfg = {
+var TARGET_ENV = process.env.npm_lifecycle_event === 'build' ? 'production' : 'development';
+
+var commonConfig = {
   devtool: 'source-map',
-  entry: [
-    './Source/index.js',
-    'webpack/hot/dev-server',
-    'webpack-dev-server/client?http://localhost:8080/',
-  ],
   output: {
     path: path.join(__dirname, "public"),
     publicPath: "",
@@ -27,15 +25,6 @@ var cfg = {
     ],
     loaders: [
       {
-        test: /\.styl$/,
-        exclude: /node_modules/,
-        loaders: [
-          'style-loader',
-          'css-loader',
-          'stylus-loader'
-        ]
-      },
-      {
         test: /\.(eot|ttf|woff|woff2|svg|png)$/,
         exclude: /node_modules/,
         loader: 'file-loader'
@@ -44,21 +33,94 @@ var cfg = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: 'Source/index.html',
+      template: 'Source/static/index.html',
       inject:   'body',
       filename: 'index.html'
     }),
     new CopyWebpackPlugin([
         {
-          from: 'Source/img/',
+          from: 'Source/static/img/',
           to:   'img/'
         }
-    ]),
-    new webpack.HotModuleReplacementPlugin(),
+    ])
   ],
   stylus: {
       use: [poststylus(['autoprefixer'])]
   }
 };
 
-module.exports = cfg;
+if ( TARGET_ENV === 'development' ) {
+  console.log( 'Serving locally...');
+  module.exports = merge(commonConfig, {
+    entry: [
+      './Source/static/index.js',
+      'webpack/hot/dev-server',
+      'webpack-dev-server/client?http://localhost:8080/',
+    ],
+
+    module: {
+      loaders: [
+        {
+          test: /\.styl$/,
+          exclude: /node_modules/,
+          loaders: [
+            'style-loader',
+            'css-loader',
+            'stylus-loader'
+          ]
+        }
+      ]
+    },
+
+    plugins: [
+      new webpack.HotModuleReplacementPlugin(),
+    ]
+
+  });
+}
+
+if ( TARGET_ENV === 'production' ) {
+  console.log( 'Building for prod...');
+
+  module.exports = merge( commonConfig, {
+
+    entry: path.join( __dirname, 'Source/static/index.js' ),
+
+    module: {
+      loaders: [
+        {
+          test: /\.styl$/,
+          loader: ExtractTextPlugin.extract( 'style-loader', [
+            'css-loader',
+            'stylus-loader'
+          ])
+        }
+      ]
+    },
+
+    plugins: [
+      new CopyWebpackPlugin([
+        {
+          from: 'src/static/img/',
+          to:   'static/img/'
+        },
+        {
+          from: 'src/static/favicon.ico'
+        },
+      ]),
+
+      new webpack.optimize.OccurenceOrderPlugin(),
+
+      // extract CSS into a separate file
+      new ExtractTextPlugin( './[hash].css', { allChunks: true } ),
+
+      // minify & mangle JS/CSS
+      new webpack.optimize.UglifyJsPlugin({
+          minimize:   true,
+          compressor: { warnings: false }
+          // mangle:  true
+      })
+    ]
+
+  });
+}
