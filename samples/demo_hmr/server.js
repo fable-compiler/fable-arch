@@ -14,7 +14,6 @@ var server = new WebpackDevServer(compiler, {
   contentBase: 'out',
   hot: true,
   filename: 'bundle.js',
-  publicPath: '/public',
   stats: {
     colors: true,
   },
