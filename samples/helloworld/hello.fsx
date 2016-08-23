@@ -11,7 +11,7 @@ open Fable.Helpers.Virtualdom.Html
 // Model
 type Model = string
 
-type TodoAction =
+type Actions =
     | ChangeInput of string
 
 // Update
