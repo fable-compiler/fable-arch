@@ -7,7 +7,7 @@
     "build": "node_modules/.bin/fable",
     "watch": "npm run build -- -w",
     "dev": "node_modules/.bin/concurrently \"npm run watch\" \"npm run wp-server\"",
-    "wp-server": "node_modules/.bin/webpack-dev-server --hot"
+    "wp-server": "node server.js"
   },
   "author": "Maxime Mangel <mangel.maxime@outlook.com>",
   "license": "ISC",
@@ -18,7 +18,8 @@
     "html-webpack-plugin": "^2.22.0",
     "source-map-loader": "^0.1.5",
     "webpack": "^1.13.2",
-    "webpack-dev-server": "^1.15.0"
+    "webpack-dev-server": "^1.15.0",
+    "webpack-module-hot-accept": "^1.0.4"
   },
   "dependencies": {
     "core-js": "^2.4.1",

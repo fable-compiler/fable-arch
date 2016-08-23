@@ -1,5 +1,7 @@
 #r "../node_modules/fable-core/Fable.Core.dll"
 #load "../node_modules/fable-import-virtualdom/Fable.Helpers.Virtualdom.fs"
+#load "Main.fs"
+
 open Fable.Core
 open Fable.Core.JsInterop
 open Fable.Import
@@ -9,16 +11,40 @@ open Fable.Helpers.Virtualdom
 open Fable.Helpers.Virtualdom.App
 open Fable.Helpers.Virtualdom.Html
 
-
 open System
+
+open Herebris
+
+
+// [<Emit("module")>]
+// type Module =
+//   abstract hot: obj with get, set
+
+// let [<Global>] [<Emit("module")>] Module : Module = failwith "JS only"
+
+// if (Module.hot <> null) then
+//   Module.hot?accept() |> ignore
+//   console.log("module.hot: Found")
+
+//   let appNode = document.getElementById "app"
+
+//   Module.hot?dispose(fun _ ->
+//     appNode.removeChild(appNode.firstChild) |> ignore
+//   ) |> ignore
 
 type Model =
   { Input: string
     Messages: string list}
-
   static member initial =
-    { Input = ""
-      Messages = []}
+    // if (unbox window?test <> null) then
+    //   let model = (unbox<string> window?storage)
+    //   ofJson<Model> model
+    // else
+      let model =
+        { Input = ""
+          Messages = []}
+      window?test <- toJson model
+      model
 
 type Action =
   | NoOp
@@ -30,6 +56,7 @@ let webSocket =
   WebSocket.Create("wss://echo.websocket.org")
 
 let update (model: Model) action =
+  coucou()
   let model', action' =
     match action with
     | ReceivedEcho msg ->
@@ -80,7 +107,7 @@ let view model =
             ]
         ]
       input
-        [ onInput (fun x -> ChangeInput x)
+        [ onInput ChangeInput
           property "value" model.Input
           onEnter SendEcho NoOp ]
       button
@@ -92,7 +119,7 @@ let view model =
         [ text "Messages received:" ]
       div
         []
-        (model.Messages |> List.map(fun x -> viewMessage x))
+        (model.Messages |> List.map(viewMessage))
     ]
 
 let webSocketProducer push =
@@ -104,5 +131,10 @@ let webSocketProducer push =
 )
 
 createApp Model.initial view update
+|> withStartNodeSelector "#app"
 |> withProducer webSocketProducer
 |> start renderer
+
+
+
+

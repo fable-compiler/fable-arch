@@ -3,7 +3,11 @@ var webpack = require("webpack");
 
 var cfg = {
   devtool: "source-map",
-  entry: "./out/Main.js",
+  entry: [
+    "./out/Entry.js",
+    'webpack/hot/dev-server',
+    'webpack-dev-server/client?http://localhost:8080/',
+  ],
   output: {
     path: path.join(__dirname, "public"),
     publicPath: "/public/",
@@ -18,12 +22,20 @@ var cfg = {
         include: "path.join(__dirname, 'public')"
       }
     ]
+    ,
+    loaders: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loaders: [
+          'webpack-module-hot-accept' // add this last
+        ]
+      }
+    ]
   },
-  devServer: {
-    contentBase: "out/",
-    inline: true,
-    publicPath: "/public/"
-  }
+  plugins: [
+    new webpack.HotModuleReplacementPlugin(),
+  ]
 };
 
 module.exports = cfg;

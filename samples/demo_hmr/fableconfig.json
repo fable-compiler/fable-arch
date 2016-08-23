@@ -1,6 +1,6 @@
 {
   "module": "amd",
   "sourceMaps": true,
-  "projFile": "./Source/Main.fsx",
+  "projFile": "./Source/Entry.fsx",
   "outDir": "out"
 }
