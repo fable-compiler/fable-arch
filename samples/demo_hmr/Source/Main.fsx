@@ -19,8 +19,7 @@ open Helpers
 module Main =
 
   type Model =
-    { Input: string
-      Messages: string list}
+    { Input: string }
 
     static member initial =
       #if DEV_HMR
@@ -28,41 +27,22 @@ module Main =
       if isNotNull (unbox window?storage) then
         unbox window?storage
       else
-        let model =
-          { Input = ""
-            Messages = [] }
+        let model = { Input = "" }
         window?storage <- model
         model
       #else
-      { Input = ""; Messages = [] }
+      { Input = "" }
       #endif
 
-  // Action support by the application
-  type Action =
-    | NoOp
+  // Actions supported by the application
+  type Actions =
     | ChangeInput of string
-    | SendEcho
-    | ReceivedEcho of string
-
-  let webSocket =
-    WebSocket.Create("wss://echo.websocket.org")
 
   let update (model: Model) action =
     let model', action' =
       match action with
-      | ReceivedEcho msg ->
-        { model with Messages = msg :: model.Messages } ,[]
       | ChangeInput s ->
-        { model with Input = s }, []
-      | SendEcho ->
-        { model with Input = "" }, []
-      | _ ->
-        model, []
-
-    let jsCall =
-      match action with
-      | SendEcho -> webSocket.send(model.Input)
-      | _ -> ()
+        { model with Input = s } , []
 
     #if DEV_HMR
     // Update the model in storage
@@ -71,63 +51,25 @@ module Main =
 
     model', action'
 
+  /// Custom binding for inInput. This directly give the value
   let inline onInput x = onEvent "oninput" (fun e -> x (unbox e?target?value))
-  let onEnter succ nop = onKeyup (fun x -> if (unbox x?keyCode) = 13 then succ else nop)
-
-  let viewMessage msg =
-    div
-      []
-      [ span
-          []
-          [ text msg ]
-        br []
-      ]
-
+  /// View
   let view model =
     div
       []
-      [ div
+      [
+        label
           []
-          [ text "Guide"
-            ol
-              []
-              [ li
-                  []
-                  [ text "Enter your text" ]
-                li
-                  []
-                  [ text "Press enter or click the button" ]
-                li
-                  []
-                  [ text "See the message been received and added to the list" ]
-              ]
-          ]
+          [text "Enter name: "]
         input
-          [ onInput ChangeInput
-            property "value" model.Input
-            onEnter SendEcho NoOp ]
-        button
-          [ onMouseClick (fun _ -> SendEcho) ]
-          [ text "Send" ]
+          [ onInput ChangeInput ]
         br []
         span
           []
-          [ text "Messages received:" ]
-        div
-          []
-          (model.Messages |> List.map(viewMessage))
+          [text (sprintf "Hello %s" model.Input)]
       ]
-
-  let webSocketProducer push =
-    webSocket.addEventListener_message(
-      Func<_,_>(fun e ->
-        push(ReceivedEcho (unbox e.data))
-        null
-    )
-  )
 
   let start node () =
     createApp Model.initial view update
     |> withStartNodeSelector node
-    |> withProducer webSocketProducer
     |> start renderer
