@@ -13,7 +13,6 @@ var compiler = webpack(config);
 var server = new WebpackDevServer(compiler, {
   contentBase: 'out',
   hot: true,
-  filename: 'bundle.js',
   stats: {
     colors: true,
   },

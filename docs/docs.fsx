@@ -30,7 +30,8 @@ open Fake.Git
 
 // Where to push generated documentation
 let publishSite = "//fable-compiler.github.io/fable-virtualdom"
-let githubLink = "http://github.com/fable-compiler/fable-virtualdom"
+//let githubLink = "http://github.com/fable-compiler/fable-virtualdom"
+let githubLink = "git@github.com:fable-compiler/fable-virtualdom.git"
 let publishBranch = "gh-pages"
 
 // Paths with template/source/output locations
@@ -228,6 +229,7 @@ type Sample =
     Name : string
     Title : string
     Tagline : string
+    GithubLink : string 
     Introduction : string
     Document : string
     RequirePaths : string
@@ -260,6 +262,7 @@ let generateSamplePage siteRoot name path =
         else "", "" ),
       ( if attrs.ContainsKey("app-style") then attrs.["app-style"] else "" )
 
+    let githubLink = sprintf "https://github.com/fable-compiler/fable-virtualdom/tree/master/samples/%s" name
     // Require paths are specified using ` .. ` - drop <code>
     let requirePaths = 
       if not (attrs.ContainsKey("require-paths")) then "" else
@@ -271,6 +274,7 @@ let generateSamplePage siteRoot name path =
           Active = "samples"; Name = name; Document = document
           Application = app; Head = appHead; RequirePaths = requirePaths
           Title = attrs.["title"]
+          GithubLink = githubLink
           Introduction = if attrs.ContainsKey("intro") then attrs.["intro"] else ""
           Tagline = attrs.["tagline"]
           AppStyle = appStyle }
@@ -378,7 +382,7 @@ Target "BrowseDocs" (fun _ ->
 
 Target "PublishDocs" (fun _ ->
   CleanDir temp
-  Repository.cloneSingleBranch "" (githubLink + ".git") publishBranch temp
+  Repository.cloneSingleBranch "" githubLink publishBranch temp
 
   CopyRecursive output temp true |> tracefn "%A"
   StageAll temp
