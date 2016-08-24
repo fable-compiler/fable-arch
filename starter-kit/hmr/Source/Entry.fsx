@@ -29,4 +29,4 @@ if isNotNull Module.hot then
   ) |> ignore
 #endif
 
-Herebris.Main.start contentNode ()
+App.Main.start contentNode ()

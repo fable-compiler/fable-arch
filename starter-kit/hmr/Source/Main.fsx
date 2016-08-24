@@ -2,7 +2,7 @@
 #load "../node_modules/fable-import-virtualdom/Fable.Helpers.Virtualdom.fs"
 #load "Helpers.fsx"
 
-namespace Herebris
+namespace App
 
 open Fable.Core
 open Fable.Core.JsInterop
