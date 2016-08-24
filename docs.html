@@ -30,8 +30,8 @@
       window.addEventListener("load", init, false);
     </script>
     
-  <title>Fable documentation - F# |> BABEL</title>
-  <meta name="description" content="Learn about how Fable works &amp; how to use it">
+  <title>Fable-virtualdom documentation - F# |> BABEL</title>
+  <meta name="description" content="Learn about how Fable-virtual works &amp; how to use it">
 
 </head>
 <body>
@@ -53,7 +53,7 @@
         <ul class="nav navbar-nav">
           <li class=""><a href="//fable-compiler.github.io/fable-virtualdom">home</a></li>
           <!--<li class=""><a href="//fable-compiler.github.io/fable-virtualdom/samples.html">samples</a></li>-->
-<!--          <li class="active"><a href="//fable-compiler.github.io/fable-virtualdom/docs.html">docs</a></li>-->
+          <li class="active"><a href="//fable-compiler.github.io/fable-virtualdom/docs.html">docs</a></li>
           <li><a href="https://github.com/fable-compiler/fable-virtualdom">source</a></li>
         </ul>
       </div>
@@ -68,8 +68,8 @@
 <div class="container">
   <div class="row">
     <div class="col-sm-12">
-      <h1>Fable documentation</h1>
-      <p>Learn about how Fable works &amp; how to use it</p>
+      <h1>Fable-virtualdom documentation</h1>
+      <p>Learn about how Fable-virtual works &amp; how to use it</p>
     </div>
   </div>
 </div>
@@ -80,31 +80,16 @@
     <div class="col-md-1 col-lg-2"></div>
     <div class="col-sm-12 col-md-10 col-lg-8">
       <p>The following documentation pages are generated from the <code>docs</code> pages
-in the Fable repository on GitHub. Is anything unclear or missing?
-Help us make Fable better by contributing!</p>
+in the fable-virtualdom repository on GitHub. These documents are not
+complete and we will add to them as the time goes. Is anything unclear
+or missing? Help us make fable-virtualdom and Fable better by contributing!</p>
 <div class="fb-docs">
 <div class="row"><div class="col-sm-6">
-<h3><a name="i-class-fa-fa-cog-aria-hidden-true-i-Compiling-to-JavaScript" class="anchor" href="#i-class-fa-fa-cog-aria-hidden-true-i-Compiling-to-JavaScript"><a href="docs/compiling.html"><i class="fa fa-cog" aria-hidden="true"></i> Compiling to JavaScript</a></a></h3>
-<p>Start here! The page covers all you need to get started
-with Fable. This includes the <code>fable</code> command parameters, <code>fableconfig.json</code> file,
-using Fable through Polyfill, modules, debugging, testing and more.</p>
-</div><div class="col-sm-6">
-<h3><a name="i-class-fa-fa-refresh-aria-hidden-true-i-F-language-and-library-compatibility" class="anchor" href="#i-class-fa-fa-refresh-aria-hidden-true-i-F-language-and-library-compatibility"><a href="docs/compatibility.html"><i class="fa fa-refresh" aria-hidden="true"></i> F# language and library compatibility</a></a></h3>
-<p>Provides details about the compatibility. This page explains how are primitive
-F# and CLR types compiled to JavaScript, which F# and CLR classes are supported
-and how they are translated.</p>
-</div></div>
-<div class="row"><div class="col-sm-6">
-<h3><a name="i-class-fa-fa-globe-aria-hidden-true-i-Interacting-with-JavaScript" class="anchor" href="#i-class-fa-fa-globe-aria-hidden-true-i-Interacting-with-JavaScript"><a href="docs/interacting.html"><i class="fa fa-globe" aria-hidden="true"></i> Interacting with JavaScript</a></a></h3>
-<p>How to call JavaScript libraries? With Fable, you can use the dynamic operator
-and write <code>jsObject?foo</code>, you can use the <code>Emit</code> attribute, or define a foreign
-interface. There are a couple of special attributes too. Learn more here!</p>
-</div><div class="col-sm-6">
-<h3><a name="i-class-fa-fa-bank-aria-hidden-true-i-Fable-architecture" class="anchor" href="#i-class-fa-fa-bank-aria-hidden-true-i-Fable-architecture"><a href="docs/plugins.html"><i class="fa fa-bank" aria-hidden="true"></i> Fable architecture</a></a></h3>
-<p>Is it very easy to add features to Fable using plugins. The best example is <a href="https://github.com/fsprojects/Fable/tree/master/src/plugins/nunit/Fable.Plugins.NUnit.fsx">the
-plugin to transform NUnit tests into Mocha</a>.
-In order to understand the plugin system we'll review briefly how Fable works.</p>
-</div></div>
+<h3><a name="i-class-fa-fa-cog-aria-hidden-true-i-Hot-Module-Reloading-HMR" class="anchor" href="#i-class-fa-fa-cog-aria-hidden-true-i-Hot-Module-Reloading-HMR"><a href="docs/hmr.html"><i class="fa fa-cog" aria-hidden="true"></i> Hot Module Reloading (HMR)</a></a></h3>
+<p>Hot Module Reloading, or Replacement, is a feature where you inject update modules in a running
+application. This opens up the possibility to time travel in the application without loosing context.
+It also makes it easier to try out changes in the functionality while retaining the state of the
+application.</p>
 </div>
 
 

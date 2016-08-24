@@ -54,7 +54,7 @@
         <ul class="nav navbar-nav">
           <li class=""><a href="//fable-compiler.github.io/fable-virtualdom">home</a></li>
           <!--<li class="active"><a href="//fable-compiler.github.io/fable-virtualdom/samples.html">samples</a></li>-->
-<!--          <li class=""><a href="//fable-compiler.github.io/fable-virtualdom/docs.html">docs</a></li>-->
+          <li class=""><a href="//fable-compiler.github.io/fable-virtualdom/docs.html">docs</a></li>
           <li><a href="https://github.com/fable-compiler/fable-virtualdom">source</a></li>
         </ul>
       </div>
@@ -160,7 +160,7 @@
 <span class="c">// Model</span>
 <span class="k">type</span> <span onmouseout="hideTip(event, 'fs8', 17)" onmouseover="showTip(event, 'fs8', 17)" class="t">Model</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs9', 18)" onmouseover="showTip(event, 'fs9', 18)" class="t">string</span>
 
-<span class="k">type</span> <span onmouseout="hideTip(event, 'fs10', 19)" onmouseover="showTip(event, 'fs10', 19)" class="t">TodoAction</span> <span class="o">=</span>
+<span class="k">type</span> <span onmouseout="hideTip(event, 'fs10', 19)" onmouseover="showTip(event, 'fs10', 19)" class="t">Actions</span> <span class="o">=</span>
     | <span onmouseout="hideTip(event, 'fs11', 20)" onmouseover="showTip(event, 'fs11', 20)" class="p">ChangeInput</span> <span class="k">of</span> <span onmouseout="hideTip(event, 'fs9', 21)" onmouseover="showTip(event, 'fs9', 21)" class="t">string</span>
 
 <span class="c">// Update</span>
@@ -208,18 +208,18 @@
 <div class="tip" id="fs7">module Html<br /><br />from Fable.Helpers.Virtualdom</div>
 <div class="tip" id="fs8">type Model = string<br /><br />Full name: Hello.Model</div>
 <div class="tip" id="fs9">Multiple items<br />val string : value:&#39;T -&gt; string<br /><br />Full name: Microsoft.FSharp.Core.Operators.string<br /><br />--------------------<br />type string = System.String<br /><br />Full name: Microsoft.FSharp.Core.string</div>
-<div class="tip" id="fs10">type TodoAction = | ChangeInput of string<br /><br />Full name: Hello.TodoAction</div>
-<div class="tip" id="fs11">union case TodoAction.ChangeInput: string -&gt; TodoAction</div>
-<div class="tip" id="fs12">val update : model:&#39;a -&gt; msg:TodoAction -&gt; string<br /><br />Full name: Hello.update</div>
+<div class="tip" id="fs10">type Actions = | ChangeInput of string<br /><br />Full name: Hello.Actions</div>
+<div class="tip" id="fs11">union case Actions.ChangeInput: string -&gt; Actions</div>
+<div class="tip" id="fs12">val update : model:&#39;a -&gt; msg:Actions -&gt; string<br /><br />Full name: Hello.update</div>
 <div class="tip" id="fs13">val model : &#39;a</div>
-<div class="tip" id="fs14">val msg : TodoAction</div>
+<div class="tip" id="fs14">val msg : Actions</div>
 <div class="tip" id="fs15">val str : string</div>
 <div class="tip" id="fs16">val onInput : x:(&#39;a -&gt; &#39;b) -&gt; Attribute&lt;&#39;b&gt;<br /><br />Full name: Hello.onInput</div>
 <div class="tip" id="fs17">val x : (&#39;a -&gt; &#39;b)</div>
 <div class="tip" id="fs18">val onEvent : eventType:string -&gt; f:(obj -&gt; &#39;c) -&gt; Attribute&lt;&#39;c&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Events.onEvent</div>
 <div class="tip" id="fs19">val e : obj</div>
 <div class="tip" id="fs20">val unbox : value:obj -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Core.Operators.unbox</div>
-<div class="tip" id="fs21">val view : model:string -&gt; DomNode&lt;TodoAction&gt;<br /><br />Full name: Hello.view</div>
+<div class="tip" id="fs21">val view : model:string -&gt; DomNode&lt;Actions&gt;<br /><br />Full name: Hello.view</div>
 <div class="tip" id="fs22">val model : string</div>
 <div class="tip" id="fs23">val div : x:Attribute&lt;&#39;a&gt; list -&gt; (DomNode&lt;&#39;a&gt; list -&gt; DomNode&lt;&#39;a&gt;)<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Tags.div</div>
 <div class="tip" id="fs24">val label : x:Attribute&lt;&#39;a&gt; list -&gt; (DomNode&lt;&#39;a&gt; list -&gt; DomNode&lt;&#39;a&gt;)<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Tags.label</div>

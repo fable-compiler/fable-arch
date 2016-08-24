@@ -50,7 +50,7 @@
 	    Object.defineProperty(exports, "__esModule", {
 	        value: true
 	    });
-	    exports.TodoAction = undefined;
+	    exports.Actions = undefined;
 	    exports.update = update;
 	    exports.view = view;
 	
@@ -78,15 +78,15 @@
 	        };
 	    }();
 	
-	    var TodoAction = exports.TodoAction = function () {
-	        function TodoAction(caseName, fields) {
-	            _classCallCheck(this, TodoAction);
+	    var Actions = exports.Actions = function () {
+	        function Actions(caseName, fields) {
+	            _classCallCheck(this, Actions);
 	
 	            this.Case = caseName;
 	            this.Fields = fields;
 	        }
 	
-	        _createClass(TodoAction, [{
+	        _createClass(Actions, [{
 	            key: "Equals",
 	            value: function Equals(other) {
 	                return _fableCore.Util.equalsUnions(this, other);
@@ -98,10 +98,10 @@
 	            }
 	        }]);
 	
-	        return TodoAction;
+	        return Actions;
 	    }();
 	
-	    _fableCore.Util.setInterfaces(TodoAction.prototype, ["FSharpUnion", "System.IEquatable", "System.IComparable"], "Hello.TodoAction");
+	    _fableCore.Util.setInterfaces(Actions.prototype, ["FSharpUnion", "System.IEquatable", "System.IComparable"], "Hello.Actions");
 	
 	    function update(model, msg) {
 	        var str = msg.Fields[0];
@@ -121,7 +121,7 @@
 	            };
 	        }()(_fableCore.List.ofArray([new _FableHelpers.Html.Types.DomNode("Text", ["Enter name: "])])), new _FableHelpers.Html.Types.DomNode("VoidElement", [["input", _fableCore.List.ofArray([new _FableHelpers.Html.Types.Attribute("EventHandler", [["oninput", function (e) {
 	            return function (x) {
-	                return new TodoAction("ChangeInput", [x]);
+	                return new Actions("ChangeInput", [x]);
 	            }(e.target.value);
 	        }]])])]]), new _FableHelpers.Html.Types.DomNode("VoidElement", [["br", new _fableCore.List()]]), function () {
 	            var tagName = "span";
