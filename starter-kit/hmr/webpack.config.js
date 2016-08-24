@@ -20,8 +20,7 @@ var commonConfig = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: "source-map-loader",
-        include: "path.join(__dirname, 'public')"
+        loader: "source-map-loader"
       }
     ],
     loaders: [
