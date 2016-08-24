@@ -1,0 +1,45 @@
+{
+  "name": "fable-virtualdom-hmr-starter-kit",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "fable-build": "node_modules/.bin/fable",
+    "fable-watch": "npm run fable-build -- -w --symbols DEV_HMR",
+    "wp-server": "node server.js",
+    "dev": "node_modules/.bin/concurrently \"npm run fable-watch\" \"npm run wp-server\"",
+    "build": "rimraf public && \"node_modules/.bin/webpack\""
+  },
+  "author": "Maxime Mangel <mangel.maxime@outlook.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "autoprefixer": "^6.4.0",
+    "autoprefixer-stylus": "^0.9.4",
+    "concurrently": "^2.2.0",
+    "copy-webpack-plugin": "^3.0.1",
+    "css-loader": "^0.23.1",
+    "fable-compiler": "^0.5.6",
+    "fable-import-virtualdom": "^0.6.7",
+    "file-loader": "^0.9.0",
+    "html-webpack-plugin": "^2.22.0",
+    "postcss-loader": "^0.10.1",
+    "poststylus": "^0.2.3",
+    "source-map-loader": "^0.1.5",
+    "style-loader": "^0.13.1",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^2.3.1",
+    "webpack": "^1.13.2",
+    "webpack-dev-server": "^1.15.0",
+    "webpack-merge": "^0.14.1",
+    "rimraf": "^2.5.4",
+    "extract-text-webpack-plugin": "^1.0.1"
+  },
+  "dependencies": {
+    "core-js": "^2.4.1",
+    "fable-core": "^0.5.4",
+    "virtual-dom": "^2.1.1"
+  },
+  "engines": {
+    "fable": "^0.5.6"
+  }
+}
