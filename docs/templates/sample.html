@@ -11,7 +11,7 @@
   <div class="row">
     <div class="col-sm-12">
       <h1>{{ model.Title }}</h1>
-      <p>{{ model.Tagline }}</p>
+      <p>{{ model.Tagline }} (<a href="{{model.GithubLink}}">go to source</a>)</p>
     </div>
   </div>
 </div>
@@ -42,5 +42,4 @@
     <div class="col-md-1 col-lg-2"></div>
   </div>
 </div>
-<script src="./public/bundle.js"></script>
 {% endblock %}

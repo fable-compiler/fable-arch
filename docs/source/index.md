@@ -16,5 +16,3 @@ request [for the samples directory](https://github.com/fable-compiler/fable-virt
 * [Subscriber demo - sample that shows how to log everyting from the app to the console](samples/subscriberexample/index.html)
 * [Sudoku - port of https://github.com/forki/react-sudoku for comparison with fable-react](samples/sudoku/index.html)
 * [Todo MVC - the famous Todo MVC](samples/todomvc/index.html)
-
-* [Temporary link to HMR](docs/hmr.html)

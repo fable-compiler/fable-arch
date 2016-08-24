@@ -266,3 +266,5 @@ docs/output/
 
 # temp folder
 temp/
+
+.DS_Store
