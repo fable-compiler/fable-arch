@@ -378,22 +378,20 @@ module RouteParser =
             Parse: string -> 'TRoute option
             Route: 'TRoute -> string
         }
-        with 
-            static member create routes mapRoute =
-                {
-                    Parse = choose routes
-                    Route = mapRoute
-                } 
+    let createRouter routes mapRoute =
+        {
+            Parse = choose routes
+            Route = mapRoute
+        } 
 
     let routeProducer locationHandler router handler = 
         let changeHandler str =
             match router.Parse str with
-            | Some route -> handler route
+            | Some route -> route |> handler
             | None -> () 
         locationHandler.SubscribeToChange changeHandler
 
-    let routeSubscriber locationHandler mapToRoute router message = 
+    let routeSubscriber locationHandler router message = 
         message
-        |> mapToRoute
-        |> router.Route
+        |> router
         |> locationHandler.PushChange
