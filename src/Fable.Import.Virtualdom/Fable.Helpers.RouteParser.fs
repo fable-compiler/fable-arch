@@ -376,7 +376,7 @@ module RouteParser =
     type Router<'TRoute> =
         {
             Parse: string -> 'TRoute option
-            Route: 'TRoute -> string
+            Route: 'TRoute -> string option
         }
     let createRouter routes mapRoute =
         {
@@ -394,4 +394,6 @@ module RouteParser =
     let routeSubscriber locationHandler router message = 
         message
         |> router
-        |> locationHandler.PushChange
+        |> function
+            | Some s -> locationHandler.PushChange s
+            | None _ -> ()

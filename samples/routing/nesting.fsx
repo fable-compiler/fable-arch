@@ -59,14 +59,16 @@ let counterView model =
                   onDblClick (fun x -> ((Increment 10)))]
                 [ text (string "Increment")]
             div [ Style ["background-color", bgColor; "color", "white"]]
-                [text (string model)]
+                [text (string model.Count)]
             div [ Style ["border", "1px solid green";
                          "height", ((string (7 + model.Count)) + "px")]
                   onMouseClick (fun x -> (Decrement 1))
                   onDblClick (fun x -> (Decrement 5))]
                 [ text (string "Decrement")]
-            a [ attribute "href" "#counter1/56" ] [text "counter1"]
-            a [ attribute "href" "#counter2/156" ] [text "counter2"]
+            a [ attribute "href" "#counter1" ] [text "counter1"]
+            a [ attribute "href" "#counter2" ] [text "counter2"]
+            a [ attribute "href" (sprintf "#counter1/%i" (model.Count*2)) ] [text "counter1 with count"]
+            a [ attribute "href" (sprintf "#counter2/%i" -model.Count) ] [text "counter2 with count"]
         ]
 
 
@@ -76,8 +78,10 @@ type NestedAction =
     | Reset
     | Top of CounterAction
     | Bottom of CounterAction
-    | Show1 of int
-    | Show2 of int
+    | Show1
+    | Show2
+    | Show1WithCnt of int
+    | Show2WithCnt of int
 
 let nestedUpdate model action = 
     match action with
@@ -88,10 +92,14 @@ let nestedUpdate model action =
     | Bottom ca -> 
         let res = counterUpdate model.Bottom ca
         {model with Bottom = res}
-    | Show1 i -> 
+    | Show1WithCnt i -> 
         {model with Top = {model.Top with Show = true; Count = i}; Bottom = {model.Bottom with Show = false}}
-    | Show2 i -> 
+    | Show2WithCnt i -> 
         {model with Bottom = {model.Bottom with Show = true; Count = i}; Top = {model.Top with Show = false}}
+    | Show1 -> 
+        {model with Top = {model.Top with Show = true}; Bottom = {model.Bottom with Show = false}}
+    | Show2 -> 
+        {model with Bottom = {model.Bottom with Show = true}; Top = {model.Top with Show = false}}
 
 let nestedView model = 
     div []
@@ -114,13 +122,19 @@ open Fable.Helpers.RouteParser
 open Fable.Helpers.Parsing
 
 let routes = [
-    runM1 Show1 (pStaticStr "counter1" </.> pint)
-    runM1 Show2 (pStaticStr "counter2" </.> pint)
+    runM Show1 (pStaticStr "counter1" |> (drop >> _end))
+    runM Show2 (pStaticStr "counter2" |> (drop >> _end))
+    runM1 Show1WithCnt (pStaticStr "counter1" </.> pint)
+    runM1 Show2WithCnt (pStaticStr "counter2" </.> pint)
 ]
 let mapToRoute r = 
     match r with
-    | Show1 i -> sprintf "counter1/%i" i
-    | Show2 i -> sprintf "counter2/%i" i
+    | Show1 -> sprintf "counter1" |> Some
+    | Show2 -> sprintf "counter2" |> Some
+    | Show1WithCnt i -> sprintf "counter1/%i" i |> Some
+    | Show2WithCnt i -> sprintf "counter2/%i" i |> Some
+    | Reset -> sprintf " " |> Some
+    | _ -> None
 
 let router = createRouter routes mapToRoute
 
@@ -139,7 +153,7 @@ let locationHandler =
 let routerF m = 
     match m with
     | ActionReceived msg -> router.Route msg
-    | _ -> window.location.hash
+    | _ -> None
 
 createSimpleApp {Top = initCounter; Bottom = initCounter} nestedView nestedUpdate
 |> withStartNodeSelector "#nested-counter"
