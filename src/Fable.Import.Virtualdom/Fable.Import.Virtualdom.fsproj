@@ -41,7 +41,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Fable.Helpers.Virtualdom.fs" />
+    <Compile Include="Fable.Helpers.RouteParser.fs" />
     <Content Include="paket.references" />
+    <Compile Include="RouteParserTesting.fsx" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <Choose>
