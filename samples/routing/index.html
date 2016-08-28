@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Tomas Jansson">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <link href='https://fonts.googleapis.com/css?family=Josefin+Sans:400,300,600,700|Roboto+Mono' rel='stylesheet' type='text/css'>
+    <link href="/content/custom.css" rel='stylesheet' type='text/css'>
+    <script src="/content/tips.js"></script>
+    <link rel="stylesheet" type="text/css" href="/content/snippets.css" />
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <script language="javascript" type="text/javascript">
+      function init() {
+          try {
+            websocket = new WebSocket("ws://"+window.location.host+"/websocket");
+            websocket.onmessage = function(evt) { location.reload(); };
+          } catch(e) { /* For local development only */ }
+      }
+      window.addEventListener("load", init, false);
+    </script>
+    
+  <title>Nesting - how to nest "apps" with a counter as a example - F# |> BABEL</title>
+  
+  <meta name="description" content="Nesting application implemented with fable-virtualdom">
+
+</head>
+<body>
+
+  <div class="fb-navbar">
+  <div class="container">
+  <nav class="navbar navbar-default">
+    <div class="navbar-wrapper">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="//fable-compiler.github.io/fable-virtualdom">Fable</a>
+      </div>
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li class=""><a href="//fable-compiler.github.io/fable-virtualdom">home</a></li>
+          <!--<li class="active"><a href="//fable-compiler.github.io/fable-virtualdom/samples.html">samples</a></li>-->
+          <li class=""><a href="//fable-compiler.github.io/fable-virtualdom/docs.html">docs</a></li>
+          <li><a href="https://github.com/fable-compiler/fable-virtualdom">source</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  </div>
+  </div>
+
+  <div class="fb-content-wrapper">
+  
+<div class="fb-heading">
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12">
+      <h1>Nesting - how to nest "apps" with a counter as a example</h1>
+      <p>Nesting application implemented with fable-virtualdom (<a href="https://github.com/fable-compiler/fable-virtualdom/tree/master/samples/routing">go to source</a>)</p>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="container fb-content">
+  <div class="row">
+    <div class="col-md-1 col-lg-2"></div>
+    <div class="col-sm-12 col-md-10 col-lg-8">
+      <p>This is a simple "hello world" application.</p>
+    </div>
+    <div class="col-md-1 col-lg-2"></div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="app-container" style="width:800px; margin:20px auto 50px auto;">
+        
+		<div id="nested-counter"></div>
+    <script src="./public/bundle.js"></script>
+		
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-1 col-lg-2"></div>
+    <div class="col-sm-12 col-md-10 col-lg-8">
+      <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+<span class="l">17: </span>
+<span class="l">18: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="prep">#r</span> <span class="s">&quot;node_modules/fable-core/Fable.Core.dll&quot;</span>
+<span class="prep">#load</span> <span class="s">&quot;node_modules/fable-import-virtualdom/Fable.Helpers.Virtualdom.fs&quot;</span>
+<span class="prep">#load</span> <span class="s">&quot;node_modules/fable-import-virtualdom/Fable.Helpers.RouteParser.fs&quot;</span>
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 1)" onmouseover="showTip(event, 'fs1', 1)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs2', 2)" onmouseover="showTip(event, 'fs2', 2)" class="i">Core</span>
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 3)" onmouseover="showTip(event, 'fs1', 3)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs3', 4)" onmouseover="showTip(event, 'fs3', 4)" class="i">Import</span>
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 5)" onmouseover="showTip(event, 'fs1', 5)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs3', 6)" onmouseover="showTip(event, 'fs3', 6)" class="i">Import</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs4', 7)" onmouseover="showTip(event, 'fs4', 7)" class="i">Browser</span>
+
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 8)" onmouseover="showTip(event, 'fs1', 8)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 9)" onmouseover="showTip(event, 'fs5', 9)" class="i">Helpers</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs6', 10)" onmouseover="showTip(event, 'fs6', 10)" class="i">Virtualdom</span>
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 11)" onmouseover="showTip(event, 'fs1', 11)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 12)" onmouseover="showTip(event, 'fs5', 12)" class="i">Helpers</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs6', 13)" onmouseover="showTip(event, 'fs6', 13)" class="i">Virtualdom</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 14)" onmouseover="showTip(event, 'fs7', 14)" class="i">App</span>
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 15)" onmouseover="showTip(event, 'fs1', 15)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 16)" onmouseover="showTip(event, 'fs5', 16)" class="i">Helpers</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs6', 17)" onmouseover="showTip(event, 'fs6', 17)" class="i">Virtualdom</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs8', 18)" onmouseover="showTip(event, 'fs8', 18)" class="i">Html</span>
+
+<span class="c">// model</span>
+<span class="k">type</span> <span onmouseout="hideTip(event, 'fs9', 19)" onmouseover="showTip(event, 'fs9', 19)" class="t">Model</span> <span class="o">=</span> 
+    {
+        <span onmouseout="hideTip(event, 'fs10', 20)" onmouseover="showTip(event, 'fs10', 20)" class="i">Count</span><span class="o">:</span> <span onmouseout="hideTip(event, 'fs11', 21)" onmouseover="showTip(event, 'fs11', 21)" class="t">int</span>
+        <span onmouseout="hideTip(event, 'fs12', 22)" onmouseover="showTip(event, 'fs12', 22)" class="i">Show</span><span class="o">:</span> <span onmouseout="hideTip(event, 'fs13', 23)" onmouseover="showTip(event, 'fs13', 23)" class="t">bool</span>
+    }
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs14', 24)" onmouseover="showTip(event, 'fs14', 24)" class="i">initCounter</span> <span class="o">=</span> {<span class="i">Count</span> <span class="o">=</span> <span class="n">0</span>; <span class="i">Show</span> <span class="o">=</span> <span class="k">true</span>}
+</code></pre></td>
+</tr>
+</table>
+<p>The model for the first example is a simple integer that will act as hour counter.
+We also provide a default value for our counter.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+<span class="l">17: </span>
+<span class="l">18: </span>
+<span class="l">19: </span>
+<span class="l">20: </span>
+<span class="l">21: </span>
+<span class="l">22: </span>
+<span class="l">23: </span>
+<span class="l">24: </span>
+<span class="l">25: </span>
+<span class="l">26: </span>
+<span class="l">27: </span>
+<span class="l">28: </span>
+<span class="l">29: </span>
+<span class="l">30: </span>
+<span class="l">31: </span>
+<span class="l">32: </span>
+<span class="l">33: </span>
+<span class="l">34: </span>
+<span class="l">35: </span>
+<span class="l">36: </span>
+<span class="l">37: </span>
+<span class="l">38: </span>
+<span class="l">39: </span>
+<span class="l">40: </span>
+<span class="l">41: </span>
+<span class="l">42: </span>
+<span class="l">43: </span>
+<span class="l">44: </span>
+<span class="l">45: </span>
+<span class="l">46: </span>
+<span class="l">47: </span>
+<span class="l">48: </span>
+<span class="l">49: </span>
+<span class="l">50: </span>
+<span class="l">51: </span>
+<span class="l">52: </span>
+<span class="l">53: </span>
+<span class="l">54: </span>
+<span class="l">55: </span>
+<span class="l">56: </span>
+<span class="l">57: </span>
+<span class="l">58: </span>
+<span class="l">59: </span>
+<span class="l">60: </span>
+<span class="l">61: </span>
+<span class="l">62: </span>
+<span class="l">63: </span>
+<span class="l">64: </span>
+<span class="l">65: </span>
+<span class="l">66: </span>
+<span class="l">67: </span>
+<span class="l">68: </span>
+<span class="l">69: </span>
+<span class="l">70: </span>
+<span class="l">71: </span>
+<span class="l">72: </span>
+<span class="l">73: </span>
+<span class="l">74: </span>
+<span class="l">75: </span>
+<span class="l">76: </span>
+<span class="l">77: </span>
+<span class="l">78: </span>
+<span class="l">79: </span>
+<span class="l">80: </span>
+<span class="l">81: </span>
+<span class="l">82: </span>
+<span class="l">83: </span>
+<span class="l">84: </span>
+<span class="l">85: </span>
+<span class="l">86: </span>
+<span class="l">87: </span>
+<span class="l">88: </span>
+<span class="l">89: </span>
+<span class="l">90: </span>
+<span class="l">91: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// Update</span>
+
+<span class="k">type</span> <span onmouseout="hideTip(event, 'fs15', 25)" onmouseover="showTip(event, 'fs15', 25)" class="t">CounterAction</span> <span class="o">=</span>
+    | <span onmouseout="hideTip(event, 'fs16', 26)" onmouseover="showTip(event, 'fs16', 26)" class="p">Decrement</span> <span class="k">of</span> <span onmouseout="hideTip(event, 'fs11', 27)" onmouseover="showTip(event, 'fs11', 27)" class="t">int</span>
+    | <span onmouseout="hideTip(event, 'fs17', 28)" onmouseover="showTip(event, 'fs17', 28)" class="p">Increment</span> <span class="k">of</span> <span onmouseout="hideTip(event, 'fs11', 29)" onmouseover="showTip(event, 'fs11', 29)" class="t">int</span>
+
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs18', 30)" onmouseover="showTip(event, 'fs18', 30)" class="f">counterUpdate</span> <span onmouseout="hideTip(event, 'fs19', 31)" onmouseover="showTip(event, 'fs19', 31)" class="i">model</span> <span onmouseout="hideTip(event, 'fs20', 32)" onmouseover="showTip(event, 'fs20', 32)" class="i">command</span> <span class="o">=</span>
+    <span class="k">match</span> <span onmouseout="hideTip(event, 'fs20', 33)" onmouseover="showTip(event, 'fs20', 33)" class="i">command</span> <span class="k">with</span>
+    | <span onmouseout="hideTip(event, 'fs16', 34)" onmouseover="showTip(event, 'fs16', 34)" class="p">Decrement</span> <span onmouseout="hideTip(event, 'fs21', 35)" onmouseover="showTip(event, 'fs21', 35)" class="i">x</span> <span class="k">-&gt;</span> {<span onmouseout="hideTip(event, 'fs19', 36)" onmouseover="showTip(event, 'fs19', 36)" class="i">model</span> <span class="k">with</span> <span class="i">Count</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs19', 37)" onmouseover="showTip(event, 'fs19', 37)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs10', 38)" onmouseover="showTip(event, 'fs10', 38)" class="i">Count</span> <span class="o">-</span> <span onmouseout="hideTip(event, 'fs21', 39)" onmouseover="showTip(event, 'fs21', 39)" class="i">x</span> }
+    | <span onmouseout="hideTip(event, 'fs17', 40)" onmouseover="showTip(event, 'fs17', 40)" class="p">Increment</span> <span onmouseout="hideTip(event, 'fs21', 41)" onmouseover="showTip(event, 'fs21', 41)" class="i">x</span> <span class="k">-&gt;</span> {<span onmouseout="hideTip(event, 'fs19', 42)" onmouseover="showTip(event, 'fs19', 42)" class="i">model</span> <span class="k">with</span> <span class="i">Count</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs19', 43)" onmouseover="showTip(event, 'fs19', 43)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs10', 44)" onmouseover="showTip(event, 'fs10', 44)" class="i">Count</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs21', 45)" onmouseover="showTip(event, 'fs21', 45)" class="i">x</span> }
+
+<span class="c">// View</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs22', 46)" onmouseover="showTip(event, 'fs22', 46)" class="f">counterView</span> <span onmouseout="hideTip(event, 'fs19', 47)" onmouseover="showTip(event, 'fs19', 47)" class="i">model</span> <span class="o">=</span>
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs23', 48)" onmouseover="showTip(event, 'fs23', 48)" class="i">bgColor</span> <span class="o">=</span>
+        <span class="k">match</span> <span onmouseout="hideTip(event, 'fs19', 49)" onmouseover="showTip(event, 'fs19', 49)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs10', 50)" onmouseover="showTip(event, 'fs10', 50)" class="i">Count</span> <span class="k">with</span>
+        | <span onmouseout="hideTip(event, 'fs21', 51)" onmouseover="showTip(event, 'fs21', 51)" class="i">x</span> <span class="k">when</span> <span onmouseout="hideTip(event, 'fs21', 52)" onmouseover="showTip(event, 'fs21', 52)" class="i">x</span> <span class="o">&gt;</span> <span class="n">10</span> <span class="k">-&gt;</span> <span class="s">&quot;red&quot;</span>
+        | <span onmouseout="hideTip(event, 'fs21', 53)" onmouseover="showTip(event, 'fs21', 53)" class="i">x</span> <span class="k">when</span> <span onmouseout="hideTip(event, 'fs21', 54)" onmouseover="showTip(event, 'fs21', 54)" class="i">x</span> <span class="o">&lt;</span> <span class="n">0</span> <span class="k">-&gt;</span> <span class="s">&quot;blue&quot;</span>
+        | _ <span class="k">-&gt;</span> <span class="s">&quot;green&quot;</span>
+    
+    <span onmouseout="hideTip(event, 'fs24', 55)" onmouseover="showTip(event, 'fs24', 55)" class="f">div</span> [ <span onmouseout="hideTip(event, 'fs25', 56)" onmouseover="showTip(event, 'fs25', 56)" class="p">Style</span> [<span class="s">&quot;display&quot;</span>, <span class="k">if</span> <span onmouseout="hideTip(event, 'fs19', 57)" onmouseover="showTip(event, 'fs19', 57)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs12', 58)" onmouseover="showTip(event, 'fs12', 58)" class="i">Show</span> <span class="k">then</span> <span class="s">&quot;&quot;</span> <span class="k">else</span> <span class="s">&quot;none&quot;</span>] ]
+        [
+            <span onmouseout="hideTip(event, 'fs24', 59)" onmouseover="showTip(event, 'fs24', 59)" class="f">div</span> [ <span onmouseout="hideTip(event, 'fs25', 60)" onmouseover="showTip(event, 'fs25', 60)" class="p">Style</span> [<span class="s">&quot;width&quot;</span>, <span class="s">&quot;120px&quot;</span>; <span class="s">&quot;height&quot;</span>, <span class="s">&quot;120px&quot;</span>] ] [
+                <span onmouseout="hideTip(event, 'fs26', 61)" onmouseover="showTip(event, 'fs26', 61)" class="f">svg</span> [ <span onmouseout="hideTip(event, 'fs27', 62)" onmouseover="showTip(event, 'fs27', 62)" class="f">width</span> <span class="s">&quot;120&quot;</span>; <span onmouseout="hideTip(event, 'fs28', 63)" onmouseover="showTip(event, 'fs28', 63)" class="f">height</span> <span class="s">&quot;120&quot;</span>; <span onmouseout="hideTip(event, 'fs29', 64)" onmouseover="showTip(event, 'fs29', 64)" class="f">viewBox</span> <span class="s">&quot;0 0 100 100&quot;</span> ]
+                    [ <span onmouseout="hideTip(event, 'fs30', 65)" onmouseover="showTip(event, 'fs30', 65)" class="f">rect</span> [<span onmouseout="hideTip(event, 'fs27', 66)" onmouseover="showTip(event, 'fs27', 66)" class="f">width</span> <span class="s">&quot;110&quot;</span>; <span onmouseout="hideTip(event, 'fs28', 67)" onmouseover="showTip(event, 'fs28', 67)" class="f">height</span> <span class="s">&quot;110&quot;</span>; <span onmouseout="hideTip(event, 'fs31', 68)" onmouseover="showTip(event, 'fs31', 68)" class="f">fill</span> <span onmouseout="hideTip(event, 'fs23', 69)" onmouseover="showTip(event, 'fs23', 69)" class="i">bgColor</span>] []]
+            ]
+            <span onmouseout="hideTip(event, 'fs24', 70)" onmouseover="showTip(event, 'fs24', 70)" class="f">div</span> [ <span onmouseout="hideTip(event, 'fs25', 71)" onmouseover="showTip(event, 'fs25', 71)" class="p">Style</span> [<span class="s">&quot;border&quot;</span>,<span class="s">&quot;1px solid blue&quot;</span>]
+                  <span onmouseout="hideTip(event, 'fs32', 72)" onmouseover="showTip(event, 'fs32', 72)" class="f">onMouseClick</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs33', 73)" onmouseover="showTip(event, 'fs33', 73)" class="i">x</span> <span class="k">-&gt;</span> (<span onmouseout="hideTip(event, 'fs17', 74)" onmouseover="showTip(event, 'fs17', 74)" class="p">Increment</span> <span class="n">1</span>))
+                  <span onmouseout="hideTip(event, 'fs34', 75)" onmouseover="showTip(event, 'fs34', 75)" class="f">onDblClick</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs33', 76)" onmouseover="showTip(event, 'fs33', 76)" class="i">x</span> <span class="k">-&gt;</span> ((<span onmouseout="hideTip(event, 'fs17', 77)" onmouseover="showTip(event, 'fs17', 77)" class="p">Increment</span> <span class="n">10</span>)))]
+                [ <span onmouseout="hideTip(event, 'fs35', 78)" onmouseover="showTip(event, 'fs35', 78)" class="f">text</span> (<span onmouseout="hideTip(event, 'fs36', 79)" onmouseover="showTip(event, 'fs36', 79)" class="f">string</span> <span class="s">&quot;Increment&quot;</span>)]
+            <span onmouseout="hideTip(event, 'fs24', 80)" onmouseover="showTip(event, 'fs24', 80)" class="f">div</span> [ <span onmouseout="hideTip(event, 'fs25', 81)" onmouseover="showTip(event, 'fs25', 81)" class="p">Style</span> [<span class="s">&quot;background-color&quot;</span>, <span onmouseout="hideTip(event, 'fs23', 82)" onmouseover="showTip(event, 'fs23', 82)" class="i">bgColor</span>; <span class="s">&quot;color&quot;</span>, <span class="s">&quot;white&quot;</span>]]
+                [<span onmouseout="hideTip(event, 'fs35', 83)" onmouseover="showTip(event, 'fs35', 83)" class="f">text</span> (<span onmouseout="hideTip(event, 'fs36', 84)" onmouseover="showTip(event, 'fs36', 84)" class="f">string</span> <span onmouseout="hideTip(event, 'fs19', 85)" onmouseover="showTip(event, 'fs19', 85)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs10', 86)" onmouseover="showTip(event, 'fs10', 86)" class="i">Count</span>)]
+            <span onmouseout="hideTip(event, 'fs24', 87)" onmouseover="showTip(event, 'fs24', 87)" class="f">div</span> [ <span onmouseout="hideTip(event, 'fs25', 88)" onmouseover="showTip(event, 'fs25', 88)" class="p">Style</span> [<span class="s">&quot;border&quot;</span>, <span class="s">&quot;1px solid green&quot;</span>;
+                         <span class="s">&quot;height&quot;</span>, ((<span onmouseout="hideTip(event, 'fs36', 89)" onmouseover="showTip(event, 'fs36', 89)" class="f">string</span> (<span class="n">7</span> <span class="o">+</span> <span onmouseout="hideTip(event, 'fs19', 90)" onmouseover="showTip(event, 'fs19', 90)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs10', 91)" onmouseover="showTip(event, 'fs10', 91)" class="i">Count</span>)) <span class="o">+</span> <span class="s">&quot;px&quot;</span>)]
+                  <span onmouseout="hideTip(event, 'fs32', 92)" onmouseover="showTip(event, 'fs32', 92)" class="f">onMouseClick</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs33', 93)" onmouseover="showTip(event, 'fs33', 93)" class="i">x</span> <span class="k">-&gt;</span> (<span onmouseout="hideTip(event, 'fs16', 94)" onmouseover="showTip(event, 'fs16', 94)" class="p">Decrement</span> <span class="n">1</span>))
+                  <span onmouseout="hideTip(event, 'fs34', 95)" onmouseover="showTip(event, 'fs34', 95)" class="f">onDblClick</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs33', 96)" onmouseover="showTip(event, 'fs33', 96)" class="i">x</span> <span class="k">-&gt;</span> (<span onmouseout="hideTip(event, 'fs16', 97)" onmouseover="showTip(event, 'fs16', 97)" class="p">Decrement</span> <span class="n">5</span>))]
+                [ <span onmouseout="hideTip(event, 'fs35', 98)" onmouseover="showTip(event, 'fs35', 98)" class="f">text</span> (<span onmouseout="hideTip(event, 'fs36', 99)" onmouseover="showTip(event, 'fs36', 99)" class="f">string</span> <span class="s">&quot;Decrement&quot;</span>)]
+            <span onmouseout="hideTip(event, 'fs37', 100)" onmouseover="showTip(event, 'fs37', 100)" class="f">a</span> [ <span onmouseout="hideTip(event, 'fs38', 101)" onmouseover="showTip(event, 'fs38', 101)" class="f">attribute</span> <span class="s">&quot;href&quot;</span> <span class="s">&quot;#counter1&quot;</span> ] [<span onmouseout="hideTip(event, 'fs35', 102)" onmouseover="showTip(event, 'fs35', 102)" class="f">text</span> <span class="s">&quot;counter1&quot;</span>]
+            <span onmouseout="hideTip(event, 'fs37', 103)" onmouseover="showTip(event, 'fs37', 103)" class="f">a</span> [ <span onmouseout="hideTip(event, 'fs38', 104)" onmouseover="showTip(event, 'fs38', 104)" class="f">attribute</span> <span class="s">&quot;href&quot;</span> <span class="s">&quot;#counter2&quot;</span> ] [<span onmouseout="hideTip(event, 'fs35', 105)" onmouseover="showTip(event, 'fs35', 105)" class="f">text</span> <span class="s">&quot;counter2&quot;</span>]
+            <span onmouseout="hideTip(event, 'fs37', 106)" onmouseover="showTip(event, 'fs37', 106)" class="f">a</span> [ <span onmouseout="hideTip(event, 'fs38', 107)" onmouseover="showTip(event, 'fs38', 107)" class="f">attribute</span> <span class="s">&quot;href&quot;</span> (<span onmouseout="hideTip(event, 'fs39', 108)" onmouseover="showTip(event, 'fs39', 108)" class="f">sprintf</span> <span class="s">&quot;#counter1/</span><span class="pf">%i</span><span class="s">&quot;</span> (<span onmouseout="hideTip(event, 'fs19', 109)" onmouseover="showTip(event, 'fs19', 109)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs10', 110)" onmouseover="showTip(event, 'fs10', 110)" class="i">Count</span><span class="o">*</span><span class="n">2</span>)) ] [<span onmouseout="hideTip(event, 'fs35', 111)" onmouseover="showTip(event, 'fs35', 111)" class="f">text</span> <span class="s">&quot;counter1 with count&quot;</span>]
+            <span onmouseout="hideTip(event, 'fs37', 112)" onmouseover="showTip(event, 'fs37', 112)" class="f">a</span> [ <span onmouseout="hideTip(event, 'fs38', 113)" onmouseover="showTip(event, 'fs38', 113)" class="f">attribute</span> <span class="s">&quot;href&quot;</span> (<span onmouseout="hideTip(event, 'fs39', 114)" onmouseover="showTip(event, 'fs39', 114)" class="f">sprintf</span> <span class="s">&quot;#counter2/</span><span class="pf">%i</span><span class="s">&quot;</span> <span class="o">-</span><span onmouseout="hideTip(event, 'fs19', 115)" onmouseover="showTip(event, 'fs19', 115)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs10', 116)" onmouseover="showTip(event, 'fs10', 116)" class="i">Count</span>) ] [<span onmouseout="hideTip(event, 'fs35', 117)" onmouseover="showTip(event, 'fs35', 117)" class="f">text</span> <span class="s">&quot;counter2 with count&quot;</span>]
+        ]
+
+
+<span class="k">type</span> <span onmouseout="hideTip(event, 'fs40', 118)" onmouseover="showTip(event, 'fs40', 118)" class="t">NestedModel</span> <span class="o">=</span> { <span onmouseout="hideTip(event, 'fs41', 119)" onmouseover="showTip(event, 'fs41', 119)" class="i">Top</span><span class="o">:</span> <span onmouseout="hideTip(event, 'fs9', 120)" onmouseover="showTip(event, 'fs9', 120)" class="t">Model</span>; <span onmouseout="hideTip(event, 'fs42', 121)" onmouseover="showTip(event, 'fs42', 121)" class="i">Bottom</span><span class="o">:</span> <span onmouseout="hideTip(event, 'fs9', 122)" onmouseover="showTip(event, 'fs9', 122)" class="t">Model</span>}
+
+<span class="k">type</span> <span onmouseout="hideTip(event, 'fs43', 123)" onmouseover="showTip(event, 'fs43', 123)" class="t">NestedAction</span> <span class="o">=</span> 
+    | <span onmouseout="hideTip(event, 'fs44', 124)" onmouseover="showTip(event, 'fs44', 124)" class="p">Reset</span>
+    | <span onmouseout="hideTip(event, 'fs45', 125)" onmouseover="showTip(event, 'fs45', 125)" class="p">Top</span> <span class="k">of</span> <span onmouseout="hideTip(event, 'fs15', 126)" onmouseover="showTip(event, 'fs15', 126)" class="t">CounterAction</span>
+    | <span onmouseout="hideTip(event, 'fs46', 127)" onmouseover="showTip(event, 'fs46', 127)" class="p">Bottom</span> <span class="k">of</span> <span onmouseout="hideTip(event, 'fs15', 128)" onmouseover="showTip(event, 'fs15', 128)" class="t">CounterAction</span>
+    | <span onmouseout="hideTip(event, 'fs47', 129)" onmouseover="showTip(event, 'fs47', 129)" class="p">Show1</span>
+    | <span onmouseout="hideTip(event, 'fs48', 130)" onmouseover="showTip(event, 'fs48', 130)" class="p">Show2</span>
+    | <span onmouseout="hideTip(event, 'fs49', 131)" onmouseover="showTip(event, 'fs49', 131)" class="p">Show1WithCnt</span> <span class="k">of</span> <span onmouseout="hideTip(event, 'fs11', 132)" onmouseover="showTip(event, 'fs11', 132)" class="t">int</span>
+    | <span onmouseout="hideTip(event, 'fs50', 133)" onmouseover="showTip(event, 'fs50', 133)" class="p">Show2WithCnt</span> <span class="k">of</span> <span onmouseout="hideTip(event, 'fs11', 134)" onmouseover="showTip(event, 'fs11', 134)" class="t">int</span>
+
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs51', 135)" onmouseover="showTip(event, 'fs51', 135)" class="f">nestedUpdate</span> <span onmouseout="hideTip(event, 'fs52', 136)" onmouseover="showTip(event, 'fs52', 136)" class="i">model</span> <span onmouseout="hideTip(event, 'fs53', 137)" onmouseover="showTip(event, 'fs53', 137)" class="i">action</span> <span class="o">=</span> 
+    <span class="k">match</span> <span onmouseout="hideTip(event, 'fs53', 138)" onmouseover="showTip(event, 'fs53', 138)" class="i">action</span> <span class="k">with</span>
+    | <span onmouseout="hideTip(event, 'fs44', 139)" onmouseover="showTip(event, 'fs44', 139)" class="p">Reset</span> <span class="k">-&gt;</span> {<span onmouseout="hideTip(event, 'fs45', 140)" onmouseover="showTip(event, 'fs45', 140)" class="i">Top</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs14', 141)" onmouseover="showTip(event, 'fs14', 141)" class="i">initCounter</span>; <span onmouseout="hideTip(event, 'fs46', 142)" onmouseover="showTip(event, 'fs46', 142)" class="i">Bottom</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs14', 143)" onmouseover="showTip(event, 'fs14', 143)" class="i">initCounter</span>}
+    | <span onmouseout="hideTip(event, 'fs45', 144)" onmouseover="showTip(event, 'fs45', 144)" class="p">Top</span> <span onmouseout="hideTip(event, 'fs54', 145)" onmouseover="showTip(event, 'fs54', 145)" class="i">ca</span> <span class="k">-&gt;</span> 
+        <span class="k">let</span> <span onmouseout="hideTip(event, 'fs55', 146)" onmouseover="showTip(event, 'fs55', 146)" class="i">res</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs18', 147)" onmouseover="showTip(event, 'fs18', 147)" class="f">counterUpdate</span> <span onmouseout="hideTip(event, 'fs52', 148)" onmouseover="showTip(event, 'fs52', 148)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs41', 149)" onmouseover="showTip(event, 'fs41', 149)" class="i">Top</span> <span onmouseout="hideTip(event, 'fs54', 150)" onmouseover="showTip(event, 'fs54', 150)" class="i">ca</span>
+        {<span onmouseout="hideTip(event, 'fs52', 151)" onmouseover="showTip(event, 'fs52', 151)" class="i">model</span> <span class="k">with</span> <span onmouseout="hideTip(event, 'fs45', 152)" onmouseover="showTip(event, 'fs45', 152)" class="i">Top</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs55', 153)" onmouseover="showTip(event, 'fs55', 153)" class="i">res</span>}
+    | <span onmouseout="hideTip(event, 'fs46', 154)" onmouseover="showTip(event, 'fs46', 154)" class="p">Bottom</span> <span onmouseout="hideTip(event, 'fs54', 155)" onmouseover="showTip(event, 'fs54', 155)" class="i">ca</span> <span class="k">-&gt;</span> 
+        <span class="k">let</span> <span onmouseout="hideTip(event, 'fs55', 156)" onmouseover="showTip(event, 'fs55', 156)" class="i">res</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs18', 157)" onmouseover="showTip(event, 'fs18', 157)" class="f">counterUpdate</span> <span onmouseout="hideTip(event, 'fs52', 158)" onmouseover="showTip(event, 'fs52', 158)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs42', 159)" onmouseover="showTip(event, 'fs42', 159)" class="i">Bottom</span> <span onmouseout="hideTip(event, 'fs54', 160)" onmouseover="showTip(event, 'fs54', 160)" class="i">ca</span>
+        {<span onmouseout="hideTip(event, 'fs52', 161)" onmouseover="showTip(event, 'fs52', 161)" class="i">model</span> <span class="k">with</span> <span onmouseout="hideTip(event, 'fs46', 162)" onmouseover="showTip(event, 'fs46', 162)" class="i">Bottom</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs55', 163)" onmouseover="showTip(event, 'fs55', 163)" class="i">res</span>}
+    | <span onmouseout="hideTip(event, 'fs49', 164)" onmouseover="showTip(event, 'fs49', 164)" class="p">Show1WithCnt</span> <span onmouseout="hideTip(event, 'fs56', 165)" onmouseover="showTip(event, 'fs56', 165)" class="i">i</span> <span class="k">-&gt;</span> 
+        {<span onmouseout="hideTip(event, 'fs52', 166)" onmouseover="showTip(event, 'fs52', 166)" class="i">model</span> <span class="k">with</span> <span onmouseout="hideTip(event, 'fs45', 167)" onmouseover="showTip(event, 'fs45', 167)" class="i">Top</span> <span class="o">=</span> {<span onmouseout="hideTip(event, 'fs52', 168)" onmouseover="showTip(event, 'fs52', 168)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs41', 169)" onmouseover="showTip(event, 'fs41', 169)" class="i">Top</span> <span class="k">with</span> <span class="i">Show</span> <span class="o">=</span> <span class="k">true</span>; <span class="i">Count</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs56', 170)" onmouseover="showTip(event, 'fs56', 170)" class="i">i</span>}; <span onmouseout="hideTip(event, 'fs46', 171)" onmouseover="showTip(event, 'fs46', 171)" class="i">Bottom</span> <span class="o">=</span> {<span onmouseout="hideTip(event, 'fs52', 172)" onmouseover="showTip(event, 'fs52', 172)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs42', 173)" onmouseover="showTip(event, 'fs42', 173)" class="i">Bottom</span> <span class="k">with</span> <span class="i">Show</span> <span class="o">=</span> <span class="k">false</span>}}
+    | <span onmouseout="hideTip(event, 'fs50', 174)" onmouseover="showTip(event, 'fs50', 174)" class="p">Show2WithCnt</span> <span onmouseout="hideTip(event, 'fs56', 175)" onmouseover="showTip(event, 'fs56', 175)" class="i">i</span> <span class="k">-&gt;</span> 
+        {<span onmouseout="hideTip(event, 'fs52', 176)" onmouseover="showTip(event, 'fs52', 176)" class="i">model</span> <span class="k">with</span> <span onmouseout="hideTip(event, 'fs46', 177)" onmouseover="showTip(event, 'fs46', 177)" class="i">Bottom</span> <span class="o">=</span> {<span onmouseout="hideTip(event, 'fs52', 178)" onmouseover="showTip(event, 'fs52', 178)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs42', 179)" onmouseover="showTip(event, 'fs42', 179)" class="i">Bottom</span> <span class="k">with</span> <span class="i">Show</span> <span class="o">=</span> <span class="k">true</span>; <span class="i">Count</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs56', 180)" onmouseover="showTip(event, 'fs56', 180)" class="i">i</span>}; <span onmouseout="hideTip(event, 'fs45', 181)" onmouseover="showTip(event, 'fs45', 181)" class="i">Top</span> <span class="o">=</span> {<span onmouseout="hideTip(event, 'fs52', 182)" onmouseover="showTip(event, 'fs52', 182)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs41', 183)" onmouseover="showTip(event, 'fs41', 183)" class="i">Top</span> <span class="k">with</span> <span class="i">Show</span> <span class="o">=</span> <span class="k">false</span>}}
+    | <span onmouseout="hideTip(event, 'fs47', 184)" onmouseover="showTip(event, 'fs47', 184)" class="p">Show1</span> <span class="k">-&gt;</span> 
+        {<span onmouseout="hideTip(event, 'fs52', 185)" onmouseover="showTip(event, 'fs52', 185)" class="i">model</span> <span class="k">with</span> <span onmouseout="hideTip(event, 'fs45', 186)" onmouseover="showTip(event, 'fs45', 186)" class="i">Top</span> <span class="o">=</span> {<span onmouseout="hideTip(event, 'fs52', 187)" onmouseover="showTip(event, 'fs52', 187)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs41', 188)" onmouseover="showTip(event, 'fs41', 188)" class="i">Top</span> <span class="k">with</span> <span class="i">Show</span> <span class="o">=</span> <span class="k">true</span>}; <span onmouseout="hideTip(event, 'fs46', 189)" onmouseover="showTip(event, 'fs46', 189)" class="i">Bottom</span> <span class="o">=</span> {<span onmouseout="hideTip(event, 'fs52', 190)" onmouseover="showTip(event, 'fs52', 190)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs42', 191)" onmouseover="showTip(event, 'fs42', 191)" class="i">Bottom</span> <span class="k">with</span> <span class="i">Show</span> <span class="o">=</span> <span class="k">false</span>}}
+    | <span onmouseout="hideTip(event, 'fs48', 192)" onmouseover="showTip(event, 'fs48', 192)" class="p">Show2</span> <span class="k">-&gt;</span> 
+        {<span onmouseout="hideTip(event, 'fs52', 193)" onmouseover="showTip(event, 'fs52', 193)" class="i">model</span> <span class="k">with</span> <span onmouseout="hideTip(event, 'fs46', 194)" onmouseover="showTip(event, 'fs46', 194)" class="i">Bottom</span> <span class="o">=</span> {<span onmouseout="hideTip(event, 'fs52', 195)" onmouseover="showTip(event, 'fs52', 195)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs42', 196)" onmouseover="showTip(event, 'fs42', 196)" class="i">Bottom</span> <span class="k">with</span> <span class="i">Show</span> <span class="o">=</span> <span class="k">true</span>}; <span onmouseout="hideTip(event, 'fs45', 197)" onmouseover="showTip(event, 'fs45', 197)" class="i">Top</span> <span class="o">=</span> {<span onmouseout="hideTip(event, 'fs52', 198)" onmouseover="showTip(event, 'fs52', 198)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs41', 199)" onmouseover="showTip(event, 'fs41', 199)" class="i">Top</span> <span class="k">with</span> <span class="i">Show</span> <span class="o">=</span> <span class="k">false</span>}}
+
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs57', 200)" onmouseover="showTip(event, 'fs57', 200)" class="f">nestedView</span> <span onmouseout="hideTip(event, 'fs52', 201)" onmouseover="showTip(event, 'fs52', 201)" class="i">model</span> <span class="o">=</span> 
+    <span onmouseout="hideTip(event, 'fs24', 202)" onmouseover="showTip(event, 'fs24', 202)" class="f">div</span> []
+        [
+            <span onmouseout="hideTip(event, 'fs8', 203)" onmouseover="showTip(event, 'fs8', 203)" class="t">Html</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs58', 204)" onmouseover="showTip(event, 'fs58', 204)" class="f">map</span> <span onmouseout="hideTip(event, 'fs45', 205)" onmouseover="showTip(event, 'fs45', 205)" class="p">Top</span> (<span onmouseout="hideTip(event, 'fs22', 206)" onmouseover="showTip(event, 'fs22', 206)" class="f">counterView</span> <span onmouseout="hideTip(event, 'fs52', 207)" onmouseover="showTip(event, 'fs52', 207)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs41', 208)" onmouseover="showTip(event, 'fs41', 208)" class="i">Top</span>)
+            <span onmouseout="hideTip(event, 'fs8', 209)" onmouseover="showTip(event, 'fs8', 209)" class="t">Html</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs58', 210)" onmouseover="showTip(event, 'fs58', 210)" class="f">map</span> <span onmouseout="hideTip(event, 'fs46', 211)" onmouseover="showTip(event, 'fs46', 211)" class="p">Bottom</span> (<span onmouseout="hideTip(event, 'fs22', 212)" onmouseover="showTip(event, 'fs22', 212)" class="f">counterView</span> <span onmouseout="hideTip(event, 'fs52', 213)" onmouseover="showTip(event, 'fs52', 213)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs42', 214)" onmouseover="showTip(event, 'fs42', 214)" class="i">Bottom</span>)
+            <span onmouseout="hideTip(event, 'fs59', 215)" onmouseover="showTip(event, 'fs59', 215)" class="f">button</span> 
+                [
+                    <span onmouseout="hideTip(event, 'fs32', 216)" onmouseover="showTip(event, 'fs32', 216)" class="f">onMouseClick</span> (<span class="k">fun</span> _ <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs44', 217)" onmouseover="showTip(event, 'fs44', 217)" class="p">Reset</span>)
+                ]
+                [
+                    <span onmouseout="hideTip(event, 'fs35', 218)" onmouseover="showTip(event, 'fs35', 218)" class="f">text</span> <span class="s">&quot;Reset&quot;</span>
+                ]
+        ]
+
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs60', 219)" onmouseover="showTip(event, 'fs60', 219)" class="f">resetEveryTenth</span> <span onmouseout="hideTip(event, 'fs61', 220)" onmouseover="showTip(event, 'fs61', 220)" class="f">h</span> <span class="o">=</span>
+    <span onmouseout="hideTip(event, 'fs62', 221)" onmouseover="showTip(event, 'fs62', 221)" class="i">window</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs63', 222)" onmouseover="showTip(event, 'fs63', 222)" class="f">setInterval</span>((<span class="k">fun</span> _ <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs44', 223)" onmouseover="showTip(event, 'fs44', 223)" class="p">Reset</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs61', 224)" onmouseover="showTip(event, 'fs61', 224)" class="f">h</span>), <span class="n">10000</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs64', 225)" onmouseover="showTip(event, 'fs64', 225)" class="f">ignore</span>
+
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 226)" onmouseover="showTip(event, 'fs1', 226)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 227)" onmouseover="showTip(event, 'fs5', 227)" class="i">Helpers</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs65', 228)" onmouseover="showTip(event, 'fs65', 228)" class="i">RouteParser</span>
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 229)" onmouseover="showTip(event, 'fs1', 229)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 230)" onmouseover="showTip(event, 'fs5', 230)" class="i">Helpers</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs66', 231)" onmouseover="showTip(event, 'fs66', 231)" class="i">Parsing</span>
+</code></pre></td>
+</tr>
+</table>
+<p>This defines how we parse the routes and create actions from them.
+It will match four different routes:</p>
+<p>counter1 --&gt; Show1 (just show counter 1)
+counter2 --&gt; Show2 (just show counter 2)
+counter1/%i --&gt; Show1WithCnt (show counter 1 and set a count)
+counter2/%i --&gt; Show2WithCnt (show counter 2 and set a count)</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs67', 232)" onmouseover="showTip(event, 'fs67', 232)" class="i">routes</span> <span class="o">=</span> [
+    <span onmouseout="hideTip(event, 'fs68', 233)" onmouseover="showTip(event, 'fs68', 233)" class="f">runM</span> <span onmouseout="hideTip(event, 'fs47', 234)" onmouseover="showTip(event, 'fs47', 234)" class="p">Show1</span> (<span onmouseout="hideTip(event, 'fs69', 235)" onmouseover="showTip(event, 'fs69', 235)" class="f">pStaticStr</span> <span class="s">&quot;counter1&quot;</span> <span class="o">|&gt;</span> (<span onmouseout="hideTip(event, 'fs70', 236)" onmouseover="showTip(event, 'fs70', 236)" class="f">drop</span> <span class="o">&gt;</span><span class="o">&gt;</span> <span onmouseout="hideTip(event, 'fs71', 237)" onmouseover="showTip(event, 'fs71', 237)" class="f">_end</span>))
+    <span onmouseout="hideTip(event, 'fs68', 238)" onmouseover="showTip(event, 'fs68', 238)" class="f">runM</span> <span onmouseout="hideTip(event, 'fs48', 239)" onmouseover="showTip(event, 'fs48', 239)" class="p">Show2</span> (<span onmouseout="hideTip(event, 'fs69', 240)" onmouseover="showTip(event, 'fs69', 240)" class="f">pStaticStr</span> <span class="s">&quot;counter2&quot;</span> <span class="o">|&gt;</span> (<span onmouseout="hideTip(event, 'fs70', 241)" onmouseover="showTip(event, 'fs70', 241)" class="f">drop</span> <span class="o">&gt;</span><span class="o">&gt;</span> <span onmouseout="hideTip(event, 'fs71', 242)" onmouseover="showTip(event, 'fs71', 242)" class="f">_end</span>))
+    <span onmouseout="hideTip(event, 'fs72', 243)" onmouseover="showTip(event, 'fs72', 243)" class="f">runM1</span> <span onmouseout="hideTip(event, 'fs49', 244)" onmouseover="showTip(event, 'fs49', 244)" class="p">Show1WithCnt</span> (<span onmouseout="hideTip(event, 'fs69', 245)" onmouseover="showTip(event, 'fs69', 245)" class="f">pStaticStr</span> <span class="s">&quot;counter1&quot;</span> <span class="o">&lt;/.&gt;</span> <span onmouseout="hideTip(event, 'fs73', 246)" onmouseover="showTip(event, 'fs73', 246)" class="i">pint</span>)
+    <span onmouseout="hideTip(event, 'fs72', 247)" onmouseover="showTip(event, 'fs72', 247)" class="f">runM1</span> <span onmouseout="hideTip(event, 'fs50', 248)" onmouseover="showTip(event, 'fs50', 248)" class="p">Show2WithCnt</span> (<span onmouseout="hideTip(event, 'fs69', 249)" onmouseover="showTip(event, 'fs69', 249)" class="f">pStaticStr</span> <span class="s">&quot;counter2&quot;</span> <span class="o">&lt;/.&gt;</span> <span onmouseout="hideTip(event, 'fs73', 250)" onmouseover="showTip(event, 'fs73', 250)" class="i">pint</span>)
+]
+</code></pre></td>
+</tr>
+</table>
+<p>We can't use the parser to create the routes, so we need to
+manually map the actions to routes. Returning <code>Some str</code> will
+set the route, <code>None</code> will do nothing.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs74', 251)" onmouseover="showTip(event, 'fs74', 251)" class="f">mapToRoute</span> <span onmouseout="hideTip(event, 'fs75', 252)" onmouseover="showTip(event, 'fs75', 252)" class="i">r</span> <span class="o">=</span> 
+    <span class="k">match</span> <span onmouseout="hideTip(event, 'fs75', 253)" onmouseover="showTip(event, 'fs75', 253)" class="i">r</span> <span class="k">with</span>
+    | <span onmouseout="hideTip(event, 'fs47', 254)" onmouseover="showTip(event, 'fs47', 254)" class="p">Show1</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs39', 255)" onmouseover="showTip(event, 'fs39', 255)" class="f">sprintf</span> <span class="s">&quot;counter1&quot;</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs76', 256)" onmouseover="showTip(event, 'fs76', 256)" class="p">Some</span>
+    | <span onmouseout="hideTip(event, 'fs48', 257)" onmouseover="showTip(event, 'fs48', 257)" class="p">Show2</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs39', 258)" onmouseover="showTip(event, 'fs39', 258)" class="f">sprintf</span> <span class="s">&quot;counter2&quot;</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs76', 259)" onmouseover="showTip(event, 'fs76', 259)" class="p">Some</span>
+    | <span onmouseout="hideTip(event, 'fs49', 260)" onmouseover="showTip(event, 'fs49', 260)" class="p">Show1WithCnt</span> <span onmouseout="hideTip(event, 'fs56', 261)" onmouseover="showTip(event, 'fs56', 261)" class="i">i</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs39', 262)" onmouseover="showTip(event, 'fs39', 262)" class="f">sprintf</span> <span class="s">&quot;counter1/</span><span class="pf">%i</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs56', 263)" onmouseover="showTip(event, 'fs56', 263)" class="i">i</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs76', 264)" onmouseover="showTip(event, 'fs76', 264)" class="p">Some</span>
+    | <span onmouseout="hideTip(event, 'fs50', 265)" onmouseover="showTip(event, 'fs50', 265)" class="p">Show2WithCnt</span> <span onmouseout="hideTip(event, 'fs56', 266)" onmouseover="showTip(event, 'fs56', 266)" class="i">i</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs39', 267)" onmouseover="showTip(event, 'fs39', 267)" class="f">sprintf</span> <span class="s">&quot;counter2/</span><span class="pf">%i</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs56', 268)" onmouseover="showTip(event, 'fs56', 268)" class="i">i</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs76', 269)" onmouseover="showTip(event, 'fs76', 269)" class="p">Some</span>
+    | <span onmouseout="hideTip(event, 'fs44', 270)" onmouseover="showTip(event, 'fs44', 270)" class="p">Reset</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs39', 271)" onmouseover="showTip(event, 'fs39', 271)" class="f">sprintf</span> <span class="s">&quot;&quot;</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs76', 272)" onmouseover="showTip(event, 'fs76', 272)" class="p">Some</span>
+    | _ <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs77', 273)" onmouseover="showTip(event, 'fs77', 273)" class="p">None</span>
+
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs78', 274)" onmouseover="showTip(event, 'fs78', 274)" class="i">router</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs79', 275)" onmouseover="showTip(event, 'fs79', 275)" class="f">createRouter</span> <span onmouseout="hideTip(event, 'fs67', 276)" onmouseover="showTip(event, 'fs67', 276)" class="i">routes</span> <span onmouseout="hideTip(event, 'fs74', 277)" onmouseover="showTip(event, 'fs74', 277)" class="f">mapToRoute</span>
+</code></pre></td>
+</tr>
+</table>
+<p>A location handler is used to dealt with the <code>window.location</code>,
+this is abstracted so anyone can use whatever lib they want to
+work with the <code>location</code>.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
+<span class="l"> 2: </span>
+<span class="l"> 3: </span>
+<span class="l"> 4: </span>
+<span class="l"> 5: </span>
+<span class="l"> 6: </span>
+<span class="l"> 7: </span>
+<span class="l"> 8: </span>
+<span class="l"> 9: </span>
+<span class="l">10: </span>
+<span class="l">11: </span>
+<span class="l">12: </span>
+<span class="l">13: </span>
+<span class="l">14: </span>
+<span class="l">15: </span>
+<span class="l">16: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs80', 278)" onmouseover="showTip(event, 'fs80', 278)" class="i">locationHandler</span> <span class="o">=</span> 
+    {
+        <span class="i">SubscribeToChange</span> <span class="o">=</span> 
+            (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs81', 279)" onmouseover="showTip(event, 'fs81', 279)" class="f">h</span> <span class="k">-&gt;</span>
+                <span onmouseout="hideTip(event, 'fs62', 280)" onmouseover="showTip(event, 'fs62', 280)" class="i">window</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs82', 281)" onmouseover="showTip(event, 'fs82', 281)" class="f">addEventListener_hashchange</span>(<span class="k">fun</span> _ <span class="k">-&gt;</span>
+                    <span onmouseout="hideTip(event, 'fs81', 282)" onmouseover="showTip(event, 'fs81', 282)" class="f">h</span> (<span onmouseout="hideTip(event, 'fs62', 283)" onmouseover="showTip(event, 'fs62', 283)" class="i">window</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs83', 284)" onmouseover="showTip(event, 'fs83', 284)" class="i">location</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs84', 285)" onmouseover="showTip(event, 'fs84', 285)" class="i">hash</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs85', 286)" onmouseover="showTip(event, 'fs85', 286)" class="f">Substring</span> <span class="n">1</span>)
+                    <span class="k">null</span>
+            ))
+        <span class="i">PushChange</span> <span class="o">=</span> 
+            <span class="k">fun</span> <span onmouseout="hideTip(event, 'fs86', 287)" onmouseover="showTip(event, 'fs86', 287)" class="i">s</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs87', 288)" onmouseover="showTip(event, 'fs87', 288)" class="i">location</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs88', 289)" onmouseover="showTip(event, 'fs88', 289)" class="f">assign</span> (<span onmouseout="hideTip(event, 'fs39', 290)" onmouseover="showTip(event, 'fs39', 290)" class="f">sprintf</span> <span class="s">&quot;#</span><span class="pf">%s</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs86', 291)" onmouseover="showTip(event, 'fs86', 291)" class="i">s</span>) 
+    }
+
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs89', 292)" onmouseover="showTip(event, 'fs89', 292)" class="f">routerF</span> <span onmouseout="hideTip(event, 'fs90', 293)" onmouseover="showTip(event, 'fs90', 293)" class="i">m</span> <span class="o">=</span> 
+    <span class="k">match</span> <span onmouseout="hideTip(event, 'fs90', 294)" onmouseover="showTip(event, 'fs90', 294)" class="i">m</span> <span class="k">with</span>
+    | <span onmouseout="hideTip(event, 'fs91', 295)" onmouseover="showTip(event, 'fs91', 295)" class="p">ActionReceived</span> <span onmouseout="hideTip(event, 'fs92', 296)" onmouseover="showTip(event, 'fs92', 296)" class="i">msg</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs78', 297)" onmouseover="showTip(event, 'fs78', 297)" class="i">router</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs93', 298)" onmouseover="showTip(event, 'fs93', 298)" class="i">Route</span> <span onmouseout="hideTip(event, 'fs92', 299)" onmouseover="showTip(event, 'fs92', 299)" class="i">msg</span>
+    | _ <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs77', 300)" onmouseover="showTip(event, 'fs77', 300)" class="p">None</span>
+</code></pre></td>
+</tr>
+</table>
+<p>We add a <code>routeProducer</code>, which is what listens to the location
+changes. We also add a <code>routeSubscriber</code>, which listens to events
+from the app and update the location accordingly.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
+<span class="l">5: </span>
+<span class="l">6: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs94', 301)" onmouseover="showTip(event, 'fs94', 301)" class="f">createSimpleApp</span> {<span onmouseout="hideTip(event, 'fs45', 302)" onmouseover="showTip(event, 'fs45', 302)" class="i">Top</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs14', 303)" onmouseover="showTip(event, 'fs14', 303)" class="i">initCounter</span>; <span onmouseout="hideTip(event, 'fs46', 304)" onmouseover="showTip(event, 'fs46', 304)" class="i">Bottom</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs14', 305)" onmouseover="showTip(event, 'fs14', 305)" class="i">initCounter</span>} <span onmouseout="hideTip(event, 'fs57', 306)" onmouseover="showTip(event, 'fs57', 306)" class="f">nestedView</span> <span onmouseout="hideTip(event, 'fs51', 307)" onmouseover="showTip(event, 'fs51', 307)" class="f">nestedUpdate</span>
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs95', 308)" onmouseover="showTip(event, 'fs95', 308)" class="f">withStartNodeSelector</span> <span class="s">&quot;#nested-counter&quot;</span>
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs96', 309)" onmouseover="showTip(event, 'fs96', 309)" class="f">withProducer</span> (<span onmouseout="hideTip(event, 'fs97', 310)" onmouseover="showTip(event, 'fs97', 310)" class="f">routeProducer</span> <span onmouseout="hideTip(event, 'fs80', 311)" onmouseover="showTip(event, 'fs80', 311)" class="i">locationHandler</span> <span onmouseout="hideTip(event, 'fs78', 312)" onmouseover="showTip(event, 'fs78', 312)" class="i">router</span>)
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs98', 313)" onmouseover="showTip(event, 'fs98', 313)" class="f">withSubscriber</span> <span class="s">&quot;route-subscriber&quot;</span> (<span onmouseout="hideTip(event, 'fs99', 314)" onmouseover="showTip(event, 'fs99', 314)" class="f">routeSubscriber</span> <span onmouseout="hideTip(event, 'fs80', 315)" onmouseover="showTip(event, 'fs80', 315)" class="i">locationHandler</span> <span onmouseout="hideTip(event, 'fs89', 316)" onmouseover="showTip(event, 'fs89', 316)" class="f">routerF</span>)
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs98', 317)" onmouseover="showTip(event, 'fs98', 317)" class="f">withSubscriber</span> <span class="s">&quot;logger&quot;</span> (<span onmouseout="hideTip(event, 'fs100', 318)" onmouseover="showTip(event, 'fs100', 318)" class="f">printfn</span> <span class="s">&quot;</span><span class="pf">%A</span><span class="s">&quot;</span>)
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs101', 319)" onmouseover="showTip(event, 'fs101', 319)" class="f">start</span> <span onmouseout="hideTip(event, 'fs102', 320)" onmouseover="showTip(event, 'fs102', 320)" class="i">renderer</span>
+</code></pre></td>
+</tr>
+</table>
+
+
+<div class="tip" id="fs1">namespace Fable</div>
+<div class="tip" id="fs2">namespace Fable.Core</div>
+<div class="tip" id="fs3">namespace Fable.Import</div>
+<div class="tip" id="fs4">module Browser<br /><br />from Fable.Import</div>
+<div class="tip" id="fs5">namespace Fable.Helpers</div>
+<div class="tip" id="fs6">module Virtualdom<br /><br />from Fable.Helpers</div>
+<div class="tip" id="fs7">module App<br /><br />from Fable.Helpers.Virtualdom</div>
+<div class="tip" id="fs8">module Html<br /><br />from Fable.Helpers.Virtualdom</div>
+<div class="tip" id="fs9">type Model =<br />&#160;&#160;{Count: int;<br />&#160;&#160;&#160;Show: bool;}<br /><br />Full name: Routing.Model</div>
+<div class="tip" id="fs10">Model.Count: int</div>
+<div class="tip" id="fs11">Multiple items<br />val int : value:&#39;T -&gt; int (requires member op_Explicit)<br /><br />Full name: Microsoft.FSharp.Core.Operators.int<br /><br />--------------------<br />type int = int32<br /><br />Full name: Microsoft.FSharp.Core.int<br /><br />--------------------<br />type int&lt;&#39;Measure&gt; = int<br /><br />Full name: Microsoft.FSharp.Core.int&lt;_&gt;</div>
+<div class="tip" id="fs12">Model.Show: bool</div>
+<div class="tip" id="fs13">type bool = System.Boolean<br /><br />Full name: Microsoft.FSharp.Core.bool</div>
+<div class="tip" id="fs14">val initCounter : Model<br /><br />Full name: Routing.initCounter</div>
+<div class="tip" id="fs15">type CounterAction =<br />&#160;&#160;| Decrement of int<br />&#160;&#160;| Increment of int<br /><br />Full name: Routing.CounterAction</div>
+<div class="tip" id="fs16">union case CounterAction.Decrement: int -&gt; CounterAction</div>
+<div class="tip" id="fs17">union case CounterAction.Increment: int -&gt; CounterAction</div>
+<div class="tip" id="fs18">val counterUpdate : model:Model -&gt; command:CounterAction -&gt; Model<br /><br />Full name: Routing.counterUpdate</div>
+<div class="tip" id="fs19">val model : Model</div>
+<div class="tip" id="fs20">val command : CounterAction</div>
+<div class="tip" id="fs21">val x : int</div>
+<div class="tip" id="fs22">val counterView : model:Model -&gt; DomNode&lt;CounterAction&gt;<br /><br />Full name: Routing.counterView</div>
+<div class="tip" id="fs23">val bgColor : string</div>
+<div class="tip" id="fs24">val div : x:Attribute&lt;&#39;a&gt; list -&gt; (DomNode&lt;&#39;a&gt; list -&gt; DomNode&lt;&#39;a&gt;)<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Tags.div</div>
+<div class="tip" id="fs25">Multiple items<br />union case Attribute.Style: Style -&gt; Attribute&lt;&#39;TMessage&gt;<br /><br />--------------------<br />type Style = (string * string) list<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Types.Style</div>
+<div class="tip" id="fs26">val svg : x:Attribute&lt;&#39;a&gt; list -&gt; (DomNode&lt;&#39;a&gt; list -&gt; DomNode&lt;&#39;a&gt;)<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Svg.svg</div>
+<div class="tip" id="fs27">val width : x:string -&gt; Attribute&lt;&#39;a&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Svg.width</div>
+<div class="tip" id="fs28">val height : x:string -&gt; Attribute&lt;&#39;a&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Svg.height</div>
+<div class="tip" id="fs29">val viewBox : x:string -&gt; Attribute&lt;&#39;a&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Svg.viewBox</div>
+<div class="tip" id="fs30">val rect : x:Attribute&lt;&#39;a&gt; list -&gt; (DomNode&lt;&#39;a&gt; list -&gt; DomNode&lt;&#39;a&gt;)<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Svg.rect</div>
+<div class="tip" id="fs31">val fill : x:string -&gt; Attribute&lt;&#39;a&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Svg.fill</div>
+<div class="tip" id="fs32">val onMouseClick : x:(obj -&gt; &#39;a) -&gt; Attribute&lt;&#39;a&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Events.onMouseClick</div>
+<div class="tip" id="fs33">val x : obj</div>
+<div class="tip" id="fs34">val onDblClick : x:(obj -&gt; &#39;a) -&gt; Attribute&lt;&#39;a&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Events.onDblClick</div>
+<div class="tip" id="fs35">val text : x:string -&gt; DomNode&lt;&#39;a&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Tags.text</div>
+<div class="tip" id="fs36">Multiple items<br />val string : value:&#39;T -&gt; string<br /><br />Full name: Microsoft.FSharp.Core.Operators.string<br /><br />--------------------<br />type string = System.String<br /><br />Full name: Microsoft.FSharp.Core.string</div>
+<div class="tip" id="fs37">val a : x:Attribute&lt;&#39;a&gt; list -&gt; (DomNode&lt;&#39;a&gt; list -&gt; DomNode&lt;&#39;a&gt;)<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Tags.a</div>
+<div class="tip" id="fs38">val attribute : key:string -&gt; value:string -&gt; Attribute&lt;&#39;a&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Attributes.attribute</div>
+<div class="tip" id="fs39">val sprintf : format:Printf.StringFormat&lt;&#39;T&gt; -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Core.ExtraTopLevelOperators.sprintf</div>
+<div class="tip" id="fs40">type NestedModel =<br />&#160;&#160;{Top: Model;<br />&#160;&#160;&#160;Bottom: Model;}<br /><br />Full name: Routing.NestedModel</div>
+<div class="tip" id="fs41">NestedModel.Top: Model</div>
+<div class="tip" id="fs42">NestedModel.Bottom: Model</div>
+<div class="tip" id="fs43">type NestedAction =<br />&#160;&#160;| Reset<br />&#160;&#160;| Top of CounterAction<br />&#160;&#160;| Bottom of CounterAction<br />&#160;&#160;| Show1<br />&#160;&#160;| Show2<br />&#160;&#160;| Show1WithCnt of int<br />&#160;&#160;| Show2WithCnt of int<br /><br />Full name: Routing.NestedAction</div>
+<div class="tip" id="fs44">union case NestedAction.Reset: NestedAction</div>
+<div class="tip" id="fs45">union case NestedAction.Top: CounterAction -&gt; NestedAction</div>
+<div class="tip" id="fs46">union case NestedAction.Bottom: CounterAction -&gt; NestedAction</div>
+<div class="tip" id="fs47">union case NestedAction.Show1: NestedAction</div>
+<div class="tip" id="fs48">union case NestedAction.Show2: NestedAction</div>
+<div class="tip" id="fs49">union case NestedAction.Show1WithCnt: int -&gt; NestedAction</div>
+<div class="tip" id="fs50">union case NestedAction.Show2WithCnt: int -&gt; NestedAction</div>
+<div class="tip" id="fs51">val nestedUpdate : model:NestedModel -&gt; action:NestedAction -&gt; NestedModel<br /><br />Full name: Routing.nestedUpdate</div>
+<div class="tip" id="fs52">val model : NestedModel</div>
+<div class="tip" id="fs53">val action : NestedAction</div>
+<div class="tip" id="fs54">val ca : CounterAction</div>
+<div class="tip" id="fs55">val res : Model</div>
+<div class="tip" id="fs56">val i : int</div>
+<div class="tip" id="fs57">val nestedView : model:NestedModel -&gt; DomNode&lt;NestedAction&gt;<br /><br />Full name: Routing.nestedView</div>
+<div class="tip" id="fs58">val map : mapping:(&#39;T1 -&gt; &#39;T2) -&gt; node:DomNode&lt;&#39;T1&gt; -&gt; DomNode&lt;&#39;T2&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.Html.map</div>
+<div class="tip" id="fs59">val button : x:Attribute&lt;&#39;a&gt; list -&gt; (DomNode&lt;&#39;a&gt; list -&gt; DomNode&lt;&#39;a&gt;)<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Tags.button</div>
+<div class="tip" id="fs60">val resetEveryTenth : h:(NestedAction -&gt; &#39;a) -&gt; unit<br /><br />Full name: Routing.resetEveryTenth</div>
+<div class="tip" id="fs61">val h : (NestedAction -&gt; &#39;a)</div>
+<div class="tip" id="fs62">val window : Window<br /><br />Full name: Fable.Import.Browser.window</div>
+<div class="tip" id="fs63">abstract member WindowTimers.setInterval : handler:obj * ?timeout:obj * [&lt;System.ParamArray&gt;] args:obj [] -&gt; float</div>
+<div class="tip" id="fs64">val ignore : value:&#39;T -&gt; unit<br /><br />Full name: Microsoft.FSharp.Core.Operators.ignore</div>
+<div class="tip" id="fs65">module RouteParser<br /><br />from Fable.Helpers</div>
+<div class="tip" id="fs66">module Parsing<br /><br />from Fable.Helpers</div>
+<div class="tip" id="fs67">val routes : (string -&gt; Result&lt;NestedAction,(ParserLabel * ParserError)&gt;) list<br /><br />Full name: Routing.routes</div>
+<div class="tip" id="fs68">val runM : map:&#39;a -&gt; route:Parser&lt;unit&gt; -&gt; str:string -&gt; Result&lt;&#39;a,(ParserLabel * ParserError)&gt;<br /><br />Full name: Fable.Helpers.Parsing.runM</div>
+<div class="tip" id="fs69">val pStaticStr : str:ParserLabel -&gt; Parser&lt;System.String&gt;<br /><br />Full name: Fable.Helpers.Parsing.pStaticStr</div>
+<div class="tip" id="fs70">val drop : p:Parser&lt;&#39;a&gt; -&gt; Parser&lt;unit&gt;<br /><br />Full name: Fable.Helpers.Parsing.drop</div>
+<div class="tip" id="fs71">val _end : parser:Parser&lt;&#39;a&gt; -&gt; Parser&lt;&#39;a&gt;<br /><br />Full name: Fable.Helpers.Parsing._end</div>
+<div class="tip" id="fs72">val runM1 : map:(&#39;a -&gt; &#39;b) -&gt; route:Parser&lt;&#39;a&gt; -&gt; str:string -&gt; Result&lt;&#39;b,(ParserLabel * ParserError)&gt;<br /><br />Full name: Fable.Helpers.Parsing.runM1</div>
+<div class="tip" id="fs73">val pint : Parser&lt;int&gt;<br /><br />Full name: Fable.Helpers.Parsing.pint</div>
+<div class="tip" id="fs74">val mapToRoute : r:NestedAction -&gt; string option<br /><br />Full name: Routing.mapToRoute</div>
+<div class="tip" id="fs75">val r : NestedAction</div>
+<div class="tip" id="fs76">union case Option.Some: Value: &#39;T -&gt; Option&lt;&#39;T&gt;</div>
+<div class="tip" id="fs77">union case Option.None: Option&lt;&#39;T&gt;</div>
+<div class="tip" id="fs78">val router : Router&lt;NestedAction&gt;<br /><br />Full name: Routing.router</div>
+<div class="tip" id="fs79">val createRouter : routes:(string -&gt; Result&lt;&#39;a,(&#39;b * &#39;c)&gt;) list -&gt; mapRoute:(&#39;a -&gt; string option) -&gt; Router&lt;&#39;a&gt;<br /><br />Full name: Fable.Helpers.RouteParser.createRouter</div>
+<div class="tip" id="fs80">val locationHandler : LocationHandler<br /><br />Full name: Routing.locationHandler</div>
+<div class="tip" id="fs81">val h : (string -&gt; unit)</div>
+<div class="tip" id="fs82">abstract member Window.addEventListener_hashchange : listener:System.Func&lt;HashChangeEvent,obj&gt; * ?useCapture:bool -&gt; unit</div>
+<div class="tip" id="fs83">property Window.location: Location</div>
+<div class="tip" id="fs84">property Location.hash: string</div>
+<div class="tip" id="fs85">System.String.Substring(startIndex: int) : string<br />System.String.Substring(startIndex: int, length: int) : string</div>
+<div class="tip" id="fs86">val s : string</div>
+<div class="tip" id="fs87">val location : Location<br /><br />Full name: Fable.Import.Browser.location</div>
+<div class="tip" id="fs88">abstract member Location.assign : url:string -&gt; unit</div>
+<div class="tip" id="fs89">val routerF : m:AppEvents&lt;NestedAction,&#39;a&gt; -&gt; string option<br /><br />Full name: Routing.routerF</div>
+<div class="tip" id="fs90">val m : AppEvents&lt;NestedAction,&#39;a&gt;</div>
+<div class="tip" id="fs91">union case AppEvents.ActionReceived: &#39;TMessage -&gt; AppEvents&lt;&#39;TMessage,&#39;TModel&gt;</div>
+<div class="tip" id="fs92">val msg : NestedAction</div>
+<div class="tip" id="fs93">Router.Route: NestedAction -&gt; string option</div>
+<div class="tip" id="fs94">val createSimpleApp : model:&#39;a -&gt; view:(&#39;a -&gt; DomNode&lt;&#39;b&gt;) -&gt; update:(&#39;a -&gt; &#39;b -&gt; &#39;a) -&gt; App&lt;&#39;a,&#39;b&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.App.createSimpleApp</div>
+<div class="tip" id="fs95">val withStartNodeSelector : selector:string -&gt; app:App&lt;&#39;a,&#39;b&gt; -&gt; App&lt;&#39;a,&#39;b&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.App.withStartNodeSelector</div>
+<div class="tip" id="fs96">val withProducer : p:Producer&lt;&#39;a&gt; -&gt; app:App&lt;&#39;b,&#39;a&gt; -&gt; App&lt;&#39;b,&#39;a&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.App.withProducer</div>
+<div class="tip" id="fs97">val routeProducer : locationHandler:LocationHandler -&gt; router:Router&lt;&#39;a&gt; -&gt; handler:(&#39;a -&gt; unit) -&gt; unit<br /><br />Full name: Fable.Helpers.RouteParser.routeProducer</div>
+<div class="tip" id="fs98">val withSubscriber : subscriberId:string -&gt; subscriber:Subscriber&lt;&#39;a,&#39;b&gt; -&gt; app:App&lt;&#39;b,&#39;a&gt; -&gt; App&lt;&#39;b,&#39;a&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.App.withSubscriber</div>
+<div class="tip" id="fs99">val routeSubscriber : locationHandler:LocationHandler -&gt; router:(&#39;a -&gt; string option) -&gt; message:&#39;a -&gt; unit<br /><br />Full name: Fable.Helpers.RouteParser.routeSubscriber</div>
+<div class="tip" id="fs100">val printfn : format:Printf.TextWriterFormat&lt;&#39;T&gt; -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Core.ExtraTopLevelOperators.printfn</div>
+<div class="tip" id="fs101">val start : renderer:Renderer&lt;&#39;a&gt; -&gt; app:App&lt;&#39;b,&#39;a&gt; -&gt; MailboxProcessor&lt;AppMessage&lt;&#39;a&gt;&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.App.start</div>
+<div class="tip" id="fs102">val renderer : Renderer&lt;&#39;a&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.renderer</div>
+
+    </div>
+    <div class="col-md-1 col-lg-2"></div>
+  </div>
+</div>
+
+  </div>
+
+  <a class="gh-forkme" href="https://github.com/fable-compiler/fable-virtualdom"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+</body>
+</html>
