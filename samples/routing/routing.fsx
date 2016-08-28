@@ -7,6 +7,10 @@
 
 #r "node_modules/fable-core/Fable.Core.dll"
 #load "node_modules/fable-import-virtualdom/Fable.Helpers.Virtualdom.fs"
+
+(**
+Route parser is optional, so you need to add it yourself if you want it.
+*)
 #load "node_modules/fable-import-virtualdom/Fable.Helpers.RouteParser.fs"
 open Fable.Core
 open Fable.Import
@@ -65,10 +69,13 @@ let counterView model =
                   onMouseClick (fun x -> (Decrement 1))
                   onDblClick (fun x -> (Decrement 5))]
                 [ text (string "Decrement")]
-            a [ attribute "href" "#counter1" ] [text "counter1"]
-            a [ attribute "href" "#counter2" ] [text "counter2"]
-            a [ attribute "href" (sprintf "#counter1/%i" (model.Count*2)) ] [text "counter1 with count"]
-            a [ attribute "href" (sprintf "#counter2/%i" -model.Count) ] [text "counter2 with count"]
+            div [ attribute "class" "cnt-links"]
+                [
+                    a [ attribute "href" "#counter1" ] [text "counter1"]
+                    a [ attribute "href" "#counter2" ] [text "counter2"]
+                    a [ attribute "href" (sprintf "#counter1/%i" (model.Count*2)) ] [text "counter1 with count"]
+                    a [ attribute "href" (sprintf "#counter2/%i" -model.Count) ] [text "counter2 with count"]
+                ]
         ]
 
 
@@ -118,26 +125,48 @@ let nestedView model =
 let resetEveryTenth h =
     window.setInterval((fun _ -> Reset |> h), 10000) |> ignore
 
+(**
+The routing part starts here.
+*)
 open Fable.Helpers.RouteParser
 open Fable.Helpers.Parsing
+(**
+This defines how we parse the routes and create actions from them.
+It will match four different routes:
 
+* `counter1` --> `Show1` (just show counter 1)
+* `counter2` --> `Show2` (just show counter 2)
+* `counter1/%i` --> `Show1WithCnt` (show counter 1 and set a count)
+* `counter2/%i` --> `Show2WithCnt` (show counter 2 and set a count)
+*)
 let routes = [
     runM Show1 (pStaticStr "counter1" |> (drop >> _end))
     runM Show2 (pStaticStr "counter2" |> (drop >> _end))
     runM1 Show1WithCnt (pStaticStr "counter1" </.> pint)
     runM1 Show2WithCnt (pStaticStr "counter2" </.> pint)
 ]
+
+(**
+We can't use the parser to create the routes, so we need to
+manually map the actions to routes. Returning `Some str` will
+set the route, `None` will do nothing.
+*)
 let mapToRoute r = 
     match r with
     | Show1 -> sprintf "counter1" |> Some
     | Show2 -> sprintf "counter2" |> Some
     | Show1WithCnt i -> sprintf "counter1/%i" i |> Some
     | Show2WithCnt i -> sprintf "counter2/%i" i |> Some
-    | Reset -> sprintf " " |> Some
+    | Reset -> sprintf "" |> Some
     | _ -> None
 
 let router = createRouter routes mapToRoute
 
+(**
+A location handler is used to dealt with the `window.location`,
+this is abstracted so anyone can use whatever lib they want to 
+work with the `location`. 
+*)
 let locationHandler = 
     {
         SubscribeToChange = 
@@ -155,8 +184,14 @@ let routerF m =
     | ActionReceived msg -> router.Route msg
     | _ -> None
 
+(**
+We add a `routeProducer`, which is what listens to the location
+changes. We also add a `routeSubscriber`, which listens to events
+from the app and update the location accordingly.
+*)
 createSimpleApp {Top = initCounter; Bottom = initCounter} nestedView nestedUpdate
 |> withStartNodeSelector "#nested-counter"
 |> withProducer (routeProducer locationHandler router)
 |> withSubscriber "route-subscriber" (routeSubscriber locationHandler routerF)
+|> withSubscriber "logger" (printfn "%A")
 |> start renderer
