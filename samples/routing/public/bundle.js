@@ -212,6 +212,11 @@
 	                }]])])], children]);
 	            };
 	        }()(_fableCore.List.ofArray([new _FableHelpers.Html.Types.DomNode("Text", ["Decrement"])])), function () {
+	            var tagName = "div";
+	            return function (children) {
+	                return new _FableHelpers.Html.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableHelpers.Html.Types.Attribute("Attribute", [["class", "cnt-links"]])])], children]);
+	            };
+	        }()(_fableCore.List.ofArray([function () {
 	            var tagName = "a";
 	            return function (children) {
 	                return new _FableHelpers.Html.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableHelpers.Html.Types.Attribute("Attribute", [["href", "#counter1"]])])], children]);
@@ -235,7 +240,7 @@
 	                    return x;
 	                })(-model.Count)]])])], children]);
 	            };
-	        }()(_fableCore.List.ofArray([new _FableHelpers.Html.Types.DomNode("Text", ["counter2 with count"])]))]));
+	        }()(_fableCore.List.ofArray([new _FableHelpers.Html.Types.DomNode("Text", ["counter2 with count"])]))]))]));
 	    }
 	
 	    var NestedModel = exports.NestedModel = function () {
