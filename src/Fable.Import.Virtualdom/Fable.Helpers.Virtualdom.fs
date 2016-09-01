@@ -227,7 +227,12 @@ module Html =
 
     [<AutoOpen>]
     module Events =
-        let inline onMouseEvent eventType f = EventHandler (eventType, f)
+        let inline onMouseEvent eventType f = 
+            let h e =
+                e?stopPropagation() |> ignore
+                e?preventDefault() |> ignore
+                f e
+            EventHandler (eventType, h)
 
         let inline onMouseClick x = onMouseEvent "onclick" x
         let inline onContextMenu x = onMouseEvent "oncontextmenu" x
@@ -339,21 +344,43 @@ open Fable.Import.Browser
 
 [<AutoOpen>]
 module App =
+
+    type ModelChanged<'TMessage, 'TModel> = 
+        {
+            PreviousState: 'TModel
+            Message: 'TMessage
+            CurrentState: 'TModel
+        }
+
+    type AppEvents<'TMessage, 'TModel> =
+        | ModelChanged of ModelChanged<'TMessage, 'TModel>
+        | ActionReceived of 'TMessage
+        | Replayed of (System.Guid * 'TModel) list
+        | DrawStarted
+
     type Action<'TMessage> = ('TMessage -> unit) -> unit
-    type Producer<'TMessage> = ('TMessage -> unit) -> unit
+    type Subscriber<'TMessage, 'TModel> = AppEvents<'TMessage, 'TModel> -> unit
+
+    type AppMessage<'TMessage, 'TModel> =
+//        | AddSubscriber of string*Subscriber<'TMessage, 'TMessage>
+//        | RemoveSubscriber of string
+        | Message of 'TMessage
+        | Replay of 'TModel*((System.Guid*'TMessage) list)
+        | Draw
+
+    type Producer<'TMessage, 'TModel> = (AppMessage<'TMessage, 'TModel> -> unit) -> unit
+
+    type Plugin<'TMessage, 'TModel> =
+        {
+            Producer: Producer<'TMessage, 'TModel>
+            Subscriber: Subscriber<'TMessage, 'TModel>
+        }
 
     let mapAction<'T1,'T2> (mapping:'T1 -> 'T2) (action:Action<'T1>) : Action<'T2> = 
         fun x -> action (mapping >> x)  
 
     let mapActions m = List.map (mapAction m)
     let toActionList a = [a]
-
-    type AppEvents<'TMessage, 'TModel> =
-        | ModelChanged of 'TModel*'TModel
-        | ActionReceived of 'TMessage
-        | DrawStarted
-
-    type Subscriber<'TMessage, 'TModel> = AppEvents<'TMessage, 'TModel> -> unit
 
     type RenderState = 
         | InProgress
@@ -366,7 +393,7 @@ module App =
             Update: 'TModel -> 'TMessage -> ('TModel * Action<'TMessage> list)
             InitMessage : (('TMessage -> unit) -> unit) option
             Actions: Action<'TMessage> list
-            Producers: Producer<'TMessage> list
+            Producers: Producer<'TMessage, 'TModel> list
             Node: Node option
             CurrentTree: obj option
             Subscribers: Map<string, Subscriber<'TMessage, 'TModel>>
@@ -376,12 +403,6 @@ module App =
 
     type ScheduleMessage = 
         | PingIn of float*(unit -> unit)
-
-    type AppMessage<'TMessage> =
-        | AddSubscriber of string*Subscriber<'TMessage, 'TMessage>
-        | RemoveSubscriber of string
-        | Message of 'TMessage
-        | Draw
 
     type Renderer<'TMessage> =
         {
@@ -418,6 +439,10 @@ module App =
         let subsribers = app.Subscribers |> Map.add subscriberId subscriber
         { app with Subscribers = subsribers }
 
+    let withPlugin pluginId plugin =
+        (withSubscriber pluginId plugin.Subscriber)
+        >> (withProducer plugin.Producer)
+
     let createScheduler() = 
         MailboxProcessor.Start(fun inbox ->
             let rec loop() = 
@@ -443,6 +468,7 @@ module App =
     let handleMessage msg notify schedule state = 
         ActionReceived msg |> (notify state.Subscribers)
         let (model', actions) = state.Update state.Model msg
+        ModelChanged {PreviousState = state.Model; Message =  msg; CurrentState = model'} |> notify state.Subscribers
 
         let renderState =
             match state.RenderState with
@@ -457,18 +483,46 @@ module App =
                 RenderState = renderState
                 Actions = state.Actions @ actions }
 
+    let draw state renderTree renderer post currentTree rootNode = 
+        let model = state.Model
+        let tree = renderTree state.View post model
+        let patches = renderer.Diff currentTree tree
+        renderer.Patch rootNode patches |> ignore
+        tree
+
     let handleDraw renderTree renderer post notify rootNode currentTree state = 
         match state.RenderState with
         | InProgress ->
             DrawStarted |> notify state.Subscribers
-            let model = state.Model
-            let tree = renderTree state.View post model
-            let patches = renderer.Diff currentTree tree
-            renderer.Patch rootNode patches |> ignore
+            let tree = draw state renderTree renderer post currentTree rootNode
             state.Actions |> List.iter (fun i -> i post)
-            (ModelChanged (model, state.Model)) |> notify state.Subscribers
             {state with RenderState = NoRequest; CurrentTree = Some tree; Actions = []}
         | NoRequest -> raise (exn "Shouldn't happen")
+
+    let calculateModelChanges initState update actions = 
+        let execUpdate r a =
+            let m = 
+                match r with
+                | [] -> initState
+                | x::_ -> x |> snd
+            let msg = a |> snd
+            let (m', _) = update m (a |> snd)
+            let id:System.Guid = a |> fst
+            id,m'
+
+        actions
+        |> List.fold (fun s a -> (execUpdate s a)::s) []
+
+    let handleReplay state post notify initState actions renderTree renderer currentTree rootNode = 
+        let result = calculateModelChanges initState state.Update actions
+        let model = 
+            match result with 
+            | m::_ -> m |> snd
+            | [] -> initState
+        let state' = {state with Model = model}
+        let tree = draw state' renderTree renderer (Message >> post) currentTree rootNode
+        (Replayed result) |> notify state.Subscribers
+        {state' with CurrentTree = Some tree}
 
     let start renderer app =
         let renderTree view handler model =
@@ -483,7 +537,7 @@ module App =
         let scheduler = createScheduler()
         MailboxProcessor.Start(fun inbox ->
             let post message =
-                inbox.Post (Message message)
+                inbox.Post message
             let notifySubscribers subs model =
                 subs |> Map.iter (fun key handler -> handler model)
             app.Producers |> List.iter (fun p -> p post)
@@ -492,18 +546,22 @@ module App =
                 async {
                     match state.Node, state.CurrentTree with
                     | None,_ ->
-                        let state' = createFirstLoopState renderTree startElem post renderer state
+                        let state' = createFirstLoopState renderTree startElem (Message >> post) renderer state
                         return! loop state'
                     | Some rootNode, Some currentTree ->
                         let! message = inbox.Receive()
                         match message with
                         | Message msg ->
+                            Fable.Import.Browser.window.console.log("Some state", state)
                             let state' = handleMessage msg notifySubscribers schedule state
                             return! loop state'
                         | Draw -> 
-                            let state' = handleDraw renderTree renderer post notifySubscribers rootNode currentTree state
+                            let state' = handleDraw renderTree renderer (Message >> post) notifySubscribers rootNode currentTree state
                             return! loop state'
-                        | _ -> return! loop state
+                        | Replay (initState, actions) ->
+                            let state' = handleReplay state post notifySubscribers initState actions renderTree renderer currentTree rootNode
+                            Fable.Import.Browser.window.console.log("Some replay", state')
+                            return! loop state'
                     | _ -> failwith "Shouldn't happen"
                 }
             loop app)
