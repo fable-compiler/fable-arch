@@ -277,6 +277,13 @@ module Parsing =
         |> mapP charListToStr 
         <?> label
 
+    let pString = 
+        let label = "string"
+        let predicate = fun _ -> true
+        satisfy predicate "string"
+        |> many
+        |> mapP charListToStr
+
     let pStringTo endingChar = 
         let label = sprintf "string up to char %c" endingChar
         let ending = pchar endingChar
