@@ -23,6 +23,7 @@ type DevToolsModel<'TAppMessage, 'TAppModel> =
 
 type DevToolsMessage<'TAppMessage, 'TAppModel> = 
     | AddMessage of 'TAppMessage * 'TAppModel
+    | MessagesReplayed of (Guid*'TAppModel) list
     | Replay of 'TAppModel * ((Guid*'TAppMessage) list)
     | ToggleObjectVisibility of string
     | ToggleAction of Guid
@@ -44,6 +45,11 @@ let devToolsUpdate model action =
             {model with LastCommited = latestCommited::model.LastCommited; Actions = []}, [fun h -> h (Replay (latestCommited,[]))]
         | AddMessage (msg, appModel) ->
             {model with Actions = model.Actions @ [{Id = Guid.NewGuid(); Excluded = false; Message = msg; State = appModel}]},[]
+        | MessagesReplayed modelList ->
+            let state = 
+                modelList 
+                |> List.fold (fun s (id, m) -> {s with Actions = (s.Actions |> List.map (fun a -> if a.Id <> id then a else {a with State = m}))}) model
+            state,[]
         | ToggleObjectVisibility str ->
             let currentValue = isCollapsed str model
             {model with Collapsed = model.Collapsed |> Map.add str (currentValue |> not)},[]
@@ -388,5 +394,6 @@ let createDevTools<'TMessage, 'TModel> pluginId initModel=
         Producer = (fun h -> linkAgent.Post(SetHandler h)) 
         Subscriber = (function 
                         | ModelChanged m -> devToolsAgent.Post(Message (AddMessage (m.Message, m.CurrentState)))
+                        | Replayed modelList -> devToolsAgent.Post(Message (MessagesReplayed modelList))
                         | _ -> ())
     }
