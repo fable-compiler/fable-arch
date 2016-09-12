@@ -128,6 +128,10 @@ let cssString = """
         width: 100%;
     }
 
+    ._fable_dev_tools .action-list .header.action {
+        cursor: pointer;
+    }
+
     ._fable_dev_tools .action-list .content {
         padding-top: 10px;
         padding-bottom: 10px;
@@ -302,10 +306,9 @@ let devToolsView model =
         let rowClass = if excluded then "row excluded" else "row"
 
         let headerAttributes = 
-            (attribute "class" "header") :: 
-                match headerClicked with
-                | Some h -> [onMouseClick h]
-                | None -> []
+            match headerClicked with
+            | Some h -> [onMouseClick h; attribute "class" "header action"]
+            | None -> [attribute "class" "header"]
             
         let inner = 
             (div headerAttributes [text headerText]) ::
