@@ -1,8 +1,8 @@
 module Fable.Arch.DevTools
 
-open Fable.Helpers.Virtualdom
-open Fable.Helpers.Virtualdom.App
-open Fable.Helpers.Virtualdom.Html
+open Fable.Arch.Virtualdom
+open Fable.Arch.App
+open Fable.Arch.Html
 
 open Fable.Core
 open Fable.Import

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <Name>Fable.Import.Virtualdom</Name>
-    <AssemblyName>Fable.Import.Virtualdom</AssemblyName>
-    <RootNamespace>Fable.Import.Virtualdom</RootNamespace>
+    <Name>Fable.Arch</Name>
+    <AssemblyName>Fable.Arch</AssemblyName>
+    <RootNamespace>Fable.Arch</RootNamespace>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
@@ -40,9 +40,11 @@
     <Reference Include="./node_modules/fable-core/Fable.Core.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Fable.Helpers.Virtualdom.fs" />
+    <Compile Include="Fable.Arch.Html.fs" />
+    <Compile Include="Fable.Arch.App.fs" />
+    <Compile Include="Fable.Arch.Virtualdom.fs" />
     <Compile Include="Fable.Arch.DevTools.fs" />
-    <Compile Include="Fable.Helpers.RouteParser.fs" />
+    <Compile Include="Fable.Arch.RouteParser.fs" />
     <Content Include="paket.references" />
     <Compile Include="RouteParserTesting.fsx" />
   </ItemGroup>
