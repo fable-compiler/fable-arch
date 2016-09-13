@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Fable.Helpers.Virtualdom.fs" />
+    <Compile Include="Fable.Arch.DevTools.fs" />
     <Compile Include="Fable.Helpers.RouteParser.fs" />
     <Content Include="paket.references" />
     <Compile Include="RouteParserTesting.fsx" />

@@ -4,8 +4,11 @@
  - app-style: width:800px; margin:20px auto 50px auto;
  - intro: This is a simple "hello world" application.
 *)
-#load "references.fsx"
-#load "devtools.fsx"
+#r "node_modules/fable-core/Fable.Core.dll"
+#load "node_modules/fable-import-virtualdom/Fable.Helpers.Virtualdom.fs"
+//#if DEV
+#load "node_modules/fable-import-virtualdom/Fable.Arch.DevTools.fs"
+//#endif
 open Fable.Core
 open Fable.Import
 open Fable.Import.Browser
@@ -14,7 +17,9 @@ open Fable.Helpers.Virtualdom
 open Fable.Helpers.Virtualdom.App
 open Fable.Helpers.Virtualdom.Html
 
-open Devtools
+#if DEV
+open Fable.Arch.DevTools
+#endif
 
 // model
 type Counter = int
@@ -99,5 +104,7 @@ let resetEveryTenth h =
 let initModel = {Top = 0; Bottom = 0}
 createSimpleApp initModel nestedView nestedUpdate
 |> withStartNodeSelector "#nested-counter"
+#if DEV
 |> withPlugin "something" (createDevTools<NestedAction, NestedModel> "something" initModel)
+#endif
 |> start renderer
