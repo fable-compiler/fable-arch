@@ -1,6 +1,5 @@
 module Fable.Arch.DevTools
 
-open Fable.Arch.Virtualdom
 open Fable.Arch.App
 open Fable.Arch.Html
 
@@ -373,23 +372,24 @@ let createDevTools<'TMessage, 'TModel> pluginId initModel=
                     state.Handler m
                     return! loop state
                 | SetHandler h -> 
+                    Browser.window.console.log("Setting up handler")
                     return! loop {state with Handler = h}
             }
         loop ({Handler = (fun _ -> ())}:LinkState<'TMessage, 'TModel>)
     )
 
     let devToolsAgent = 
-        createApp {Base = initModel; Actions = []; Collapsed = Map.empty; LastCommited =[initModel]} devToolsView devToolsUpdate
+        createApp {Base = initModel; Actions = []; Collapsed = Map.empty; LastCommited =[initModel]} devToolsView devToolsUpdate Virtualdom.renderer
         |> withStartNodeSelector "#___devtools"
-        |> withSubscriber "appSub" (
+        |> withSubscriber (
             fun ae -> 
                 Browser.window.console.log(ae)
                 match ae with
                 | ActionReceived(Replay (s,m)) ->
-                    Fable.Import.Browser.window.console.log(s,m)
+                    Browser.window.console.log("Should replay now", s, m)
                     linkAgent.Post(Push (AppMessage.Replay (s,m)))
                 | _ -> ())
-        |> start renderer
+        |> start 
     
     {
         Producer = (fun h -> linkAgent.Post(SetHandler h)) 

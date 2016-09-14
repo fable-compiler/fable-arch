@@ -1,6 +1,8 @@
+[<RequireQualifiedAccess>]
 module Fable.Arch.Virtualdom
 
 open Fable.Core
+open Fable.Import.Browser
 open Fable.Core.JsInterop
 
 open Html
@@ -44,18 +46,43 @@ let createTree<'T> (handler:'T -> unit) tag (attributes:Attribute<'T> list) chil
     let elem = h(tag, toAttrs attributes, List.toArray children)
     elem
 
-let rec render handler node =
+type ViewState<'TMessage> = 
+    {
+        CurrentTree: obj
+        Node: Node 
+    }
+
+let rec renderSomething handler node = 
     match node with
     | Element((tag,attrs), nodes)
-    | Svg((tag,attrs), nodes) -> createTree handler tag attrs (nodes |> List.map (render handler))
+    | Svg((tag,attrs), nodes) -> createTree handler tag attrs (nodes |> List.map (renderSomething handler))
     | VoidElement (tag, attrs) -> createTree handler tag attrs []
     | Text str -> box(string str)
     | WhiteSpace str -> box(string str)
 
+
+let render handler view viewState =
+    let tree = renderSomething handler view
+    {viewState with CurrentTree = tree}
+
+let init selector handler view = 
+    let node = document.body.querySelector(selector) :?> HTMLElement
+    let tree = renderSomething handler view
+    let vdomNode = createElement tree
+    node.appendChild(vdomNode) |> ignore
+    {
+        CurrentTree = tree
+        Node = vdomNode
+    }    
+
+let render' handler view viewState = 
+    let viewState' = render handler view viewState
+    let patches = diff viewState.CurrentTree viewState'.CurrentTree
+    patch viewState.Node patches |> ignore
+    viewState'
+
 let renderer =
     {
-        Render = render
-        Diff = diff
-        Patch = patch
-        CreateElement = createElement
+        Render = render'
+        Init = init
     }

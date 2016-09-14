@@ -5,12 +5,10 @@ open Fable.Core.JsInterop
 open System.Diagnostics
 
 open Fable.Import.Browser
-
 open Html
 
 [<AutoOpen>]
-module App =
-
+module Types =
     type ModelChanged<'TMessage, 'TModel> = 
         {
             PreviousState: 'TModel
@@ -18,97 +16,62 @@ module App =
             CurrentState: 'TModel
         }
 
-    type AppEvents<'TMessage, 'TModel> =
+    type AppEvent<'TMessage, 'TModel> =
         | ModelChanged of ModelChanged<'TMessage, 'TModel>
         | ActionReceived of 'TMessage
         | Replayed of (System.Guid * 'TModel) list
-        | DrawStarted
-
-    type Action<'TMessage> = ('TMessage -> unit) -> unit
-    type Subscriber<'TMessage, 'TModel> = AppEvents<'TMessage, 'TModel> -> unit
-
+    
     type AppMessage<'TMessage, 'TModel> =
-//        | AddSubscriber of string*Subscriber<'TMessage, 'TMessage>
-//        | RemoveSubscriber of string
         | Message of 'TMessage
         | Replay of 'TModel*((System.Guid*'TMessage) list)
         | Draw
 
-    type Producer<'TMessage, 'TModel> = (AppMessage<'TMessage, 'TModel> -> unit) -> unit
+    type Action<'TMessage> = ('TMessage -> unit) -> unit
 
+    type Subscriber<'TMessage, 'TModel> = AppEvent<'TMessage, 'TModel> -> unit
+    type Producer<'TMessage, 'TModel> = (AppMessage<'TMessage, 'TModel> -> unit) -> unit
     type Plugin<'TMessage, 'TModel> =
         {
             Producer: Producer<'TMessage, 'TModel>
             Subscriber: Subscriber<'TMessage, 'TModel>
         }
 
-    let mapAction<'T1,'T2> (mapping:'T1 -> 'T2) (action:Action<'T1>) : Action<'T2> = 
-        fun x -> action (mapping >> x)  
-
-    let mapActions m = List.map (mapAction m)
-    let toActionList a = [a]
-
     type RenderState = 
         | InProgress
         | NoRequest
 
-    type App<'TModel, 'TMessage> =
-        {
-            Model: 'TModel
-            View: 'TModel -> DomNode<'TMessage>
-            Update: 'TModel -> 'TMessage -> ('TModel * Action<'TMessage> list)
-            InitMessage : (('TMessage -> unit) -> unit) option
-            Actions: Action<'TMessage> list
-            Producers: Producer<'TMessage, 'TModel> list
-            Node: Node option
-            CurrentTree: obj option
-            Subscribers: Map<string, Subscriber<'TMessage, 'TModel>>
-            NodeSelector: string option
-            RenderState: RenderState
-        }
+type ScheduleMessage = 
+    | PingIn of float*(unit -> unit)
 
-    type ScheduleMessage = 
-        | PingIn of float*(unit -> unit)
+type Selector = string
+type Renderer<'TMessage, 'TView, 'TViewState> = 
+    {
+        Render: ('TMessage -> unit) -> 'TView -> 'TViewState -> 'TViewState
+        Init: Selector -> ('TMessage -> unit) -> 'TView -> 'TViewState
+    }
 
-    type Renderer<'TMessage> =
-        {
-            Render: ('TMessage -> unit) -> DomNode<'TMessage> -> obj
-            Diff: obj -> obj -> obj
-            Patch: Fable.Import.Browser.Node -> obj -> Fable.Import.Browser.Node
-            CreateElement: obj -> Fable.Import.Browser.Node
-        }
+type AppSpecification<'TModel, 'TMessage, 'TView, 'TViewState> = 
+    {
+        InitState: 'TModel
+        View: 'TModel -> 'TView
+        Update: 'TModel -> 'TMessage -> ('TModel * Action<'TMessage> list)
+        InitMessage: (('TMessage -> unit) -> unit) option
+        Renderer: Renderer<'TMessage, 'TView, 'TViewState>
+        NodeSelector: Selector
+        Producers: Producer<'TMessage, 'TModel> list
+        Subscribers: Subscriber<'TMessage, 'TModel> list
+    }
 
-    let createApp model view update =
-        {
-            Model = model
-            View = view
-            Update = update
-            NodeSelector = None
-            InitMessage = None
-            Producers = []
-            Subscribers = Map.empty
+type App<'TModel, 'TMessage, 'TViewState> =
+    {
+        Model: 'TModel
+        Actions: Action<'TMessage> list
+        ViewState: 'TViewState
+        RenderState: RenderState
+    }
 
-            CurrentTree = None
-            RenderState = NoRequest
-            Actions = []
-            Node = None
-        }
-
-    let createSimpleApp model view update =
-        createApp model view (fun x y -> (update x y), [])
-
-    let withStartNodeSelector selector app = { app with NodeSelector = Some selector }
-    let withInitMessage msg app = { app with InitMessage = Some msg }
-    let withProducer p app = 
-        {app with Producers = p::app.Producers}
-    let withSubscriber subscriberId subscriber app =
-        let subsribers = app.Subscribers |> Map.add subscriberId subscriber
-        { app with Subscribers = subsribers }
-
-    let withPlugin pluginId plugin =
-        (withSubscriber pluginId plugin.Subscriber)
-        >> (withProducer plugin.Producer)
-
+[<AutoOpen>]
+module internal Helpers = 
     let createScheduler() = 
         MailboxProcessor.Start(fun inbox ->
             let rec loop() = 
@@ -122,48 +85,62 @@ module App =
             loop()
         )
 
-    let createFirstLoopState renderTree (startElem:Node) post renderer state =
-        let tree = renderTree state.View post state.Model
-        let rootNode = renderer.CreateElement tree
-        startElem.appendChild(rootNode) |> ignore
-        match state.InitMessage with
-        | None -> ()
-        | Some init -> init post
-        {state with CurrentTree = Some tree; Node = Some rootNode}
+    let application handleMessage handleDraw handleReplay configureProducers createInitApp (inbox:MailboxProcessor<AppMessage<'TMessage, 'TModel>>) =
+        let scheduler = createScheduler()
+        let scheduleDraw() = scheduler.Post(PingIn(1000./60., (fun() -> inbox.Post(Draw))))
+        let post msg = inbox.Post(msg)
+        let postMessage = Message >> post
+        configureProducers post
+        let rec inner state =
+            async {
+                let! msg = inbox.Receive()
+                match msg with
+                | Message message -> 
+                    return! inner (handleMessage scheduleDraw post message state)
+                | Draw -> 
+                    return! inner (handleDraw postMessage state)
+                | Replay (model, messages) ->
+                    Fable.Import.Browser.window.console.log("Replaying stuff", model, messages)
+                    return! inner (handleReplay postMessage (model, messages) state)
+            }
+        inner (createInitApp postMessage)
 
-    let handleMessage msg notify schedule state = 
-        ActionReceived msg |> (notify state.Subscribers)
-        let (model', actions) = state.Update state.Model msg
-        ModelChanged {PreviousState = state.Model; Message =  msg; CurrentState = model'} |> notify state.Subscribers
+    let render post viewFn renderer app =
+        let view = viewFn app.Model
+        let viewState' = renderer.Render post view app.ViewState
+        {app with ViewState = viewState'}
 
-        let renderState =
-            match state.RenderState with
-            | NoRequest ->
-                schedule()
-//                    scheduler.Post(PingIn(1000./60., (fun() -> inbox.Post(Draw))))
-                InProgress
-            | InProgress -> InProgress
-        {
-            state with 
-                Model = model'
-                RenderState = renderState
-                Actions = state.Actions @ actions }
+    let executeActions post = List.iter (fun a -> a (Message >> post))
+    let notifySubscribers subscribers msg = 
+        subscribers |> List.iter (fun s -> msg |> s)
 
-    let draw state renderTree renderer post currentTree rootNode = 
-        let model = state.Model
-        let tree = renderTree state.View post model
-        let patches = renderer.Diff currentTree tree
-        renderer.Patch rootNode patches |> ignore
-        tree
+    let requestDraw scheduleDraw = 
+        function
+        | NoRequest -> 
+            scheduleDraw()
+            InProgress
+        | InProgress -> InProgress
+    
+    let handleMessage update subscribers scheduleDraw post message app =
+        notifySubscribers subscribers (ActionReceived message)
+        let (model, actions) = update app.Model message
 
-    let handleDraw renderTree renderer post notify rootNode currentTree state = 
-        match state.RenderState with
-        | InProgress ->
-            DrawStarted |> notify state.Subscribers
-            let tree = draw state renderTree renderer post currentTree rootNode
-            state.Actions |> List.iter (fun i -> i post)
-            {state with RenderState = NoRequest; CurrentTree = Some tree; Actions = []}
-        | NoRequest -> raise (exn "Shouldn't happen")
+        let modelChanged = 
+            ModelChanged {
+                CurrentState = model
+                PreviousState = app.Model
+                Message = message
+            }
+        let renderState = requestDraw scheduleDraw app.RenderState
+        
+        executeActions post actions
+        notifySubscribers subscribers modelChanged
+
+        {app with Model = model; RenderState = renderState}
+
+    let handleDraw viewFn renderer post app = 
+        render post viewFn renderer app
+        |> (fun s -> {s with RenderState = NoRequest})
 
     let calculateModelChanges initState update actions = 
         let execUpdate r a =
@@ -179,55 +156,79 @@ module App =
         actions
         |> List.fold (fun s a -> (execUpdate s a)::s) []
 
-    let handleReplay state post notify initState actions renderTree renderer currentTree rootNode = 
-        let result = calculateModelChanges initState state.Update actions
+    let handleReplay viewFn updateFn renderer subscribers post (fromModel, actions) app = 
+        let result = calculateModelChanges fromModel updateFn actions
         let model = 
             match result with 
             | m::_ -> m |> snd
-            | [] -> initState
-        let state' = {state with Model = model}
-        let tree = draw state' renderTree renderer (Message >> post) currentTree rootNode
-        (Replayed result) |> notify state.Subscribers
-        {state' with CurrentTree = Some tree}
+            | [] -> fromModel
+        let app' = 
+            {app with Model = model}
+            |> render post viewFn renderer
 
-    let start renderer app =
-        let renderTree view handler model =
-            view model
-            |> renderer.Render handler
+        Fable.Import.Browser.window.console.log("Replayed with", app')
+        (Replayed result) |> notifySubscribers subscribers
+        app'
 
-        let startElem =
-            match app.NodeSelector with
-            | None -> document.body
-            | Some sel -> document.body.querySelector(sel) :?> HTMLElement
+[<AutoOpen>]
+module AppApi = 
+    // Helper functions to map from one action type to another
+    let mapAction<'T1,'T2> (mapping:'T1 -> 'T2) (action:Action<'T1>) : Action<'T2> = 
+        fun x -> action (mapping >> x)  
 
-        let scheduler = createScheduler()
-        MailboxProcessor.Start(fun inbox ->
-            let post message =
-                inbox.Post message
-            let notifySubscribers subs model =
-                subs |> Map.iter (fun key handler -> handler model)
-            app.Producers |> List.iter (fun p -> p post)
-            let schedule() = scheduler.Post(PingIn(1000./60., (fun() -> inbox.Post(Draw))))
-            let rec loop state =
-                async {
-                    match state.Node, state.CurrentTree with
-                    | None,_ ->
-                        let state' = createFirstLoopState renderTree startElem (Message >> post) renderer state
-                        return! loop state'
-                    | Some rootNode, Some currentTree ->
-                        let! message = inbox.Receive()
-                        match message with
-                        | Message msg ->
-                            Fable.Import.Browser.window.console.log("Some state", state)
-                            let state' = handleMessage msg notifySubscribers schedule state
-                            return! loop state'
-                        | Draw -> 
-                            let state' = handleDraw renderTree renderer (Message >> post) notifySubscribers rootNode currentTree state
-                            return! loop state'
-                        | Replay (initState, actions) ->
-                            let state' = handleReplay state post notifySubscribers initState actions renderTree renderer currentTree rootNode
-                            Fable.Import.Browser.window.console.log("Some replay", state')
-                            return! loop state'
-                    | _ -> failwith "Shouldn't happen"
-                }
-            loop app)
+    let mapActions m = List.map (mapAction m)
+    let toActionList a = [a]
+
+    // Starting point for creating an application
+    let createApp state view update renderer =
+        {
+            InitState = state
+            View = view
+            Update = update
+            InitMessage = None
+            Renderer = renderer
+            NodeSelector = "body"
+            Producers = []
+            Subscribers = []
+        }
+
+    // Starting point for an application with a simpler update function
+    let createSimpleApp model view update =
+        createApp model view (fun x y -> (update x y), [])
+
+    // Fluent api functions to add optional configurations to the application
+    let withStartNodeSelector selector app = { app with NodeSelector = selector }
+    let withInitMessage msg app = { app with InitMessage = Some msg }
+    let withProducer p app = 
+        {app with Producers = p::app.Producers}
+    let withSubscriber subscriber app =
+        {app with Subscribers = subscriber::app.Subscribers}
+    let withPlugin plugin =
+        (withSubscriber plugin.Subscriber)
+        >> (withProducer plugin.Producer)
+
+    let configureProducers producers post =
+        producers |> List.iter (fun p -> p post) 
+
+    // Start the application
+    let start appSpec =
+        let renderer = appSpec.Renderer
+        let viewFn = appSpec.View
+        let updateFn = appSpec.Update
+
+        let createInitApp post = 
+            let view = viewFn appSpec.InitState
+            let viewState = renderer.Init appSpec.NodeSelector post view
+            let render = appSpec.Renderer.Render
+
+            {
+                Model = appSpec.InitState
+                ViewState = viewState
+                RenderState = NoRequest
+                Actions = []
+            }
+        let handleMessage' = handleMessage updateFn appSpec.Subscribers
+        let handleDraw' = handleDraw viewFn renderer
+        let handleReplay' = handleReplay viewFn updateFn renderer appSpec.Subscribers
+        let configureProducers' = configureProducers appSpec.Producers
+        MailboxProcessor.Start(application handleMessage' handleDraw' handleReplay' configureProducers' createInitApp)
