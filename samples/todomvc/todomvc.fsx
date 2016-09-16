@@ -7,16 +7,18 @@
 
 
 #r "node_modules/fable-core/Fable.Core.dll"
-#load "node_modules/fable-import-virtualdom/Fable.Helpers.Virtualdom.fs"
+#load "node_modules/fable-arch/Fable.Arch.Html.fs"
+#load "node_modules/fable-arch/Fable.Arch.App.fs"
+#load "node_modules/fable-arch/Fable.Arch.Virtualdom.fs"
 
 open Fable.Core
 open Fable.Core.JsInterop
 open Fable.Import
 open Fable.Import.Browser
 
-open Fable.Helpers.Virtualdom
-open Fable.Helpers.Virtualdom.App
-open Fable.Helpers.Virtualdom.Html
+open Fable.Arch
+open Fable.Arch.App
+open Fable.Arch.Html
 
 // Todo model
 type Filter =
@@ -233,11 +235,8 @@ open Storage
 let initList = fetch<Item>() |> List.ofArray
 let initModel = {Filter = All; Items = initList; Input = ""}
 
-createApp initModel view update
-|> (withSubscriber "storagesub" (function
-        | ModelChanged (newModel,old) ->
-            save (newModel.Items |> Array.ofList)
-        | _ -> ()))
-|> (withSubscriber "modellogger" (printfn "%A"))
+createApp initModel view update Virtualdom.renderer
+|> (withSubscriber (fun m -> save (m.CurrentState.Items |> Array.ofList)))
+|> (withSubscriber (printfn "%A"))
 |> withStartNodeSelector "#todoapp"
-|> start renderer
+|> start

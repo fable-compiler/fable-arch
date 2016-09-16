@@ -1,10 +1,10 @@
 {
   "name": "fable-arch",
-  "version": "0.9.0",
-  "description": "Fable bindings for virtual-dom",
+  "version": "0.9.1",
+  "description": "Fable Arch is a generic version of the elm architecture implemented with Fable in F#.",
   "repository": {
     "type": "git",
-    "url": "https://github.com/fable-compiler/fable-virtualdom"
+    "url": "https://github.com/fable-compiler/fable-arch"
   },
   "license": "Apache-2.0",
   "author": "Tomas Jansson",
@@ -15,7 +15,7 @@
     "F#"
   ],
   "devDependencies": {
-      "fable-core": "^0.5.4"
+      "fable-core": "^0.6.3"
   },
   "homepage": "https://github.com/fable-compiler/Fable#readme"
 }

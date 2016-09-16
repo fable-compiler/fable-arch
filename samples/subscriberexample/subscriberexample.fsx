@@ -6,14 +6,16 @@
 *)
 
 #r "node_modules/fable-core/Fable.Core.dll"
-#load "node_modules/fable-import-virtualdom/Fable.Helpers.Virtualdom.fs"
+#load "node_modules/fable-arch/Fable.Arch.Html.fs"
+#load "node_modules/fable-arch/Fable.Arch.App.fs"
+#load "node_modules/fable-arch/Fable.Arch.Virtualdom.fs"
 
 open Fable.Core
 open Fable.Core.JsInterop
 
-open Fable.Helpers.Virtualdom
-open Fable.Helpers.Virtualdom.App
-open Fable.Helpers.Virtualdom.Html
+open Fable.Arch
+open Fable.Arch.App
+open Fable.Arch.Html
 
 // Model
 type Model = string
@@ -49,7 +51,7 @@ let view model =
 // update function doesn't generate any actions. See 
 // some of the other more advanced examples for how to
 // use createApp
-createSimpleApp "" view update
+createSimpleApp "" view update Virtualdom.renderer
 |> withStartNodeSelector "#hello"
-|> withSubscriber "Logger" (fun x -> Fable.Import.Browser.console.log("Event received: ", x))
-|> start renderer
+|> withSubscriber (fun x -> Fable.Import.Browser.console.log("Event received: ", x))
+|> start

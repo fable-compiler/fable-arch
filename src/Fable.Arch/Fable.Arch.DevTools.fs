@@ -372,7 +372,6 @@ let createDevTools<'TMessage, 'TModel> pluginId initModel=
                     state.Handler m
                     return! loop state
                 | SetHandler h -> 
-                    Browser.window.console.log("Setting up handler")
                     return! loop {state with Handler = h}
             }
         loop ({Handler = (fun _ -> ())}:LinkState<'TMessage, 'TModel>)
@@ -381,12 +380,10 @@ let createDevTools<'TMessage, 'TModel> pluginId initModel=
     let devToolsAgent = 
         createApp {Base = initModel; Actions = []; Collapsed = Map.empty; LastCommited =[initModel]} devToolsView devToolsUpdate Virtualdom.renderer
         |> withStartNodeSelector "#___devtools"
-        |> withSubscriber (
+        |> withInstrumentationSubscriber (
             fun ae -> 
-                Browser.window.console.log(ae)
                 match ae with
                 | ActionReceived(Replay (s,m)) ->
-                    Browser.window.console.log("Should replay now", s, m)
                     linkAgent.Post(Push (AppMessage.Replay (s,m)))
                 | _ -> ())
         |> start 

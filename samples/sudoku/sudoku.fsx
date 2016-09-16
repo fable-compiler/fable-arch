@@ -7,7 +7,9 @@
 
 // Load Fable.Core and bindings to JS global objects
 #r "node_modules/fable-core/Fable.Core.dll"
-#load "node_modules/fable-import-virtualdom/Fable.Helpers.Virtualdom.fs"
+#load "node_modules/fable-arch/Fable.Arch.Html.fs"
+#load "node_modules/fable-arch/Fable.Arch.App.fs"
+#load "node_modules/fable-arch/Fable.Arch.Virtualdom.fs"
 
 open System
 open Fable.Core
@@ -110,9 +112,9 @@ let initModel =
              [0; 5; 0;  0; 0; 0;  0; 7; 4]]
               |> toSudoku
 
-open Fable.Helpers.Virtualdom
-open Fable.Helpers.Virtualdom.App
-open Fable.Helpers.Virtualdom.Html
+open Fable.Arch
+open Fable.Arch.App
+open Fable.Arch.Html
 
 let inline onInput x = onEvent "oninput" (fun e -> x (unbox e?target?value))
 let maxlength (i:int) = attribute "maxlength" (string i) 
@@ -150,7 +152,7 @@ let view (model:Sudoku) =
         ]
 
 open Fable.Import.Browser
-createApp initModel view update
+createApp initModel view update Virtualdom.renderer
 |> withStartNodeSelector "#todoapp"
-|> withSubscriber "allseeingeye" (fun x -> window.console.log("Something happened: ", x))
-|> start renderer 
+|> withSubscriber (fun x -> window.console.log("Something happened: ", x))
+|> start

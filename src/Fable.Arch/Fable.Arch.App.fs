@@ -100,7 +100,6 @@ module internal Helpers =
                 | Draw -> 
                     return! inner (handleDraw postMessage state)
                 | Replay (model, messages) ->
-                    Fable.Import.Browser.window.console.log("Replaying stuff", model, messages)
                     return! inner (handleReplay postMessage (model, messages) state)
             }
         inner (createInitApp postMessage)
@@ -166,7 +165,6 @@ module internal Helpers =
             {app with Model = model}
             |> render post viewFn renderer
 
-        Fable.Import.Browser.window.console.log("Replayed with", app')
         (Replayed result) |> notifySubscribers subscribers
         app'
 
@@ -199,13 +197,25 @@ module AppApi =
     // Fluent api functions to add optional configurations to the application
     let withStartNodeSelector selector app = { app with NodeSelector = selector }
     let withInitMessage msg app = { app with InitMessage = Some msg }
-    let withProducer p app = 
+
+    let private withInstrumentationProducer p app = 
         {app with Producers = p::app.Producers}
-    let withSubscriber subscriber app =
+    let withProducer (producer:('a->unit)->unit) app =
+        let lift h = Message >> h 
+        let producer' = lift >> producer
+        withInstrumentationProducer producer' app
+
+    let withInstrumentationSubscriber subscriber app =
         {app with Subscribers = subscriber::app.Subscribers}
+    let withSubscriber (subscriber:ModelChanged<'a,'b> -> unit) app = 
+        let subscriber' = function 
+            | ModelChanged m -> m |> subscriber
+            | _ -> ()
+        withInstrumentationSubscriber subscriber' app
+        
     let withPlugin plugin =
-        (withSubscriber plugin.Subscriber)
-        >> (withProducer plugin.Producer)
+        (withInstrumentationSubscriber plugin.Subscriber)
+        >> (withInstrumentationProducer plugin.Producer)
 
     let configureProducers producers post =
         producers |> List.iter (fun p -> p post) 
