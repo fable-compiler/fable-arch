@@ -90,6 +90,7 @@ let cssString = """
         height: 100%;
         font-family: 'Open Sans', sans-serif;
         color: #e0e0e0;
+        z-index: 1000;
     }
     ._fable_dev_tools ul {
         padding: 0;
@@ -205,11 +206,11 @@ open JsInterop
 
 let [<Emit("$0 instanceof Object")>] isObj (x:obj): bool = failwith "JS only" 
 let [<Emit("$0 instanceof Array")>] isArray (x:obj): bool = failwith "JS only" 
-let [<Emit("$0.constructor === Number")>] isNumber (x:obj): bool = failwith "JS only" 
-let [<Emit("$0.constructor === String")>] isString (x:obj): bool = failwith "JS only" 
-let [<Emit("$0.constructor === Boolean")>] isBool (x:obj): bool = failwith "JS only" 
+let [<Emit("$0 != undefined && $0.constructor === Number")>] isNumber (x:obj): bool = failwith "JS only" 
+let [<Emit("$0 != undefined && $0.constructor === String")>] isString (x:obj): bool = failwith "JS only" 
+let [<Emit("$0 != undefined && $0.constructor === Boolean")>] isBool (x:obj): bool = failwith "JS only" 
 
-
+let [<Emit("(function() {var x = []; $0.mapIndexed(function(idx,item) {x[idx] = item;}); return x;})()")>] listToArray (list:obj): JS.Array<_> = failwith "JS only"
 let [<Emit("$0 instanceof $1")>] instanceof (x: obj) (t: obj): bool = failwith "JS only"
 
 let devToolsView model =
@@ -227,7 +228,7 @@ let devToolsView model =
         let collapsed = isCollapsed thisId model
         let extraClass = if collapsed then " collapsed" else ""
 
-        let renderChildren propertyNames = 
+        let renderChildren propertyNames o = 
             propertyNames |> Seq.map (fun y -> renderThing y thisId (o?(y))) |> Seq.toList
 
         let renderValue thingName typeName value = 
@@ -249,14 +250,14 @@ let devToolsView model =
                     span [attribute "class" (sprintf "item-short-value %s" typeName)] [text value]
                 ]                
 
-        let renderComplexType t keys = 
+        let renderComplexType t keys typeName o = 
             let length = keys |> List.length
             let itemWord = if t = "object" then "key" else "item"
-            let headerText = (sprintf "%s (%i %s) " (o.GetType().Name) length (pluralize itemWord length))
+            let headerText = (sprintf "%s (%i %s) " typeName length (pluralize itemWord length))
             [
                 header thingName true (Some (fun _ -> ToggleObjectVisibility thisId)) t headerText
                 div [attribute "class" "item-value"]
-                    (renderChildren keys)
+                    (renderChildren keys o)
             ]
 
         let renderItem children = 
@@ -265,10 +266,14 @@ let devToolsView model =
 
         let valueOnly typeName value = header thingName false None typeName (value.ToString())
         match o with
-        | x when instanceof x JS.Array -> 
-            renderComplexType "array" ([0 .. ((-) (o?length |> string |> int)) 1] |> List.map string)
+        | null -> [valueOnly "" o]
+        | x when x.GetType().Name = "FSharpList" ->
+            let list = listToArray o 
+            renderComplexType "array" ([0 .. ((-) (list?length |> string |> int)) 1] |> List.map string) "FSharpList" list
+        | x when instanceof x JS.Array ->
+            renderComplexType "array" ([0 .. ((-) (o?length |> string |> int)) 1] |> List.map string) (x.GetType().Name) x
         | x when instanceof x JS.Object-> 
-            renderComplexType "object" (Fable.Import.JS.Object.getOwnPropertyNames(o) |> Seq.toList)
+            renderComplexType "object" (Fable.Import.JS.Object.getOwnPropertyNames(o) |> Seq.toList) (x.GetType().Name) x
         | x when isNumber x -> 
             [ valueOnly "number" x ]
         | x when isString x -> 

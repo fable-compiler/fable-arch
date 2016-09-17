@@ -10,6 +10,7 @@
 #load "node_modules/fable-arch/Fable.Arch.Html.fs"
 #load "node_modules/fable-arch/Fable.Arch.App.fs"
 #load "node_modules/fable-arch/Fable.Arch.Virtualdom.fs"
+#load "node_modules/fable-arch/Fable.Arch.DevTools.fs"
 
 open Fable.Core
 open Fable.Core.JsInterop
@@ -238,5 +239,6 @@ let initModel = {Filter = All; Items = initList; Input = ""}
 createApp initModel view update Virtualdom.renderer
 |> (withSubscriber (fun m -> save (m.CurrentState.Items |> Array.ofList)))
 |> (withSubscriber (printfn "%A"))
+|> withPlugin (Fable.Arch.DevTools.createDevTools<TodoAction, Model> "something" initModel)
 |> withStartNodeSelector "#todoapp"
 |> start
