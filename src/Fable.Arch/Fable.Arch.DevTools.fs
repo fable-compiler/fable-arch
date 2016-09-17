@@ -90,6 +90,7 @@ let cssString = """
         height: 100%;
         font-family: 'Open Sans', sans-serif;
         color: #e0e0e0;
+        z-index: 1000;
     }
     ._fable_dev_tools ul {
         padding: 0;
@@ -205,9 +206,9 @@ open JsInterop
 
 let [<Emit("$0 instanceof Object")>] isObj (x:obj): bool = failwith "JS only" 
 let [<Emit("$0 instanceof Array")>] isArray (x:obj): bool = failwith "JS only" 
-let [<Emit("$0.constructor === Number")>] isNumber (x:obj): bool = failwith "JS only" 
-let [<Emit("$0.constructor === String")>] isString (x:obj): bool = failwith "JS only" 
-let [<Emit("$0.constructor === Boolean")>] isBool (x:obj): bool = failwith "JS only" 
+let [<Emit("$0 != undefined && $0.constructor === Number")>] isNumber (x:obj): bool = failwith "JS only" 
+let [<Emit("$0 != undefined && $0.constructor === String")>] isString (x:obj): bool = failwith "JS only" 
+let [<Emit("$0 != undefined && $0.constructor === Boolean")>] isBool (x:obj): bool = failwith "JS only" 
 
 
 let [<Emit("$0 instanceof $1")>] instanceof (x: obj) (t: obj): bool = failwith "JS only"
@@ -265,7 +266,10 @@ let devToolsView model =
 
         let valueOnly typeName value = header thingName false None typeName (value.ToString())
         match o with
-        | x when instanceof x JS.Array -> 
+        | null -> [valueOnly "" o]
+        | x when x.GetType().Name = "FSharpList" ->
+            renderComplexType "array" ([0 .. ((-) (o?length |> string |> int)) 1] |> List.map string)
+        | x when instanceof x JS.Array ->
             renderComplexType "array" ([0 .. ((-) (o?length |> string |> int)) 1] |> List.map string)
         | x when instanceof x JS.Object-> 
             renderComplexType "object" (Fable.Import.JS.Object.getOwnPropertyNames(o) |> Seq.toList)
