@@ -55,7 +55,7 @@ type AppSpecification<'TModel, 'TMessage, 'TView, 'TViewState> =
         InitState: 'TModel
         View: 'TModel -> 'TView
         Update: 'TModel -> 'TMessage -> ('TModel * Action<'TMessage> list)
-        InitMessage: (('TMessage -> unit) -> unit) option
+        InitMessage: (('TMessage -> unit) -> unit)
         Renderer: Renderer<'TMessage, 'TView, 'TViewState>
         NodeSelector: Selector
         Producers: Producer<'TMessage, 'TModel> list
@@ -183,7 +183,7 @@ module AppApi =
             InitState = state
             View = view
             Update = update
-            InitMessage = None
+            InitMessage = (fun _ -> ())
             Renderer = renderer
             NodeSelector = "body"
             Producers = []
@@ -196,7 +196,7 @@ module AppApi =
 
     // Fluent api functions to add optional configurations to the application
     let withStartNodeSelector selector app = { app with NodeSelector = selector }
-    let withInitMessage msg app = { app with InitMessage = Some msg }
+    let withInitMessage msg app = { app with InitMessage = msg }
 
     let private withInstrumentationProducer p app = 
         {app with Producers = p::app.Producers}
@@ -229,6 +229,7 @@ module AppApi =
         let createInitApp post = 
             let view = viewFn appSpec.InitState
             let viewState = renderer.Init appSpec.NodeSelector post view
+            appSpec.InitMessage post
             let render = appSpec.Renderer.Render
 
             {
