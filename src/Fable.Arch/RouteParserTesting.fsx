@@ -1,9 +1,10 @@
 #r "./node_modules/fable-core/Fable.Core.dll"
-#load "./Fable.Helpers.RouteParser.fs"
+#load "./Fable.Arch.RouteParser.fs"
 
 module RouteParserTesting = 
-    open Fable.Helpers.Parsing
-    open Fable.Helpers.RouteParser
+    open Fable.Arch.RouteParser.Parsing
+    open Fable.Arch.RouteParser.RouteParser
+    
     open System
     type Route =
         | Home

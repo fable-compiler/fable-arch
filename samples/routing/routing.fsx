@@ -1,24 +1,27 @@
 (**
  - title: Nesting - how to nest "apps" with a counter as a example
- - tagline: Nesting application implemented with fable-virtualdom
+ - tagline: Nesting application implemented with fable-arch
  - app-style: width:800px; margin:20px auto 50px auto;
  - intro: This is a simple "hello world" application.
 *)
 
 #r "node_modules/fable-core/Fable.Core.dll"
-#load "node_modules/fable-import-virtualdom/Fable.Helpers.Virtualdom.fs"
+#load "node_modules/fable-arch/Fable.Arch.Html.fs"
+#load "node_modules/fable-arch/Fable.Arch.App.fs"
+#load "node_modules/fable-arch/Fable.Arch.Virtualdom.fs"
 
 (**
 Route parser is optional, so you need to add it yourself if you want it.
 *)
-#load "node_modules/fable-import-virtualdom/Fable.Helpers.RouteParser.fs"
+#load "node_modules/fable-arch/Fable.Arch.RouteParser.fs"
 open Fable.Core
 open Fable.Import
 open Fable.Import.Browser
 
-open Fable.Helpers.Virtualdom
-open Fable.Helpers.Virtualdom.App
-open Fable.Helpers.Virtualdom.Html
+open Fable.Arch
+open Fable.Arch.App.Types
+open Fable.Arch.App
+open Fable.Arch.Html
 
 // model
 type Model = 
@@ -128,8 +131,8 @@ let resetEveryTenth h =
 (**
 The routing part starts here.
 *)
-open Fable.Helpers.RouteParser
-open Fable.Helpers.Parsing
+open Fable.Arch.RouteParser.Parsing
+open Fable.Arch.RouteParser.RouteParser
 (**
 This defines how we parse the routes and create actions from them.
 It will match four different routes:
@@ -179,19 +182,16 @@ let locationHandler =
             fun s -> location.assign (sprintf "#%s" s) 
     }
 
-let routerF m = 
-    match m with
-    | ActionReceived msg -> router.Route msg
-    | _ -> None
+let routerF m = router.Route m.Message
 
 (**
 We add a `routeProducer`, which is what listens to the location
 changes. We also add a `routeSubscriber`, which listens to events
 from the app and update the location accordingly.
 *)
-createSimpleApp {Top = initCounter; Bottom = initCounter} nestedView nestedUpdate
+createSimpleApp {Top = initCounter; Bottom = initCounter} nestedView nestedUpdate Virtualdom.renderer
 |> withStartNodeSelector "#nested-counter"
 |> withProducer (routeProducer locationHandler router)
-|> withSubscriber "route-subscriber" (routeSubscriber locationHandler routerF)
-|> withSubscriber "logger" (printfn "%A")
-|> start renderer
+|> withSubscriber (routeSubscriber locationHandler routerF)
+|> withSubscriber (printfn "%A")
+|> start

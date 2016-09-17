@@ -1,19 +1,21 @@
 (**
  - title: Nesting - how to nest "apps" with a counter as a example
- - tagline: Nesting application implemented with fable-virtualdom
+ - tagline: Nesting application implemented with fable-arch
  - app-style: width:800px; margin:20px auto 50px auto;
  - intro: This is a simple "hello world" application.
 *)
 
 #r "node_modules/fable-core/Fable.Core.dll"
-#load "node_modules/fable-import-virtualdom/Fable.Helpers.Virtualdom.fs"
+#load "node_modules/fable-arch/Fable.Arch.Html.fs"
+#load "node_modules/fable-arch/Fable.Arch.App.fs"
+#load "node_modules/fable-arch/Fable.Arch.Virtualdom.fs"
 open Fable.Core
 open Fable.Import
 open Fable.Import.Browser
 
-open Fable.Helpers.Virtualdom
-open Fable.Helpers.Virtualdom.App
-open Fable.Helpers.Virtualdom.Html
+open Fable.Arch
+open Fable.Arch.App
+open Fable.Arch.Html
 
 // model
 type Counter = int
@@ -95,6 +97,6 @@ let nestedView model =
 let resetEveryTenth h =
     window.setInterval((fun _ -> Reset |> h), 10000) |> ignore
 
-createSimpleApp {Top = 0; Bottom = 0} nestedView nestedUpdate
+createSimpleApp {Top = 0; Bottom = 0} nestedView nestedUpdate Virtualdom.renderer
 |> withStartNodeSelector "#nested-counter"
-|> start renderer
+|> start

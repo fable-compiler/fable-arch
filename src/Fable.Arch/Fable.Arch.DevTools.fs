@@ -1,8 +1,7 @@
 module Fable.Arch.DevTools
 
-open Fable.Helpers.Virtualdom
-open Fable.Helpers.Virtualdom.App
-open Fable.Helpers.Virtualdom.Html
+open Fable.Arch.App
+open Fable.Arch.Html
 
 open Fable.Core
 open Fable.Import
@@ -379,17 +378,15 @@ let createDevTools<'TMessage, 'TModel> pluginId initModel=
     )
 
     let devToolsAgent = 
-        createApp {Base = initModel; Actions = []; Collapsed = Map.empty; LastCommited =[initModel]} devToolsView devToolsUpdate
+        createApp {Base = initModel; Actions = []; Collapsed = Map.empty; LastCommited =[initModel]} devToolsView devToolsUpdate Virtualdom.renderer
         |> withStartNodeSelector "#___devtools"
-        |> withSubscriber "appSub" (
+        |> withInstrumentationSubscriber (
             fun ae -> 
-                Browser.window.console.log(ae)
                 match ae with
                 | ActionReceived(Replay (s,m)) ->
-                    Fable.Import.Browser.window.console.log(s,m)
                     linkAgent.Post(Push (AppMessage.Replay (s,m)))
                 | _ -> ())
-        |> start renderer
+        |> start 
     
     {
         Producer = (fun h -> linkAgent.Post(SetHandler h)) 

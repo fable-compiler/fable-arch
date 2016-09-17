@@ -1,22 +1,24 @@
 (**
  - title: A simple clock - producer demo
- - tagline: Clock implemented with fable-virtualdom
+ - tagline: Clock implemented with fable-arch
  - app-style: width:800px; margin:20px auto 50px auto;
  - require-paths: `'virtual-dom':'lib/virtual-dom'`
- - intro: This demo shows how you can add a producers of actions to fable-virtualdom.
+ - intro: This demo shows how you can add a producers of actions to fable-arch.
 *)
 
-// Load Fable.Core and bindings to JS global objects
+// Load Fable.Core and fable-arch files and bindings to JS global objects
 #r "node_modules/fable-core/Fable.Core.dll"
-#load "node_modules/fable-import-virtualdom/Fable.Helpers.Virtualdom.fs"
+#load "node_modules/fable-arch/Fable.Arch.Html.fs"
+#load "node_modules/fable-arch/Fable.Arch.App.fs"
+#load "node_modules/fable-arch/Fable.Arch.Virtualdom.fs"
 
 open System
 open Fable.Core
 open Fable.Import
 open Fable.Import.Browser
-open Fable.Helpers.Virtualdom
-open Fable.Helpers.Virtualdom.App
-open Fable.Helpers.Virtualdom.Html
+open Fable.Arch
+open Fable.Arch.App
+open Fable.Arch.Html
 
 module Clock =
 
@@ -77,7 +79,7 @@ module Clock =
         push(Tick DateTime.Now)
 
     /// Create and run our application
-    createApp Model.init view update
+    createApp Model.init view update Virtualdom.renderer
     |> withStartNodeSelector "#app"
     |> withProducer tickProducer    // Attach our producer to the app
-    |> start renderer
+    |> start

@@ -1,4 +1,4 @@
-namespace Fable.Helpers 
+namespace Fable.Arch.RouteParser 
 (*
 Based on the excellent blog series by Scott Wlaschin: http://fsharpforfunandprofit.com/posts/understanding-parser-combinators/
 Inspired by Elm Route Parser: http://package.elm-lang.org/packages/etaque/elm-route-parser/2.2.1/

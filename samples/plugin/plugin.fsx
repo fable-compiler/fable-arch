@@ -5,17 +5,19 @@
  - intro: This is a simple "hello world" application.
 *)
 #r "node_modules/fable-core/Fable.Core.dll"
-#load "node_modules/fable-import-virtualdom/Fable.Helpers.Virtualdom.fs"
+#load "node_modules/fable-arch/Fable.Arch.Html.fs"
+#load "node_modules/fable-arch/Fable.Arch.App.fs"
+#load "node_modules/fable-arch/Fable.Arch.Virtualdom.fs"
 //#if DEV
-#load "node_modules/fable-import-virtualdom/Fable.Arch.DevTools.fs"
+#load "node_modules/fable-arch/Fable.Arch.DevTools.fs"
 //#endif
 open Fable.Core
 open Fable.Import
 open Fable.Import.Browser
 
-open Fable.Helpers.Virtualdom
-open Fable.Helpers.Virtualdom.App
-open Fable.Helpers.Virtualdom.Html
+open Fable.Arch
+open Fable.Arch.App
+open Fable.Arch.Html
 
 #if DEV
 open Fable.Arch.DevTools
@@ -87,8 +89,8 @@ let nestedUpdate model action =
 let nestedView model = 
     div []
         [
-            Html.map Top (counterView model.Top)
-            Html.map Bottom (counterView model.Bottom)
+            Fable.Arch.Html.map Top (counterView model.Top)
+            Fable.Arch.Html.map Bottom (counterView model.Bottom)
             button 
                 [
                     onMouseClick (fun _ -> Reset)
@@ -102,9 +104,9 @@ let resetEveryTenth h =
     window.setInterval((fun _ -> Reset |> h), 10000) |> ignore
 
 let initModel = {Top = 0; Bottom = 0}
-createSimpleApp initModel nestedView nestedUpdate
+createSimpleApp initModel nestedView nestedUpdate Virtualdom.renderer
 |> withStartNodeSelector "#nested-counter"
-#if DEV
-|> withPlugin "something" (createDevTools<NestedAction, NestedModel> "something" initModel)
-#endif
-|> start renderer
+//#if DEV
+|> withPlugin (Fable.Arch.DevTools.createDevTools<NestedAction, NestedModel> "something" initModel)
+//#endif
+|> start
