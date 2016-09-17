@@ -97,17 +97,23 @@ let cssString = """
         margin: 0;
         list-style: none;
     }
+    ._fable_dev_tools .actions {
+        margin-bottom: 5px;
+    }
     ._fable_dev_tools .actions li {
-        color: #696969;
+        color: #565656;
         display: inline-block;
         width: 90px;
         text-align:center;
-        padding: 5px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        margin-left: 5px;
+        margin-right: 5px;
         font-weight: bold;
     }
     ._fable_dev_tools .actions li.active {
+        background-color: #565656;
         color: #e0e0e0;
-        background: #929292;
         cursor: pointer;
     }
 

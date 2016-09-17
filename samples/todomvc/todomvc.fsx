@@ -44,7 +44,7 @@ type Model =
 
 type TodoAction =
     | NoOp
-    | AddItem
+    | AddItem of string
     | ChangeInput of string
     | MarkAsDone of Item
     | ToggleItem of Item
@@ -74,7 +74,7 @@ let update model msg =
     let model' =
         match msg with
         | NoOp -> model
-        | AddItem ->
+        | AddItem str ->
             let maxId =
                 if model.Items |> List.isEmpty then 1
                 else
@@ -83,7 +83,7 @@ let update model msg =
                     |> List.max
             (fun items ->
                 items @ [{  Id = maxId + 1
-                            Name = model.Input
+                            Name = str
                             Done = false
                             IsEditing = false}])
             |> updateItems {model with Input = ""}
@@ -156,16 +156,16 @@ let todoFooter model =
                 [ text "Clear completed" ] ]
 
 let inline onInput x = onEvent "oninput" (fun e -> x (unbox e?target?value)) 
-let onEnter succ nop = onKeyup (fun x -> if (unbox x?keyCode) = 13 then succ else nop)
+let onEnter succ nop = onKeyup (fun x -> if (unbox x?keyCode) = 13 then let value = (x?target?value).ToString() in x?target?value <- ""; succ value else nop)
 let todoHeader model =
     header
         [attribute "class" "header"]
         [   h1 [] [text "todos"]
             input [ attribute "class" "new-todo"
                     attribute "id" "new-todo"
-                    property "value" model
+//                    property "value" model
                     property "placeholder" "What needs to be done?"
-                    onInput (fun x -> ChangeInput x)
+//                    onInput (fun x -> ChangeInput x)
                     onEnter AddItem NoOp ]]
 let listItem item =
     let itemChecked = if item.Done then "true" else ""
