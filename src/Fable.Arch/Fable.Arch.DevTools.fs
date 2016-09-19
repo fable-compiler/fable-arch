@@ -273,8 +273,8 @@ let devToolsView model =
         let valueOnly typeName value = header thingName false None typeName (value.ToString())
         match o with
         | null -> [valueOnly "" o]
-        | x when x.GetType().Name = "FSharpList" ->
-            let list = listToArray o 
+        | :? List<obj> as o ->
+            let list = List.toArray o 
             renderComplexType "array" ([0 .. ((-) (list?length |> string |> int)) 1] |> List.map string) "FSharpList" list
         | x when instanceof x JS.Array ->
             renderComplexType "array" ([0 .. ((-) (o?length |> string |> int)) 1] |> List.map string) (x.GetType().Name) x
@@ -389,7 +389,7 @@ let createDevTools<'TMessage, 'TModel> pluginId initModel=
     )
 
     let devToolsAgent = 
-        createApp {Base = initModel; Actions = []; Collapsed = Map.empty; LastCommited =[initModel]} devToolsView devToolsUpdate Virtualdom.renderer
+        createApp {Base = initModel; Actions = []; Collapsed = Map.empty; LastCommited =[initModel]} devToolsView devToolsUpdate (Virtualdom.renderer())
         |> withStartNodeSelector "#___devtools"
         |> withInstrumentationSubscriber (
             fun ae -> 

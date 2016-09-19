@@ -87,7 +87,8 @@ module internal Helpers =
 
     let application handleMessage handleDraw handleReplay configureProducers createInitApp (inbox:MailboxProcessor<AppMessage<'TMessage, 'TModel>>) =
         let scheduler = createScheduler()
-        let scheduleDraw() = scheduler.Post(PingIn(1000./60., (fun() -> inbox.Post(Draw))))
+        let scheduleDraw() = inbox.Post(Draw) 
+//             scheduler.Post(PingIn(1000./60., (fun() -> inbox.Post(Draw))))
         let post msg = inbox.Post(msg)
         let postMessage = Message >> post
         configureProducers post
@@ -130,12 +131,14 @@ module internal Helpers =
                 PreviousState = app.Model
                 Message = message
             }
-        let renderState = requestDraw scheduleDraw app.RenderState
+        scheduleDraw()
+//        let renderState = requestDraw scheduleDraw app.RenderState
         
         executeActions post actions
         notifySubscribers subscribers modelChanged
 
-        {app with Model = model; RenderState = renderState}
+        {app with Model = model}
+//        {app with Model = model; RenderState = renderState}
 
     let handleDraw viewFn renderer post app = 
         render post viewFn renderer app

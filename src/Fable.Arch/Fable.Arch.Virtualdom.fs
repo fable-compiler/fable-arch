@@ -81,8 +81,54 @@ let render' handler view viewState =
     patch viewState.Node patches |> ignore
     viewState'
 
-let renderer =
+type RenderState = 
+    | NoRequest
+    | ExtraRequest
+    | PendingRequest
+type VDomRenderer() = 
+    let mutable state = NoRequest
+    let mutable currentVirtualNode = null
+    let mutable nextVirtualNode = null
+    let mutable vdomNode = null
+    let rec update() =
+        match state with
+        | NoRequest -> raise (exn "Unexpected draw")
+        | PendingRequest -> 
+            window.requestAnimationFrame((fun _ -> update())) |> ignore     
+            state <- ExtraRequest
+            let patches = diff currentVirtualNode nextVirtualNode
+            patch vdomNode patches |> ignore
+            currentVirtualNode <- nextVirtualNode
+        | ExtraRequest ->
+            state <- NoRequest
+
+    member this.Init selector handler view = 
+        let node = document.body.querySelector(selector) :?> HTMLElement
+        let tree = renderSomething handler view
+        vdomNode <- createElement tree
+        currentVirtualNode <- tree
+        nextVirtualNode <- tree
+        node.appendChild(vdomNode) |> ignore
+
+    member this.Render handler view viewState =
+        let tree = renderSomething handler view
+        match state with
+        | NoRequest ->
+            window.requestAnimationFrame((fun _ -> update())) |> ignore
+        | _ -> ()
+        state <- PendingRequest
+        nextVirtualNode <- tree
+    
+//    var domNode = render(initialVirtualNode, eventNode);
+//	parent.appendChild(domNode);
+//
+//	var state = 'NO_REQUEST';
+//	var currentVirtualNode = initialVirtualNode;
+//	var nextVirtualNode = initialVirtualNode;
+//
+let renderer() =
+    let vdomRenderer = VDomRenderer()
     {
-        Render = render'
-        Init = init
+        Render = vdomRenderer.Render
+        Init = vdomRenderer.Init
     }

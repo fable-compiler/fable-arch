@@ -236,7 +236,7 @@ open Storage
 let initList = fetch<Item>() |> List.ofArray
 let initModel = {Filter = All; Items = initList; Input = ""}
 
-createApp initModel view update Virtualdom.renderer
+createApp initModel view update (Virtualdom.renderer())
 |> (withSubscriber (fun m -> save (m.CurrentState.Items |> Array.ofList)))
 |> (withSubscriber (printfn "%A"))
 |> withPlugin (Fable.Arch.DevTools.createDevTools<TodoAction, Model> "something" initModel)
