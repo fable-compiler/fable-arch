@@ -87,7 +87,7 @@ let update model action =
       h (SetStatus Pending)
     | _ -> ()
 
-  // We return the model, and a list of Action to execute
+  // We return the model, and a list of Actions to execute
   model', delayedCall |> toActionList
 
 // View
@@ -104,7 +104,7 @@ let view model =
     [
       label
         []
-        [text "Enter a sentence to upper: "]
+        [text "Enter a sentence: "]
       br []
       textarea
         [
@@ -115,18 +115,14 @@ let view model =
       br []
       button
         [ onMouseClick (fun _ -> SendEcho) ]
-        [ text "Send to server" ]
+        [ text "Uppercase by server" ]
       br []
       span
         []
         [ infoText ]
     ]
 
-// Using createSimpleApp instead of createApp since our
-// update function doesn't generate any actions. See
-// some of the other more advanced examples for how to
-// use createApp. In addition to the application functions
-// we also need to specify which renderer to use.
+/// Create our application
 createApp Model.Init view update Virtualdom.renderer
 |> withStartNodeSelector "#echo"
 |> start
