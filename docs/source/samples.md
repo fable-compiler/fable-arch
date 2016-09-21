@@ -1,12 +1,12 @@
- - tagline: Explore Fable-virtualdom through fun demos!
+ - tagline: Explore Fable-arch through fun demos!
 
-# Fable-virtualdom samples
+# Fable-virtuaarchldom samples
 
-Fable-virtualdom is great for building modern web application following the [elm architecture](http://guide.elm-lang.org/architecture/index.html).
-Hopefully the samples here show you how to get started and gives you some inspiration about how to build your application using Fable-virtualdom.
+Fable-arch is great for building modern web application following the [elm architecture](http://guide.elm-lang.org/architecture/index.html).
+Hopefully the samples here show you how to get started and gives you some inspiration about how to build your application using Fable-arch.
 
 You can also contribute more examples by sending us a pull
-request [for the samples directory](https://github.com/fable-compiler/fable-virtualdom/tree/master/samples)!
+request [for the samples directory](https://github.com/fable-compiler/fable-arch/tree/master/samples)!
 
 ## Sample applications
 

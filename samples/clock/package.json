@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "fable",
+    "build": "npm install && fable",
     "serve": "http-server"
   },
   "dependencies": {
@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "http-server": "0.9.0",
-    "fable-compiler": "^0.5.5",
+    "fable-compiler": "^0.6.3",
     "fable-arch": "^0.9.1",
     "source-map-loader": "^0.1.5",
     "webpack": "^1.13.1"

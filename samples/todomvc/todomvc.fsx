@@ -1,6 +1,6 @@
 (**
  - title: Todo MVC
- - tagline: The famous todo mvc implemented in fable-virtualdom
+ - tagline: The famous todo mvc implemented in fable-arch
  - app-style: width:800px; margin:20px auto 50px auto;
  - intro: Todo MVC implemented to show a more realistic example.
 *)
@@ -10,7 +10,6 @@
 #load "node_modules/fable-arch/Fable.Arch.Html.fs"
 #load "node_modules/fable-arch/Fable.Arch.App.fs"
 #load "node_modules/fable-arch/Fable.Arch.Virtualdom.fs"
-#load "node_modules/fable-arch/Fable.Arch.DevTools.fs"
 
 open Fable.Core
 open Fable.Core.JsInterop
@@ -238,7 +237,5 @@ let initModel = {Filter = All; Items = initList; Input = ""}
 
 createApp initModel view update Virtualdom.renderer
 |> (withSubscriber (fun m -> save (m.CurrentState.Items |> Array.ofList)))
-|> (withSubscriber (printfn "%A"))
-|> withPlugin (Fable.Arch.DevTools.createDevTools<TodoAction, Model> "something" initModel)
 |> withStartNodeSelector "#todoapp"
 |> start

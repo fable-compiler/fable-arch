@@ -1,6 +1,6 @@
 (**
- - title: Sudoku - the game sudoku implemented in fable-virtualdom
- - tagline: Sudoku - the game sudoku implemented in fable-virtualdom
+ - title: Sudoku - the game sudoku implemented in fable-arch
+ - tagline: Sudoku - the game sudoku implemented in fable-arch
  - app-style: width:800px; margin:20px auto 50px auto;
  - intro: A port of https://github.com/forki/react-sudoku
 *)

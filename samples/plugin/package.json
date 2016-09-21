@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "fable",
+    "build": "npm install && fable",
     "watch": "fable -w --target watch"
   },
   "dependencies": {
@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "fable-compiler": "^0.6.4",
-    "fable-arch": "^0.9.1",
+    "fable-arch": "^0.9.4",
     "source-map-loader": "^0.1.5",
     "webpack": "^1.13.1"
   },

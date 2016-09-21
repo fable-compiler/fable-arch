@@ -1,8 +1,8 @@
 (**
- - title: Nesting - how to nest "apps" with a counter as a example
- - tagline: Nesting application implemented with fable-virtualdom
+ - title: Plugin
+ - tagline: Nesting application implemented with fable-arch and a plugin attached
  - app-style: width:800px; margin:20px auto 50px auto;
- - intro: This is a simple "hello world" application.
+ - intro: This is a simple counter but with a devtools plugin attached to the application.
 *)
 #r "node_modules/fable-core/Fable.Core.dll"
 #load "node_modules/fable-arch/Fable.Arch.Html.fs"

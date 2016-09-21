@@ -1,6 +1,6 @@
 (**
  - title: Subscriber example - demo of how to subscribe to events from the application
- - tagline: Subscribing on events from the fable-virtualdom application
+ - tagline: Subscribing on events from the fable-arch application
  - app-style: width:800px; margin:20px auto 50px auto;
  - intro: Simple hello world application, but with logging. Open console to see.
 *)

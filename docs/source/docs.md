@@ -1,11 +1,11 @@
- - tagline: Learn about how Fable-virtual works & how to use it
+ - tagline: Learn about how Fable-arch works & how to use it
 
-# Fable-virtualdom documentation
+# Fable-arch documentation
 
 The following documentation pages are generated from the `docs` pages
-in the fable-virtualdom repository on GitHub. These documents are not
+in the fable-arch repository on GitHub. These documents are not
 complete and we will add to them as the time goes. Is anything unclear 
-or missing? Help us make fable-virtualdom and Fable better by contributing!
+or missing? Help us make fable-arch and Fable better by contributing!
 
 <div class="fb-docs">
 
