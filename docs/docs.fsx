@@ -262,7 +262,7 @@ let generateSamplePage siteRoot name path =
         else "", "" ),
       ( if attrs.ContainsKey("app-style") then attrs.["app-style"] else "" )
 
-    let githubLink = sprintf "https://github.com/fable-compiler/fable-virtualdom/tree/master/samples/%s" name
+    let githubLink = sprintf "https://github.com/fable-compiler/fable-arch/tree/master/samples/%s" name
     // Require paths are specified using ` .. ` - drop <code>
     let requirePaths = 
       if not (attrs.ContainsKey("require-paths")) then "" else
