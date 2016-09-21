@@ -45,145 +45,198 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1), __webpack_require__(2), __webpack_require__(3), __webpack_require__(4)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore, _FableArch, _FableArch2, _FableArch3) {
-	    "use strict";
+	  "use strict";
 	
-	    Object.defineProperty(exports, "__esModule", {
-	        value: true
-	    });
-	    exports.Clock = undefined;
+	  Object.defineProperty(exports, "__esModule", {
+	    value: true
+	  });
+	  exports.Actions = exports.Model = exports.Status = undefined;
+	  exports.fakeAjax = fakeAjax;
+	  exports.update = update;
+	  exports.view = view;
 	
-	    function _classCallCheck(instance, Constructor) {
-	        if (!(instance instanceof Constructor)) {
-	            throw new TypeError("Cannot call a class as a function");
-	        }
+	  function _classCallCheck(instance, Constructor) {
+	    if (!(instance instanceof Constructor)) {
+	      throw new TypeError("Cannot call a class as a function");
+	    }
+	  }
+	
+	  var _createClass = function () {
+	    function defineProperties(target, props) {
+	      for (var i = 0; i < props.length; i++) {
+	        var descriptor = props[i];
+	        descriptor.enumerable = descriptor.enumerable || false;
+	        descriptor.configurable = true;
+	        if ("value" in descriptor) descriptor.writable = true;
+	        Object.defineProperty(target, descriptor.key, descriptor);
+	      }
 	    }
 	
-	    var _createClass = function () {
-	        function defineProperties(target, props) {
-	            for (var i = 0; i < props.length; i++) {
-	                var descriptor = props[i];
-	                descriptor.enumerable = descriptor.enumerable || false;
-	                descriptor.configurable = true;
-	                if ("value" in descriptor) descriptor.writable = true;
-	                Object.defineProperty(target, descriptor.key, descriptor);
-	            }
-	        }
+	    return function (Constructor, protoProps, staticProps) {
+	      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+	      if (staticProps) defineProperties(Constructor, staticProps);
+	      return Constructor;
+	    };
+	  }();
 	
-	        return function (Constructor, protoProps, staticProps) {
-	            if (protoProps) defineProperties(Constructor.prototype, protoProps);
-	            if (staticProps) defineProperties(Constructor, staticProps);
-	            return Constructor;
-	        };
-	    }();
+	  function fakeAjax(cb, data) {
+	    window.setTimeout(function (_arg1) {
+	      return cb(data.toLocaleUpperCase());
+	    }, 1500);
+	  }
 	
-	    var Clock = exports.Clock = function ($exports) {
-	        var normalizeNumber = $exports.normalizeNumber = function normalizeNumber(x) {
-	            return x < 10 ? _fableCore.String.fsFormat("0%i")(function (x) {
-	                return x;
-	            })(x) : String(x);
-	        };
+	  var Status = exports.Status = function () {
+	    function Status(caseName, fields) {
+	      _classCallCheck(this, Status);
 	
-	        var Action = $exports.Action = function () {
-	            function Action(caseName, fields) {
-	                _classCallCheck(this, Action);
+	      this.Case = caseName;
+	      this.Fields = fields;
+	    }
 	
-	                this.Case = caseName;
-	                this.Fields = fields;
-	            }
+	    _createClass(Status, [{
+	      key: "Equals",
+	      value: function Equals(other) {
+	        return _fableCore.Util.equalsUnions(this, other);
+	      }
+	    }, {
+	      key: "CompareTo",
+	      value: function CompareTo(other) {
+	        return _fableCore.Util.compareUnions(this, other);
+	      }
+	    }]);
 	
-	            _createClass(Action, [{
-	                key: "Equals",
-	                value: function Equals(other) {
-	                    return _fableCore.Util.equalsUnions(this, other);
-	                }
-	            }, {
-	                key: "CompareTo",
-	                value: function CompareTo(other) {
-	                    return _fableCore.Util.compareUnions(this, other);
-	                }
-	            }]);
+	    return Status;
+	  }();
 	
-	            return Action;
-	        }();
+	  _fableCore.Util.setInterfaces(Status.prototype, ["FSharpUnion", "System.IEquatable", "System.IComparable"], "Echo.Status");
 	
-	        _fableCore.Util.setInterfaces(Action.prototype, ["FSharpUnion", "System.IEquatable", "System.IComparable"], "Clock.Clock.Action");
+	  var Model = exports.Model = function () {
+	    function Model(inputValue, serverResponse, status) {
+	      _classCallCheck(this, Model);
 	
-	        var Model = $exports.Model = function () {
-	            function Model(time, date) {
-	                _classCallCheck(this, Model);
+	      this.InputValue = inputValue;
+	      this.ServerResponse = serverResponse;
+	      this.Status = status;
+	    }
 	
-	                this.Time = time;
-	                this.Date = date;
-	            }
+	    _createClass(Model, [{
+	      key: "Equals",
+	      value: function Equals(other) {
+	        return _fableCore.Util.equalsRecords(this, other);
+	      }
+	    }, {
+	      key: "CompareTo",
+	      value: function CompareTo(other) {
+	        return _fableCore.Util.compareRecords(this, other);
+	      }
+	    }], [{
+	      key: "Init",
+	      get: function get() {
+	        return new Model("", "", new Status("None", []));
+	      }
+	    }]);
 	
-	            _createClass(Model, [{
-	                key: "Equals",
-	                value: function Equals(other) {
-	                    return _fableCore.Util.equalsRecords(this, other);
-	                }
-	            }, {
-	                key: "CompareTo",
-	                value: function CompareTo(other) {
-	                    return _fableCore.Util.compareRecords(this, other);
-	                }
-	            }], [{
-	                key: "init",
-	                get: function get() {
-	                    return new Model("00:00:00", "1970/01/01");
-	                }
-	            }]);
+	    return Model;
+	  }();
 	
-	            return Model;
-	        }();
+	  _fableCore.Util.setInterfaces(Model.prototype, ["FSharpRecord", "System.IEquatable", "System.IComparable"], "Echo.Model");
 	
-	        _fableCore.Util.setInterfaces(Model.prototype, ["FSharpRecord", "System.IEquatable", "System.IComparable"], "Clock.Clock.Model");
+	  var Actions = exports.Actions = function () {
+	    function Actions(caseName, fields) {
+	      _classCallCheck(this, Actions);
 	
-	        var update = $exports.update = function update(model, action) {
-	            var patternInput = function () {
-	                var day = normalizeNumber(_fableCore.Date.day(action.Fields[0]));
-	                var month = normalizeNumber(_fableCore.Date.month(action.Fields[0]));
+	      this.Case = caseName;
+	      this.Fields = fields;
+	    }
 	
-	                var date = _fableCore.String.fsFormat("%i/%s/%s")(function (x) {
-	                    return x;
-	                })(_fableCore.Date.year(action.Fields[0]))(month)(day);
+	    _createClass(Actions, [{
+	      key: "Equals",
+	      value: function Equals(other) {
+	        return _fableCore.Util.equalsUnions(this, other);
+	      }
+	    }, {
+	      key: "CompareTo",
+	      value: function CompareTo(other) {
+	        return _fableCore.Util.compareUnions(this, other);
+	      }
+	    }]);
 	
-	                return [new Model(_fableCore.String.format("{0:HH:mm:ss}", action.Fields[0]), date), new _fableCore.List()];
-	            }();
+	    return Actions;
+	  }();
 	
-	            return [patternInput[0], patternInput[1]];
-	        };
+	  _fableCore.Util.setInterfaces(Actions.prototype, ["FSharpUnion", "System.IEquatable", "System.IComparable"], "Echo.Actions");
 	
-	        var view = $exports.view = function view(model) {
-	            return function () {
-	                var tagName = "div";
-	                return function (children) {
-	                    return new _FableArch.Types.DomNode("Element", [[tagName, new _fableCore.List()], children]);
-	                };
-	            }()(_fableCore.List.ofArray([new _FableArch.Types.DomNode("Text", [model.Date]), new _FableArch.Types.DomNode("VoidElement", [["br", new _fableCore.List()]]), new _FableArch.Types.DomNode("Text", [model.Time])]));
-	        };
+	  function update(model, action) {
+	    var model_ = action.Case === "ChangeInput" ? new Model(action.Fields[0], model.ServerResponse, model.Status) : action.Case === "ServerResponse" ? function () {
+	      var Status_1 = new Status("Done", []);
+	      return new Model(model.InputValue, action.Fields[0], Status_1);
+	    }() : action.Case === "SetStatus" ? new Model(model.InputValue, model.ServerResponse, action.Fields[0]) : model;
 	
-	        var tickProducer = $exports.tickProducer = function tickProducer(push) {
-	            window.setInterval(function (_arg1) {
-	                push(new Action("Tick", [_fableCore.Date.now()]));
-	                return null;
-	            }, 1000);
-	            push(new Action("Tick", [_fableCore.Date.now()]));
-	        };
+	    var delayedCall = function delayedCall(h) {
+	      if (action.Case === "SendEcho") {
+	        fakeAjax(function (data) {
+	          h(new Actions("ServerResponse", [data]));
+	        }, model.InputValue);
+	        h(new Actions("SetStatus", [new Status("Pending", [])]));
+	      }
+	    };
 	
-	        _FableArch2.AppApi.start(function (app) {
-	            return _FableArch2.AppApi.withProducer(function (push) {
-	                tickProducer(push);
-	            }, app);
-	        }(_FableArch2.AppApi.withStartNodeSelector("#app", _FableArch2.AppApi.createApp(Model.init, function (model) {
-	            return view(model);
-	        }, function (model) {
-	            return function (action) {
-	                return update(model, action);
-	            };
-	        }, (0, _FableArch3.renderer)()))));
+	    return [model_, _FableArch.AppApi.toActionList(delayedCall)];
+	  }
 	
-	        return $exports;
-	    }({});
+	  function view(model) {
+	    var infoText = model.Status.Case === "Pending" ? new _FableArch2.Types.DomNode("Text", ["Waiting Server response"]) : model.Status.Case === "Done" ? new _FableArch2.Types.DomNode("Text", [_fableCore.String.fsFormat("The server response is: %s")(function (x) {
+	      return x;
+	    })(model.ServerResponse)]) : new _FableArch2.Types.DomNode("Text", [""]);
+	    return function () {
+	      var tagName = "div";
+	      return function (children) {
+	        return new _FableArch2.Types.DomNode("Element", [[tagName, new _fableCore.List()], children]);
+	      };
+	    }()(_fableCore.List.ofArray([function () {
+	      var tagName = "label";
+	      return function (children) {
+	        return new _FableArch2.Types.DomNode("Element", [[tagName, new _fableCore.List()], children]);
+	      };
+	    }()(_fableCore.List.ofArray([new _FableArch2.Types.DomNode("Text", ["Enter a sentence: "])])), new _FableArch2.Types.DomNode("VoidElement", [["br", new _fableCore.List()]]), function () {
+	      var tagName = "textarea";
+	      return function (children) {
+	        return new _FableArch2.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch2.Types.Attribute("EventHandler", [["oninput", function (e) {
+	          return function (arg0) {
+	            return new Actions("ChangeInput", [arg0]);
+	          }(e.target.value);
+	        }]]), new _FableArch2.Types.Attribute("Property", [["value", model.InputValue]])])], children]);
+	      };
+	    }()(new _fableCore.List()), new _FableArch2.Types.DomNode("VoidElement", [["br", new _fableCore.List()]]), function () {
+	      var tagName = "button";
+	      return function (children) {
+	        return new _FableArch2.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([function () {
+	          var h = function h(e) {
+	            e.stopPropagation();
+	            e.preventDefault();
+	            return function (_arg1) {
+	              return new Actions("SendEcho", []);
+	            }(e);
+	          };
+	
+	          return new _FableArch2.Types.Attribute("EventHandler", [["onclick", h]]);
+	        }()])], children]);
+	      };
+	    }()(_fableCore.List.ofArray([new _FableArch2.Types.DomNode("Text", ["Uppercase by server"])])), new _FableArch2.Types.DomNode("VoidElement", [["br", new _fableCore.List()]]), function () {
+	      var tagName = "span";
+	      return function (children) {
+	        return new _FableArch2.Types.DomNode("Element", [[tagName, new _fableCore.List()], children]);
+	      };
+	    }()(_fableCore.List.ofArray([infoText]))]));
+	  }
+	
+	  _FableArch.AppApi.start(_FableArch.AppApi.withStartNodeSelector("#echo", _FableArch.AppApi.createApp(Model.Init, function (model) {
+	    return view(model);
+	  }, function (model) {
+	    return function (action) {
+	      return update(model, action);
+	    };
+	  }, (0, _FableArch3.renderer)())));
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
@@ -4787,105 +4840,6 @@
 	    Object.defineProperty(exports, "__esModule", {
 	        value: true
 	    });
-	    exports.Svg = exports.Events = exports.Attributes = exports.Tags = exports.Types = undefined;
-	    exports.mapEventHandler = mapEventHandler;
-	    exports.mapAttributes = mapAttributes;
-	    exports.mapElem = mapElem;
-	    exports.mapVoidElem = mapVoidElem;
-	    exports.map = map;
-	
-	    function _classCallCheck(instance, Constructor) {
-	        if (!(instance instanceof Constructor)) {
-	            throw new TypeError("Cannot call a class as a function");
-	        }
-	    }
-	
-	    var Types = exports.Types = function ($exports) {
-	        var Attribute = $exports.Attribute = function Attribute(caseName, fields) {
-	            _classCallCheck(this, Attribute);
-	
-	            this.Case = caseName;
-	            this.Fields = fields;
-	        };
-	
-	        _fableCore.Util.setInterfaces(Attribute.prototype, ["FSharpUnion"], "Fable.Arch.Html.Types.Attribute");
-	
-	        var DomNode = $exports.DomNode = function DomNode(caseName, fields) {
-	            _classCallCheck(this, DomNode);
-	
-	            this.Case = caseName;
-	            this.Fields = fields;
-	        };
-	
-	        _fableCore.Util.setInterfaces(DomNode.prototype, ["FSharpUnion"], "Fable.Arch.Html.Types.DomNode");
-	
-	        return $exports;
-	    }({});
-	
-	    function mapEventHandler(mapping, e, f) {
-	        return new Types.Attribute("EventHandler", [[e, function ($var1) {
-	            return mapping(f($var1));
-	        }]]);
-	    }
-	
-	    function mapAttributes(mapping, attribute) {
-	        return attribute.Case === "Style" ? new Types.Attribute("Style", [attribute.Fields[0]]) : attribute.Case === "Property" ? new Types.Attribute("Property", [attribute.Fields[0]]) : attribute.Case === "Attribute" ? new Types.Attribute("Attribute", [attribute.Fields[0]]) : mapEventHandler(mapping, attribute.Fields[0][0], attribute.Fields[0][1]);
-	    }
-	
-	    function mapElem(mapping, node_0, node_1) {
-	        var node = [node_0, node_1];
-	        return [node[0], _fableCore.List.map(function (attribute) {
-	            return mapAttributes(mapping, attribute);
-	        }, node[1])];
-	    }
-	
-	    function mapVoidElem(mapping, node_0, node_1) {
-	        var node = [node_0, node_1];
-	        return [node[0], _fableCore.List.map(function (attribute) {
-	            return mapAttributes(mapping, attribute);
-	        }, node[1])];
-	    }
-	
-	    function map(mapping, node) {
-	        return node.Case === "VoidElement" ? new Types.DomNode("VoidElement", [mapVoidElem(mapping, node.Fields[0][0], node.Fields[0][1])]) : node.Case === "Text" ? new Types.DomNode("Text", [node.Fields[0]]) : node.Case === "WhiteSpace" ? new Types.DomNode("WhiteSpace", [node.Fields[0]]) : node.Case === "Svg" ? new Types.DomNode("Element", [mapElem(mapping, node.Fields[0][0], node.Fields[0][1]), _fableCore.List.map(function (node_1) {
-	            return map(mapping, node_1);
-	        }, node.Fields[1])]) : new Types.DomNode("Element", [mapElem(mapping, node.Fields[0][0], node.Fields[0][1]), _fableCore.List.map(function (node_1) {
-	            return map(mapping, node_1);
-	        }, node.Fields[1])]);
-	    }
-	
-	    var Tags = exports.Tags = function ($exports) {
-	        return $exports;
-	    }({});
-	
-	    var Attributes = exports.Attributes = function ($exports) {
-	        return $exports;
-	    }({});
-	
-	    var Events = exports.Events = function ($exports) {
-	        return $exports;
-	    }({});
-	
-	    var Svg = exports.Svg = function ($exports) {
-	        var svgNS = $exports.svgNS = function svgNS() {
-	            return new Types.Attribute("Property", [["namespace", "http://www.w3.org/2000/svg"]]);
-	        };
-	
-	        return $exports;
-	    }({});
-	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-
-
-/***/ },
-/* 3 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore) {
-	    "use strict";
-	
-	    Object.defineProperty(exports, "__esModule", {
-	        value: true
-	    });
 	    exports.AppApi = exports.Helpers = exports.App = exports.AppSpecification = exports.Renderer = exports.ScheduleMessage = exports.Types = undefined;
 	
 	    function _classCallCheck(instance, Constructor) {
@@ -5355,10 +5309,109 @@
 
 
 /***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore) {
+	    "use strict";
+	
+	    Object.defineProperty(exports, "__esModule", {
+	        value: true
+	    });
+	    exports.Svg = exports.Events = exports.Attributes = exports.Tags = exports.Types = undefined;
+	    exports.mapEventHandler = mapEventHandler;
+	    exports.mapAttributes = mapAttributes;
+	    exports.mapElem = mapElem;
+	    exports.mapVoidElem = mapVoidElem;
+	    exports.map = map;
+	
+	    function _classCallCheck(instance, Constructor) {
+	        if (!(instance instanceof Constructor)) {
+	            throw new TypeError("Cannot call a class as a function");
+	        }
+	    }
+	
+	    var Types = exports.Types = function ($exports) {
+	        var Attribute = $exports.Attribute = function Attribute(caseName, fields) {
+	            _classCallCheck(this, Attribute);
+	
+	            this.Case = caseName;
+	            this.Fields = fields;
+	        };
+	
+	        _fableCore.Util.setInterfaces(Attribute.prototype, ["FSharpUnion"], "Fable.Arch.Html.Types.Attribute");
+	
+	        var DomNode = $exports.DomNode = function DomNode(caseName, fields) {
+	            _classCallCheck(this, DomNode);
+	
+	            this.Case = caseName;
+	            this.Fields = fields;
+	        };
+	
+	        _fableCore.Util.setInterfaces(DomNode.prototype, ["FSharpUnion"], "Fable.Arch.Html.Types.DomNode");
+	
+	        return $exports;
+	    }({});
+	
+	    function mapEventHandler(mapping, e, f) {
+	        return new Types.Attribute("EventHandler", [[e, function ($var1) {
+	            return mapping(f($var1));
+	        }]]);
+	    }
+	
+	    function mapAttributes(mapping, attribute) {
+	        return attribute.Case === "Style" ? new Types.Attribute("Style", [attribute.Fields[0]]) : attribute.Case === "Property" ? new Types.Attribute("Property", [attribute.Fields[0]]) : attribute.Case === "Attribute" ? new Types.Attribute("Attribute", [attribute.Fields[0]]) : mapEventHandler(mapping, attribute.Fields[0][0], attribute.Fields[0][1]);
+	    }
+	
+	    function mapElem(mapping, node_0, node_1) {
+	        var node = [node_0, node_1];
+	        return [node[0], _fableCore.List.map(function (attribute) {
+	            return mapAttributes(mapping, attribute);
+	        }, node[1])];
+	    }
+	
+	    function mapVoidElem(mapping, node_0, node_1) {
+	        var node = [node_0, node_1];
+	        return [node[0], _fableCore.List.map(function (attribute) {
+	            return mapAttributes(mapping, attribute);
+	        }, node[1])];
+	    }
+	
+	    function map(mapping, node) {
+	        return node.Case === "VoidElement" ? new Types.DomNode("VoidElement", [mapVoidElem(mapping, node.Fields[0][0], node.Fields[0][1])]) : node.Case === "Text" ? new Types.DomNode("Text", [node.Fields[0]]) : node.Case === "WhiteSpace" ? new Types.DomNode("WhiteSpace", [node.Fields[0]]) : node.Case === "Svg" ? new Types.DomNode("Element", [mapElem(mapping, node.Fields[0][0], node.Fields[0][1]), _fableCore.List.map(function (node_1) {
+	            return map(mapping, node_1);
+	        }, node.Fields[1])]) : new Types.DomNode("Element", [mapElem(mapping, node.Fields[0][0], node.Fields[0][1]), _fableCore.List.map(function (node_1) {
+	            return map(mapping, node_1);
+	        }, node.Fields[1])]);
+	    }
+	
+	    var Tags = exports.Tags = function ($exports) {
+	        return $exports;
+	    }({});
+	
+	    var Attributes = exports.Attributes = function ($exports) {
+	        return $exports;
+	    }({});
+	
+	    var Events = exports.Events = function ($exports) {
+	        return $exports;
+	    }({});
+	
+	    var Svg = exports.Svg = function ($exports) {
+	        var svgNS = $exports.svgNS = function svgNS() {
+	            return new Types.Attribute("Property", [["namespace", "http://www.w3.org/2000/svg"]]);
+	        };
+	
+	        return $exports;
+	    }({});
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1), __webpack_require__(5), __webpack_require__(3)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore, _virtualDom, _FableArch) {
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1), __webpack_require__(5), __webpack_require__(2)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore, _virtualDom, _FableArch) {
 	    "use strict";
 	
 	    Object.defineProperty(exports, "__esModule", {

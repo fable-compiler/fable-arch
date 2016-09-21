@@ -44,13 +44,18 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1), __webpack_require__(2), __webpack_require__(3), __webpack_require__(4)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore, _FableArch, _FableArch2, _FableArch3) {
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1), __webpack_require__(2), __webpack_require__(3), __webpack_require__(4), __webpack_require__(5)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore, _FableArch, _FableArch2, _FableArch3, _FableArch4) {
 	    "use strict";
 	
 	    Object.defineProperty(exports, "__esModule", {
 	        value: true
 	    });
-	    exports.Clock = undefined;
+	    exports.initModel = exports.NestedAction = exports.NestedModel = exports.CounterAction = exports.initCounter = undefined;
+	    exports.counterUpdate = counterUpdate;
+	    exports.counterView = counterView;
+	    exports.nestedUpdate = nestedUpdate;
+	    exports.nestedView = nestedView;
+	    exports.resetEveryTenth = resetEveryTenth;
 	
 	    function _classCallCheck(instance, Constructor) {
 	        if (!(instance instanceof Constructor)) {
@@ -76,114 +81,220 @@
 	        };
 	    }();
 	
-	    var Clock = exports.Clock = function ($exports) {
-	        var normalizeNumber = $exports.normalizeNumber = function normalizeNumber(x) {
-	            return x < 10 ? _fableCore.String.fsFormat("0%i")(function (x) {
-	                return x;
-	            })(x) : String(x);
-	        };
+	    var initCounter = exports.initCounter = 0;
 	
-	        var Action = $exports.Action = function () {
-	            function Action(caseName, fields) {
-	                _classCallCheck(this, Action);
+	    var CounterAction = exports.CounterAction = function () {
+	        function CounterAction(caseName, fields) {
+	            _classCallCheck(this, CounterAction);
 	
-	                this.Case = caseName;
-	                this.Fields = fields;
+	            this.Case = caseName;
+	            this.Fields = fields;
+	        }
+	
+	        _createClass(CounterAction, [{
+	            key: "Equals",
+	            value: function Equals(other) {
+	                return _fableCore.Util.equalsUnions(this, other);
 	            }
-	
-	            _createClass(Action, [{
-	                key: "Equals",
-	                value: function Equals(other) {
-	                    return _fableCore.Util.equalsUnions(this, other);
-	                }
-	            }, {
-	                key: "CompareTo",
-	                value: function CompareTo(other) {
-	                    return _fableCore.Util.compareUnions(this, other);
-	                }
-	            }]);
-	
-	            return Action;
-	        }();
-	
-	        _fableCore.Util.setInterfaces(Action.prototype, ["FSharpUnion", "System.IEquatable", "System.IComparable"], "Clock.Clock.Action");
-	
-	        var Model = $exports.Model = function () {
-	            function Model(time, date) {
-	                _classCallCheck(this, Model);
-	
-	                this.Time = time;
-	                this.Date = date;
+	        }, {
+	            key: "CompareTo",
+	            value: function CompareTo(other) {
+	                return _fableCore.Util.compareUnions(this, other);
 	            }
+	        }]);
 	
-	            _createClass(Model, [{
-	                key: "Equals",
-	                value: function Equals(other) {
-	                    return _fableCore.Util.equalsRecords(this, other);
-	                }
-	            }, {
-	                key: "CompareTo",
-	                value: function CompareTo(other) {
-	                    return _fableCore.Util.compareRecords(this, other);
-	                }
-	            }], [{
-	                key: "init",
-	                get: function get() {
-	                    return new Model("00:00:00", "1970/01/01");
-	                }
-	            }]);
+	        return CounterAction;
+	    }();
 	
-	            return Model;
-	        }();
+	    _fableCore.Util.setInterfaces(CounterAction.prototype, ["FSharpUnion", "System.IEquatable", "System.IComparable"], "Plugin.CounterAction");
 	
-	        _fableCore.Util.setInterfaces(Model.prototype, ["FSharpRecord", "System.IEquatable", "System.IComparable"], "Clock.Clock.Model");
+	    function counterUpdate(model, command) {
+	        return command.Case === "Increment" ? model + command.Fields[0] : model - command.Fields[0];
+	    }
 	
-	        var update = $exports.update = function update(model, action) {
-	            var patternInput = function () {
-	                var day = normalizeNumber(_fableCore.Date.day(action.Fields[0]));
-	                var month = normalizeNumber(_fableCore.Date.month(action.Fields[0]));
-	
-	                var date = _fableCore.String.fsFormat("%i/%s/%s")(function (x) {
-	                    return x;
-	                })(_fableCore.Date.year(action.Fields[0]))(month)(day);
-	
-	                return [new Model(_fableCore.String.format("{0:HH:mm:ss}", action.Fields[0]), date), new _fableCore.List()];
-	            }();
-	
-	            return [patternInput[0], patternInput[1]];
-	        };
-	
-	        var view = $exports.view = function view(model) {
-	            return function () {
-	                var tagName = "div";
-	                return function (children) {
-	                    return new _FableArch.Types.DomNode("Element", [[tagName, new _fableCore.List()], children]);
-	                };
-	            }()(_fableCore.List.ofArray([new _FableArch.Types.DomNode("Text", [model.Date]), new _FableArch.Types.DomNode("VoidElement", [["br", new _fableCore.List()]]), new _FableArch.Types.DomNode("Text", [model.Time])]));
-	        };
-	
-	        var tickProducer = $exports.tickProducer = function tickProducer(push) {
-	            window.setInterval(function (_arg1) {
-	                push(new Action("Tick", [_fableCore.Date.now()]));
-	                return null;
-	            }, 1000);
-	            push(new Action("Tick", [_fableCore.Date.now()]));
-	        };
-	
-	        _FableArch2.AppApi.start(function (app) {
-	            return _FableArch2.AppApi.withProducer(function (push) {
-	                tickProducer(push);
-	            }, app);
-	        }(_FableArch2.AppApi.withStartNodeSelector("#app", _FableArch2.AppApi.createApp(Model.init, function (model) {
-	            return view(model);
-	        }, function (model) {
-	            return function (action) {
-	                return update(model, action);
+	    function counterView(model) {
+	        var bgColor = model > 10 ? "red" : model < 0 ? "blue" : "green";
+	        return function () {
+	            var tagName = "div";
+	            return function (children) {
+	                return new _FableArch.Types.DomNode("Element", [[tagName, new _fableCore.List()], children]);
 	            };
-	        }, (0, _FableArch3.renderer)()))));
+	        }()(_fableCore.List.ofArray([function () {
+	            var tagName = "div";
+	            return function (children) {
+	                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Style", [_fableCore.List.ofArray([["width", "120px"], ["height", "120px"]])])])], children]);
+	            };
+	        }()(_fableCore.List.ofArray([function () {
+	            var tagName = "svg";
+	            return function (children) {
+	                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([_FableArch.Svg.svgNS()], _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["width", "120"]]), new _FableArch.Types.Attribute("Attribute", [["height", "120"]]), new _FableArch.Types.Attribute("Attribute", [["viewBox", "0 0 100 100"]])]))], children]);
+	            };
+	        }()(_fableCore.List.ofArray([function () {
+	            var tagName = "rect";
+	            return function (children) {
+	                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([_FableArch.Svg.svgNS()], _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["width", "110"]]), new _FableArch.Types.Attribute("Attribute", [["height", "110"]]), new _FableArch.Types.Attribute("Attribute", [["fill", bgColor]])]))], children]);
+	            };
+	        }()(new _fableCore.List())]))])), function () {
+	            var tagName = "div";
+	            return function (children) {
+	                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Style", [_fableCore.List.ofArray([["border", "1px solid blue"]])]), function () {
+	                    var h = function h(e) {
+	                        e.stopPropagation();
+	                        e.preventDefault();
+	                        return function (x) {
+	                            return new CounterAction("Increment", [1]);
+	                        }(e);
+	                    };
 	
-	        return $exports;
-	    }({});
+	                    return new _FableArch.Types.Attribute("EventHandler", [["onclick", h]]);
+	                }(), function () {
+	                    var h = function h(e) {
+	                        e.stopPropagation();
+	                        e.preventDefault();
+	                        return function (x) {
+	                            return new CounterAction("Increment", [10]);
+	                        }(e);
+	                    };
+	
+	                    return new _FableArch.Types.Attribute("EventHandler", [["ondblclick", h]]);
+	                }()])], children]);
+	            };
+	        }()(_fableCore.List.ofArray([new _FableArch.Types.DomNode("Text", ["Increment"])])), function () {
+	            var tagName = "div";
+	            return function (children) {
+	                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Style", [_fableCore.List.ofArray([["background-color", bgColor], ["color", "white"]])])])], children]);
+	            };
+	        }()(_fableCore.List.ofArray([new _FableArch.Types.DomNode("Text", [String(model)])])), function () {
+	            var tagName = "div";
+	            return function (children) {
+	                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Style", [_fableCore.List.ofArray([["border", "1px solid green"], ["height", String(7 + model) + "px"]])]), function () {
+	                    var h = function h(e) {
+	                        e.stopPropagation();
+	                        e.preventDefault();
+	                        return function (x) {
+	                            return new CounterAction("Decrement", [1]);
+	                        }(e);
+	                    };
+	
+	                    return new _FableArch.Types.Attribute("EventHandler", [["onclick", h]]);
+	                }(), function () {
+	                    var h = function h(e) {
+	                        e.stopPropagation();
+	                        e.preventDefault();
+	                        return function (x) {
+	                            return new CounterAction("Decrement", [5]);
+	                        }(e);
+	                    };
+	
+	                    return new _FableArch.Types.Attribute("EventHandler", [["ondblclick", h]]);
+	                }()])], children]);
+	            };
+	        }()(_fableCore.List.ofArray([new _FableArch.Types.DomNode("Text", ["Decrement"])]))]));
+	    }
+	
+	    var NestedModel = exports.NestedModel = function () {
+	        function NestedModel(top, bottom) {
+	            _classCallCheck(this, NestedModel);
+	
+	            this.Top = top;
+	            this.Bottom = bottom;
+	        }
+	
+	        _createClass(NestedModel, [{
+	            key: "Equals",
+	            value: function Equals(other) {
+	                return _fableCore.Util.equalsRecords(this, other);
+	            }
+	        }, {
+	            key: "CompareTo",
+	            value: function CompareTo(other) {
+	                return _fableCore.Util.compareRecords(this, other);
+	            }
+	        }]);
+	
+	        return NestedModel;
+	    }();
+	
+	    _fableCore.Util.setInterfaces(NestedModel.prototype, ["FSharpRecord", "System.IEquatable", "System.IComparable"], "Plugin.NestedModel");
+	
+	    var NestedAction = exports.NestedAction = function () {
+	        function NestedAction(caseName, fields) {
+	            _classCallCheck(this, NestedAction);
+	
+	            this.Case = caseName;
+	            this.Fields = fields;
+	        }
+	
+	        _createClass(NestedAction, [{
+	            key: "Equals",
+	            value: function Equals(other) {
+	                return _fableCore.Util.equalsUnions(this, other);
+	            }
+	        }, {
+	            key: "CompareTo",
+	            value: function CompareTo(other) {
+	                return _fableCore.Util.compareUnions(this, other);
+	            }
+	        }]);
+	
+	        return NestedAction;
+	    }();
+	
+	    _fableCore.Util.setInterfaces(NestedAction.prototype, ["FSharpUnion", "System.IEquatable", "System.IComparable"], "Plugin.NestedAction");
+	
+	    function nestedUpdate(model, action) {
+	        return action.Case === "Top" ? function () {
+	            var res = counterUpdate(model.Top, action.Fields[0]);
+	            return new NestedModel(res, model.Bottom);
+	        }() : action.Case === "Bottom" ? function () {
+	            var res = counterUpdate(model.Bottom, action.Fields[0]);
+	            return new NestedModel(model.Top, res);
+	        }() : new NestedModel(0, 0);
+	    }
+	
+	    function nestedView(model) {
+	        return function () {
+	            var tagName = "div";
+	            return function (children) {
+	                return new _FableArch.Types.DomNode("Element", [[tagName, new _fableCore.List()], children]);
+	            };
+	        }()(_fableCore.List.ofArray([(0, _FableArch.map)(function (arg0) {
+	            return new NestedAction("Top", [arg0]);
+	        }, counterView(model.Top)), (0, _FableArch.map)(function (arg0) {
+	            return new NestedAction("Bottom", [arg0]);
+	        }, counterView(model.Bottom)), function () {
+	            var tagName = "button";
+	            return function (children) {
+	                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([function () {
+	                    var h = function h(e) {
+	                        e.stopPropagation();
+	                        e.preventDefault();
+	                        return function (_arg1) {
+	                            return new NestedAction("Reset", []);
+	                        }(e);
+	                    };
+	
+	                    return new _FableArch.Types.Attribute("EventHandler", [["onclick", h]]);
+	                }()])], children]);
+	            };
+	        }()(_fableCore.List.ofArray([new _FableArch.Types.DomNode("Text", ["Reset"])]))]));
+	    }
+	
+	    function resetEveryTenth(h) {
+	        window.setInterval(function (_arg1) {
+	            return h(new NestedAction("Reset", []));
+	        }, 10000);
+	    }
+	
+	    var initModel = exports.initModel = new NestedModel(0, 0);
+	
+	    _FableArch2.AppApi.start(_FableArch2.AppApi.withPlugin((0, _FableArch3.createDevTools)("something", initModel))(_FableArch2.AppApi.withStartNodeSelector("#nested-counter", _FableArch2.AppApi.createSimpleApp(initModel, function (model) {
+	        return nestedView(model);
+	    }, function (model) {
+	        return function (action) {
+	            return nestedUpdate(model, action);
+	        };
+	    })((0, _FableArch4.renderer)()))));
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
@@ -5358,7 +5469,674 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1), __webpack_require__(5), __webpack_require__(3)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore, _virtualDom, _FableArch) {
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1), __webpack_require__(2), __webpack_require__(3), __webpack_require__(5)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore, _FableArch, _FableArch2, _FableArch3) {
+	    "use strict";
+	
+	    Object.defineProperty(exports, "__esModule", {
+	        value: true
+	    });
+	    exports.LinkState = exports.LinkMessage = exports.cssString = exports.DevToolsMessage = exports.DevToolsModel = exports.ActionItem = undefined;
+	    exports.isCollapsed = isCollapsed;
+	    exports.devToolsUpdate = devToolsUpdate;
+	    exports.devToolsView = devToolsView;
+	    exports.createDevTools = createDevTools;
+	
+	    function _classCallCheck(instance, Constructor) {
+	        if (!(instance instanceof Constructor)) {
+	            throw new TypeError("Cannot call a class as a function");
+	        }
+	    }
+	
+	    var _createClass = function () {
+	        function defineProperties(target, props) {
+	            for (var i = 0; i < props.length; i++) {
+	                var descriptor = props[i];
+	                descriptor.enumerable = descriptor.enumerable || false;
+	                descriptor.configurable = true;
+	                if ("value" in descriptor) descriptor.writable = true;
+	                Object.defineProperty(target, descriptor.key, descriptor);
+	            }
+	        }
+	
+	        return function (Constructor, protoProps, staticProps) {
+	            if (protoProps) defineProperties(Constructor.prototype, protoProps);
+	            if (staticProps) defineProperties(Constructor, staticProps);
+	            return Constructor;
+	        };
+	    }();
+	
+	    var ActionItem = exports.ActionItem = function () {
+	        function ActionItem(id, excluded, message, state) {
+	            _classCallCheck(this, ActionItem);
+	
+	            this.Id = id;
+	            this.Excluded = excluded;
+	            this.Message = message;
+	            this.State = state;
+	        }
+	
+	        _createClass(ActionItem, [{
+	            key: "Equals",
+	            value: function Equals(other) {
+	                return _fableCore.Util.equalsRecords(this, other);
+	            }
+	        }, {
+	            key: "CompareTo",
+	            value: function CompareTo(other) {
+	                return _fableCore.Util.compareRecords(this, other);
+	            }
+	        }]);
+	
+	        return ActionItem;
+	    }();
+	
+	    _fableCore.Util.setInterfaces(ActionItem.prototype, ["FSharpRecord", "System.IEquatable", "System.IComparable"], "Fable.Arch.DevTools.ActionItem");
+	
+	    var DevToolsModel = exports.DevToolsModel = function () {
+	        function DevToolsModel(base, lastCommited, actions, collapsed) {
+	            _classCallCheck(this, DevToolsModel);
+	
+	            this.Base = base;
+	            this.LastCommited = lastCommited;
+	            this.Actions = actions;
+	            this.Collapsed = collapsed;
+	        }
+	
+	        _createClass(DevToolsModel, [{
+	            key: "Equals",
+	            value: function Equals(other) {
+	                return _fableCore.Util.equalsRecords(this, other);
+	            }
+	        }, {
+	            key: "CompareTo",
+	            value: function CompareTo(other) {
+	                return _fableCore.Util.compareRecords(this, other);
+	            }
+	        }]);
+	
+	        return DevToolsModel;
+	    }();
+	
+	    _fableCore.Util.setInterfaces(DevToolsModel.prototype, ["FSharpRecord", "System.IEquatable", "System.IComparable"], "Fable.Arch.DevTools.DevToolsModel");
+	
+	    var DevToolsMessage = exports.DevToolsMessage = function () {
+	        function DevToolsMessage(caseName, fields) {
+	            _classCallCheck(this, DevToolsMessage);
+	
+	            this.Case = caseName;
+	            this.Fields = fields;
+	        }
+	
+	        _createClass(DevToolsMessage, [{
+	            key: "Equals",
+	            value: function Equals(other) {
+	                return _fableCore.Util.equalsUnions(this, other);
+	            }
+	        }, {
+	            key: "CompareTo",
+	            value: function CompareTo(other) {
+	                return _fableCore.Util.compareUnions(this, other);
+	            }
+	        }]);
+	
+	        return DevToolsMessage;
+	    }();
+	
+	    _fableCore.Util.setInterfaces(DevToolsMessage.prototype, ["FSharpUnion", "System.IEquatable", "System.IComparable"], "Fable.Arch.DevTools.DevToolsMessage");
+	
+	    function isCollapsed(str, model) {
+	        return _fableCore.Seq.fold(function (x, y) {
+	            return x ? true : y;
+	        }, false, function () {
+	            var $var9 = function (table) {
+	                return _fableCore.Map.tryFind(str, table);
+	            }(model.Collapsed);
+	
+	            if ($var9 != null) {
+	                return [$var9];
+	            } else {
+	                return [];
+	            }
+	        }());
+	    }
+	
+	    function devToolsUpdate(model, action) {
+	        var patternInput = action.Case === "AddMessage" ? [function () {
+	            var Actions = _fableCore.List.append(model.Actions, _fableCore.List.ofArray([new ActionItem(_fableCore.String.newGuid(), false, action.Fields[0], action.Fields[1])]));
+	
+	            return new DevToolsModel(model.Base, model.LastCommited, Actions, model.Collapsed);
+	        }(), new _fableCore.List()] : action.Case === "MessagesReplayed" ? function () {
+	            var state = function () {
+	                var folder = function folder(s) {
+	                    return function (tupledArg) {
+	                        var Actions = _fableCore.List.map(function (a) {
+	                            return a.Id !== tupledArg[0] ? a : new ActionItem(a.Id, a.Excluded, a.Message, tupledArg[1]);
+	                        }, s.Actions);
+	
+	                        return new DevToolsModel(s.Base, s.LastCommited, Actions, s.Collapsed);
+	                    };
+	                };
+	
+	                return function (list) {
+	                    return _fableCore.Seq.fold(function ($var10, $var11) {
+	                        return folder($var10)($var11);
+	                    }, model, list);
+	                };
+	            }()(action.Fields[0]);
+	
+	            return [state, new _fableCore.List()];
+	        }() : action.Case === "ToggleObjectVisibility" ? function () {
+	            var currentValue = isCollapsed(action.Fields[0], model);
+	            return [function () {
+	                var Collapsed = function () {
+	                    var value = !currentValue;
+	                    return function (table) {
+	                        return _fableCore.Map.add(action.Fields[0], value, table);
+	                    };
+	                }()(model.Collapsed);
+	
+	                return new DevToolsModel(model.Base, model.LastCommited, model.Actions, Collapsed);
+	            }(), new _fableCore.List()];
+	        }() : action.Case === "ToggleAction" ? function () {
+	            var m_ = function () {
+	                var Actions = _fableCore.List.map(function (i) {
+	                    return i.Id !== action.Fields[0] ? i : function () {
+	                        var Excluded = !i.Excluded;
+	                        return new ActionItem(i.Id, Excluded, i.Message, i.State);
+	                    }();
+	                }, model.Actions);
+	
+	                return new DevToolsModel(model.Base, model.LastCommited, Actions, model.Collapsed);
+	            }();
+	
+	            var actions = _fableCore.List.map(function (i) {
+	                return [i.Id, i.Message];
+	            }, _fableCore.List.filter(function (i) {
+	                return !i.Excluded;
+	            }, m_.Actions));
+	
+	            var messages = _fableCore.List.ofArray([function (h) {
+	                return h(new DevToolsMessage("Replay", [m_.Base, actions]));
+	            }]);
+	
+	            return [m_, messages];
+	        }() : action.Case === "Sweep" ? function () {
+	            var actions = _fableCore.List.filter(function (i) {
+	                return !i.Excluded;
+	            }, model.Actions);
+	
+	            return [new DevToolsModel(model.Base, model.LastCommited, actions, model.Collapsed), new _fableCore.List()];
+	        }() : action.Case === "Revert" ? model.LastCommited.tail == null ? [model, new _fableCore.List()] : [function () {
+	            var Actions = new _fableCore.List();
+	            return new DevToolsModel(model.Base, model.LastCommited, Actions, model.Collapsed);
+	        }(), _fableCore.List.ofArray([function (h) {
+	            return h(new DevToolsMessage("Replay", [model.LastCommited.head, new _fableCore.List()]));
+	        }])] : action.Case === "Reset" ? [function () {
+	            var Actions = new _fableCore.List();
+	
+	            var LastCommited = _fableCore.List.ofArray([model.Base]);
+	
+	            return new DevToolsModel(model.Base, LastCommited, Actions, model.Collapsed);
+	        }(), _fableCore.List.ofArray([function (h) {
+	            return h(new DevToolsMessage("Replay", [model.Base, new _fableCore.List()]));
+	        }])] : action.Case === "Replay" ? [model, new _fableCore.List()] : function () {
+	            var latestCommited = _fableCore.Seq.last(model.Actions).State;
+	
+	            return [function () {
+	                var LastCommited = _fableCore.List.ofArray([latestCommited], model.LastCommited);
+	
+	                var Actions = new _fableCore.List();
+	                return new DevToolsModel(model.Base, LastCommited, Actions, model.Collapsed);
+	            }(), _fableCore.List.ofArray([function (h) {
+	                return h(new DevToolsMessage("Replay", [latestCommited, new _fableCore.List()]));
+	            }])];
+	        }();
+	        return [patternInput[0], patternInput[1]];
+	    }
+	
+	    var cssString = exports.cssString = "\n    ._fable_dev_tools {\n        background-color: #2d2a2a;\n        position: fixed;\n        top: 0;\n        right: 0;\n        min-width: 400px;\n        height: 100%;\n        font-family: 'Open Sans', sans-serif;\n        color: #e0e0e0;\n        z-index: 1000;\n    }\n    ._fable_dev_tools ul {\n        padding: 0;\n        margin: 0;\n        list-style: none;\n    }\n    ._fable_dev_tools .actions {\n        margin-bottom: 5px;\n    }\n    ._fable_dev_tools .actions li {\n        color: #565656;\n        display: inline-block;\n        width: 90px;\n        text-align:center;\n        padding-top: 5px;\n        padding-bottom: 5px;\n        margin-left: 5px;\n        margin-right: 5px;\n        font-weight: bold;\n    }\n    ._fable_dev_tools .actions li.active {\n        background-color: #565656;\n        color: #e0e0e0;\n        cursor: pointer;\n    }\n\n    ._fable_dev_tools .action-list {\n        margin: 0px;\n        padding: 0px;\n        margin-left: 0px;\n        overflow-y: scroll;\n        height: 100%;\n    }\n\n    ._fable_dev_tools .action-list .row.excluded .content {\n        display: none;\n    }\n\n    ._fable_dev_tools .action-list .row.excluded .header {\n        background-color: #343434;\n        color: #565656;\n        text-decoration: line-through;\n    }\n\n    ._fable_dev_tools .action-list .header {\n        padding: 15px;\n        background-color: #565656;\n        width: 100%;\n    }\n\n    ._fable_dev_tools .action-list .header.action {\n        cursor: pointer;\n    }\n\n    ._fable_dev_tools .action-list .content {\n        padding-top: 10px;\n        padding-bottom: 10px;\n    }\n\n    ._fable_dev_tools .action-list .item {\n        padding-left: 15px;    \n    }\n\n    ._fable_dev_tools .action-list .row:last-child {\n        margin-bottom: 40px;\n    }\n\n    ._fable_dev_tools .action-list .item .item-header.expand-collapse {\n        cursor: pointer;\n        margin-left: 15px;\n    }\n\n    ._fable_dev_tools .action-list .item .item-header.expand-collapse::before {\n        content: \"\\25BA\";\n        position: relative;\n        font-size: 10px;\n        margin-left: -15px;\n        margin-top: 3px;\n        transform: rotate(90deg);\n        transition-property: transform;\n        transition-duration: 0.3s;\n        display: inline-block;\n        padding-right: 5px;\n    }\n\n    ._fable_dev_tools .action-list .item.collapsed .item-header.expand-collapse::before {\n        transform: rotate(0deg);\n        transition-property: transform;\n        transition-duration: 0.3s;\n    }\n\n    ._fable_dev_tools .action-list .item.collapsed .item-value {\n        display: none;\n    }\n\n    ._fable_dev_tools .item .item-short-value.string {\n        color: #345678;\n    }\n\n    ._fable_dev_tools .item .item-short-value.number {\n        color: #876543;\n    }\n\n    ._fable_dev_tools .item .item-short-value.array {\n        color: #9356ab;\n    }\n\n    ._fable_dev_tools .item .item-short-value.object {\n        color: #ab9356;\n    }\n\n    ._fable_dev_tools .item .item-short-value.bool {\n        color: #93ab56;\n    }\n";
+	
+	    function devToolsView(model) {
+	        var pluralize = function pluralize(str) {
+	            return function (count) {
+	                return count !== 1 ? _fableCore.String.fsFormat("%s%s")(function (x) {
+	                    return x;
+	                })(str)("s") : str;
+	            };
+	        };
+	
+	        var getMessageTitle = function getMessageTitle(o) {
+	            var x = _fableCore.Util.toPlainJsObj(o);
+	
+	            return _fableCore.String.fsFormat("%s")(function (x) {
+	                return x;
+	            })(_fableCore.Util.toString(x.Case));
+	        };
+	
+	        var renderThing = function renderThing(thingName) {
+	            return function (parentId) {
+	                return function (o) {
+	                    var thisId = _fableCore.String.fsFormat("%s_%s")(function (x) {
+	                        return x;
+	                    })(parentId)(thingName);
+	
+	                    var collapsed = isCollapsed(thisId, model);
+	                    var extraClass = collapsed ? " collapsed" : "";
+	
+	                    var renderChildren = function renderChildren(propertyNames) {
+	                        return function (o_1) {
+	                            return _fableCore.Seq.toList(_fableCore.Seq.map(function (y) {
+	                                return function () {
+	                                    var clo0 = renderThing;
+	                                    return function (arg00) {
+	                                        var clo1 = clo0(arg00);
+	                                        return function (arg10) {
+	                                            var clo2 = clo1(arg10);
+	                                            return function (arg20) {
+	                                                return clo2(arg20);
+	                                            };
+	                                        };
+	                                    };
+	                                }()(y)(thisId)(o_1[y]);
+	                            }, propertyNames));
+	                        };
+	                    };
+	
+	                    var renderValue = function renderValue(thingName_1) {
+	                        return function (typeName) {
+	                            return function (value) {
+	                                return function () {
+	                                    var tagName = "div";
+	                                    return function (children) {
+	                                        return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["class", "item-value"]])])], children]);
+	                                    };
+	                                }()(_fableCore.List.ofArray([function () {
+	                                    var tagName = "span";
+	                                    return function (children) {
+	                                        return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["class", "item-name"]])])], children]);
+	                                    };
+	                                }()(_fableCore.List.ofArray([new _FableArch.Types.DomNode("Text", [_fableCore.String.fsFormat("%s: ")(function (x) {
+	                                    return x;
+	                                })(thingName_1)])])), function () {
+	                                    var tagName = "span";
+	                                    return function (children) {
+	                                        return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["class", _fableCore.String.fsFormat("item-short-value %s")(function (x) {
+	                                            return x;
+	                                        })(typeName)]])])], children]);
+	                                    };
+	                                }()(_fableCore.List.ofArray([new _FableArch.Types.DomNode("Text", [value])]))]));
+	                            };
+	                        };
+	                    };
+	
+	                    var header = function header(thingName_1) {
+	                        return function (collapseable) {
+	                            return function (onClicked) {
+	                                return function (typeName) {
+	                                    return function (value) {
+	                                        var headerClass = collapseable ? "item-header expand-collapse" : "item-header";
+	
+	                                        var headerAttributes = _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["class", headerClass]])], onClicked != null ? _fableCore.List.ofArray([function () {
+	                                            var h = function h(e) {
+	                                                e.stopPropagation();
+	                                                e.preventDefault();
+	                                                return onClicked(e);
+	                                            };
+	
+	                                            return new _FableArch.Types.Attribute("EventHandler", [["onclick", h]]);
+	                                        }()]) : new _fableCore.List());
+	
+	                                        return function () {
+	                                            var tagName = "div";
+	                                            return function (children) {
+	                                                return new _FableArch.Types.DomNode("Element", [[tagName, headerAttributes], children]);
+	                                            };
+	                                        }()(_fableCore.List.ofArray([function () {
+	                                            var tagName = "span";
+	                                            return function (children) {
+	                                                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["class", "item-key"]])])], children]);
+	                                            };
+	                                        }()(_fableCore.List.ofArray([new _FableArch.Types.DomNode("Text", [_fableCore.String.fsFormat("%s: ")(function (x) {
+	                                            return x;
+	                                        })(thingName_1)])])), function () {
+	                                            var tagName = "span";
+	                                            return function (children) {
+	                                                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["class", _fableCore.String.fsFormat("item-short-value %s")(function (x) {
+	                                                    return x;
+	                                                })(typeName)]])])], children]);
+	                                            };
+	                                        }()(_fableCore.List.ofArray([new _FableArch.Types.DomNode("Text", [value])]))]));
+	                                    };
+	                                };
+	                            };
+	                        };
+	                    };
+	
+	                    var renderComplexType = function renderComplexType(t) {
+	                        return function (keys) {
+	                            return function (typeName) {
+	                                return function (o_1) {
+	                                    var length = keys.length;
+	                                    var itemWord = t === "object" ? "key" : "item";
+	
+	                                    var headerText = _fableCore.String.fsFormat("%s (%i %s) ")(function (x) {
+	                                        return x;
+	                                    })(typeName)(length)(pluralize(itemWord)(length));
+	
+	                                    return _fableCore.List.ofArray([header(thingName)(true)(function (_arg1) {
+	                                        return new DevToolsMessage("ToggleObjectVisibility", [thisId]);
+	                                    })(t)(headerText), function () {
+	                                        var tagName = "div";
+	                                        return function (children) {
+	                                            return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["class", "item-value"]])])], children]);
+	                                        };
+	                                    }()(function () {
+	                                        var clo0 = renderChildren;
+	                                        return function (arg00) {
+	                                            var clo1 = clo0(arg00);
+	                                            return function (arg10) {
+	                                                return clo1(arg10);
+	                                            };
+	                                        };
+	                                    }()(keys)(o_1))]);
+	                                };
+	                            };
+	                        };
+	                    };
+	
+	                    var renderItem = function renderItem(children) {
+	                        return function () {
+	                            var tagName = "div";
+	                            return function (children_1) {
+	                                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["class", _fableCore.String.fsFormat("item%s")(function (x) {
+	                                    return x;
+	                                })(extraClass)]]), new _FableArch.Types.Attribute("Attribute", [["id", thisId]])])], children_1]);
+	                            };
+	                        }()(children);
+	                    };
+	
+	                    var valueOnly = function valueOnly(typeName) {
+	                        return function (value) {
+	                            return header(thingName)(false)()(typeName)(_fableCore.Util.toString(value));
+	                        };
+	                    };
+	
+	                    return renderItem(o == null ? _fableCore.List.ofArray([valueOnly("")(o)]) : _fableCore.Util.getTypeName(Object.getPrototypeOf(o).constructor) === "FSharpList" ? function () {
+	                        var list = function () {
+	                            var x = [];
+	                            o.mapIndexed(function (idx, item) {
+	                                x[idx] = item;
+	                            });
+	                            return x;
+	                        }();
+	
+	                        return renderComplexType("array")(_fableCore.List.map(function (value) {
+	                            return String(value);
+	                        }, _fableCore.Seq.toList(_fableCore.Seq.range(0, Number.parseInt(_fableCore.Util.toString(list.length)) - 1))))("FSharpList")(list);
+	                    }() : o instanceof Array ? renderComplexType("array")(_fableCore.List.map(function (value) {
+	                        return String(value);
+	                    }, _fableCore.Seq.toList(_fableCore.Seq.range(0, Number.parseInt(_fableCore.Util.toString(o.length)) - 1))))(_fableCore.Util.getTypeName(Object.getPrototypeOf(o).constructor))(o) : o instanceof Object ? renderComplexType("object")(_fableCore.Seq.toList(Object.getOwnPropertyNames(o)))(_fableCore.Util.getTypeName(Object.getPrototypeOf(o).constructor))(o) : o != undefined && o.constructor === Number ? _fableCore.List.ofArray([valueOnly("number")(o)]) : o != undefined && o.constructor === String ? _fableCore.List.ofArray([valueOnly("string")(o)]) : o != undefined && o.constructor === Boolean ? _fableCore.List.ofArray([valueOnly("bool")(o)]) : _fableCore.List.ofArray([valueOnly("???")(o)]));
+	                };
+	            };
+	        };
+	
+	        var toolStyles = function () {
+	            var tagName = "style";
+	            return function (children) {
+	                return new _FableArch.Types.DomNode("Element", [[tagName, new _fableCore.List()], children]);
+	            };
+	        }()(_fableCore.List.ofArray([new _FableArch.Types.DomNode("Text", [cssString]), new _FableArch.Types.DomNode("VoidElement", [["link", _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["href", "https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700,700i"]]), new _FableArch.Types.Attribute("Attribute", [["rel", "stylesheet"]])])]])]));
+	
+	        var toolHeader = function toolHeader(model_1) {
+	            var headerAction = function headerAction(headerText) {
+	                return function (func) {
+	                    return func != null ? function () {
+	                        var tagName = "li";
+	                        return function (children) {
+	                            return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["class", "active"]]), function () {
+	                                var h = function h(e) {
+	                                    e.stopPropagation();
+	                                    e.preventDefault();
+	                                    return function (_arg2) {
+	                                        return func;
+	                                    }(e);
+	                                };
+	
+	                                return new _FableArch.Types.Attribute("EventHandler", [["onclick", h]]);
+	                            }()])], children]);
+	                        };
+	                    }()(_fableCore.List.ofArray([new _FableArch.Types.DomNode("Text", [headerText])])) : function () {
+	                        var tagName = "li";
+	                        return function (children) {
+	                            return new _FableArch.Types.DomNode("Element", [[tagName, new _fableCore.List()], children]);
+	                        };
+	                    }()(_fableCore.List.ofArray([new _FableArch.Types.DomNode("Text", [headerText])]));
+	                };
+	            };
+	
+	            var excluded = _fableCore.Seq.exists(function (i) {
+	                return i.Excluded;
+	            }, model_1.Actions);
+	
+	            var anyNotExcluded = _fableCore.Seq.exists(function (i) {
+	                return !i.Excluded;
+	            }, model_1.Actions);
+	
+	            var isCommited = model_1.LastCommited.length > 1;
+	            var anyActions = !(model_1.Actions.tail == null);
+	            return function () {
+	                var tagName = "header";
+	                return function (children) {
+	                    return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["class", "actions"]])])], children]);
+	                };
+	            }()(_fableCore.List.ofArray([function () {
+	                var tagName = "ul";
+	                return function (children) {
+	                    return new _FableArch.Types.DomNode("Element", [[tagName, new _fableCore.List()], children]);
+	                };
+	            }()(_fableCore.List.ofArray([headerAction("Reset")((anyActions ? true : isCommited) ? new DevToolsMessage("Reset", []) : null), headerAction("Revert")(isCommited ? new DevToolsMessage("Revert", []) : null), headerAction("Sweep")(excluded ? new DevToolsMessage("Sweep", []) : null), headerAction("Commit")(anyNotExcluded ? new DevToolsMessage("Commit", []) : null)]))]));
+	        };
+	
+	        var row = function row(headerText) {
+	            return function (headerClicked) {
+	                return function (excluded) {
+	                    return function (content) {
+	                        var rowClass = excluded ? "row excluded" : "row";
+	                        var headerAttributes = headerClicked == null ? _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["class", "header"]])]) : _fableCore.List.ofArray([function () {
+	                            var h = function h(e) {
+	                                e.stopPropagation();
+	                                e.preventDefault();
+	                                return headerClicked(e);
+	                            };
+	
+	                            return new _FableArch.Types.Attribute("EventHandler", [["onclick", h]]);
+	                        }(), new _FableArch.Types.Attribute("Attribute", [["class", "header action"]])]);
+	
+	                        var inner = _fableCore.List.ofArray([function () {
+	                            var tagName = "div";
+	                            return function (children) {
+	                                return new _FableArch.Types.DomNode("Element", [[tagName, headerAttributes], children]);
+	                            };
+	                        }()(_fableCore.List.ofArray([new _FableArch.Types.DomNode("Text", [headerText])]))], excluded ? new _fableCore.List() : _fableCore.List.ofArray([function () {
+	                            var tagName = "div";
+	                            return function (children) {
+	                                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["class", "content"]])])], children]);
+	                            };
+	                        }()(_fableCore.List.ofArray([content]))]));
+	
+	                        return function () {
+	                            var tagName = "div";
+	                            return function (children) {
+	                                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["class", rowClass]])])], children]);
+	                            };
+	                        }()(inner);
+	                    };
+	                };
+	            };
+	        };
+	
+	        var renderAction = function renderAction(a) {
+	            var toggleAction = function toggleAction(_arg3) {
+	                return new DevToolsMessage("ToggleAction", [a.Id]);
+	            };
+	
+	            var content = function () {
+	                var tagName = "div";
+	                return function (children) {
+	                    return new _FableArch.Types.DomNode("Element", [[tagName, new _fableCore.List()], children]);
+	                };
+	            }()(_fableCore.List.ofArray([function () {
+	                var clo0 = renderThing;
+	                return function (arg00) {
+	                    var clo1 = clo0(arg00);
+	                    return function (arg10) {
+	                        var clo2 = clo1(arg10);
+	                        return function (arg20) {
+	                            return clo2(arg20);
+	                        };
+	                    };
+	                };
+	            }()("action")(_fableCore.String.fsFormat("_action_%s")(function (x) {
+	                return x;
+	            })(a.Id))(a.Message), function () {
+	                var clo0 = renderThing;
+	                return function (arg00) {
+	                    var clo1 = clo0(arg00);
+	                    return function (arg10) {
+	                        var clo2 = clo1(arg10);
+	                        return function (arg20) {
+	                            return clo2(arg20);
+	                        };
+	                    };
+	                };
+	            }()("state")(_fableCore.String.fsFormat("_state_%s")(function (x) {
+	                return x;
+	            })(a.Id))(a.State)]));
+	
+	            return row(getMessageTitle(a.Message))(toggleAction)(a.Excluded)(content);
+	        };
+	
+	        var toolContent = function toolContent(model_1) {
+	            var baseState = row("BASE")()(false)(function () {
+	                var clo0 = renderThing;
+	                return function (arg00) {
+	                    var clo1 = clo0(arg00);
+	                    return function (arg10) {
+	                        var clo2 = clo1(arg10);
+	                        return function (arg20) {
+	                            return clo2(arg20);
+	                        };
+	                    };
+	                };
+	            }()("model")("_base")(model_1.LastCommited.head));
+	
+	            var actions = _fableCore.List.map(renderAction, model_1.Actions);
+	
+	            return function () {
+	                var tagName = "div";
+	                return function (children) {
+	                    return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["class", "action-list"]])])], children]);
+	                };
+	            }()(_fableCore.List.ofArray([baseState], actions));
+	        };
+	
+	        return function () {
+	            var tagName = "div";
+	            return function (children) {
+	                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["class", "_fable_dev_tools"]])])], children]);
+	            };
+	        }()(_fableCore.List.ofArray([toolStyles, toolHeader(model), toolContent(model)]));
+	    }
+	
+	    var LinkMessage = exports.LinkMessage = function LinkMessage(caseName, fields) {
+	        _classCallCheck(this, LinkMessage);
+	
+	        this.Case = caseName;
+	        this.Fields = fields;
+	    };
+	
+	    _fableCore.Util.setInterfaces(LinkMessage.prototype, ["FSharpUnion"], "Fable.Arch.DevTools.LinkMessage");
+	
+	    var LinkState = exports.LinkState = function LinkState(handler) {
+	        _classCallCheck(this, LinkState);
+	
+	        this.Handler = handler;
+	    };
+	
+	    _fableCore.Util.setInterfaces(LinkState.prototype, ["FSharpRecord"], "Fable.Arch.DevTools.LinkState");
+	
+	    function createDevTools(pluginId, initModel) {
+	        var containerNode = window.document.createElement("div");
+	        containerNode.id = "___devtools";
+	        window.document.body.appendChild(containerNode);
+	
+	        var linkAgent = _fableCore.MailboxProcessor.start(function (inbox) {
+	            var loop = function loop(state) {
+	                return function (builder_) {
+	                    return builder_.Delay(function (unitVar) {
+	                        return builder_.Bind(inbox.receive(), function (_arg1) {
+	                            return _arg1.Case === "SetHandler" ? builder_.ReturnFrom(loop(new LinkState(_arg1.Fields[0]))) : function () {
+	                                state.Handler(_arg1.Fields[0]);
+	                                return builder_.ReturnFrom(loop(state));
+	                            }();
+	                        });
+	                    });
+	                }(_fableCore.AsyncBuilder.singleton);
+	            };
+	
+	            return loop(new LinkState(function (_arg1) {}));
+	        });
+	
+	        var devToolsAgent = _FableArch2.AppApi.start(_FableArch2.AppApi.withInstrumentationSubscriber(function (ae) {
+	            var $target1 = function $target1() {};
+	
+	            if (ae.Case === "ActionReceived") {
+	                if (ae.Fields[0].Case === "Replay") {
+	                    var m = ae.Fields[0].Fields[1];
+	                    var s = ae.Fields[0].Fields[0];
+	                    linkAgent.post(new LinkMessage("Push", [new _FableArch2.Types.AppMessage("Replay", [s, m])]));
+	                } else {
+	                    $target1();
+	                }
+	            } else {
+	                $target1();
+	            }
+	        }, _FableArch2.AppApi.withStartNodeSelector("#___devtools", _FableArch2.AppApi.createApp(function () {
+	            var Actions = new _fableCore.List();
+	
+	            var Collapsed = _fableCore.Map.create(null, new _fableCore.GenericComparer(function (x, y) {
+	                return x < y ? -1 : x > y ? 1 : 0;
+	            }));
+	
+	            return new DevToolsModel(initModel, _fableCore.List.ofArray([initModel]), Actions, Collapsed);
+	        }(), function (model) {
+	            return devToolsView(model);
+	        }, function (model) {
+	            return function (action) {
+	                return devToolsUpdate(model, action);
+	            };
+	        }, (0, _FableArch3.renderer)()))));
+	
+	        return new _FableArch2.Types.Plugin(function (h) {
+	            linkAgent.post(new LinkMessage("SetHandler", [h]));
+	        }, function (_arg2) {
+	            if (_arg2.Case === "ModelChanged") {
+	                devToolsAgent.post(new _FableArch2.Types.AppMessage("Message", [new DevToolsMessage("AddMessage", [_arg2.Fields[0].Message, _arg2.Fields[0].CurrentState])]));
+	            } else {
+	                if (_arg2.Case === "Replayed") {
+	                    devToolsAgent.post(new _FableArch2.Types.AppMessage("Message", [new DevToolsMessage("MessagesReplayed", [_arg2.Fields[0]])]));
+	                }
+	            }
+	        });
+	    }
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1), __webpack_require__(6), __webpack_require__(3)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore, _virtualDom, _FableArch) {
 	    "use strict";
 	
 	    Object.defineProperty(exports, "__esModule", {
@@ -5523,15 +6301,15 @@
 
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var diff = __webpack_require__(6)
-	var patch = __webpack_require__(19)
-	var h = __webpack_require__(28)
-	var create = __webpack_require__(39)
-	var VNode = __webpack_require__(30)
-	var VText = __webpack_require__(31)
+	var diff = __webpack_require__(7)
+	var patch = __webpack_require__(20)
+	var h = __webpack_require__(29)
+	var create = __webpack_require__(40)
+	var VNode = __webpack_require__(31)
+	var VText = __webpack_require__(32)
 	
 	module.exports = {
 	    diff: diff,
@@ -5544,28 +6322,28 @@
 
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var diff = __webpack_require__(7)
+	var diff = __webpack_require__(8)
 	
 	module.exports = diff
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isArray = __webpack_require__(8)
+	var isArray = __webpack_require__(9)
 	
-	var VPatch = __webpack_require__(9)
-	var isVNode = __webpack_require__(11)
-	var isVText = __webpack_require__(12)
-	var isWidget = __webpack_require__(13)
-	var isThunk = __webpack_require__(14)
-	var handleThunk = __webpack_require__(15)
+	var VPatch = __webpack_require__(10)
+	var isVNode = __webpack_require__(12)
+	var isVText = __webpack_require__(13)
+	var isWidget = __webpack_require__(14)
+	var isThunk = __webpack_require__(15)
+	var handleThunk = __webpack_require__(16)
 	
-	var diffProps = __webpack_require__(16)
+	var diffProps = __webpack_require__(17)
 	
 	module.exports = diff
 	
@@ -5986,7 +6764,7 @@
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports) {
 
 	var nativeIsArray = Array.isArray
@@ -6000,10 +6778,10 @@
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(10)
+	var version = __webpack_require__(11)
 	
 	VirtualPatch.NONE = 0
 	VirtualPatch.VTEXT = 1
@@ -6028,17 +6806,17 @@
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports) {
 
 	module.exports = "2"
 
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(10)
+	var version = __webpack_require__(11)
 	
 	module.exports = isVirtualNode
 	
@@ -6048,10 +6826,10 @@
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(10)
+	var version = __webpack_require__(11)
 	
 	module.exports = isVirtualText
 	
@@ -6061,7 +6839,7 @@
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports) {
 
 	module.exports = isWidget
@@ -6072,7 +6850,7 @@
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports) {
 
 	module.exports = isThunk
@@ -6083,13 +6861,13 @@
 
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isVNode = __webpack_require__(11)
-	var isVText = __webpack_require__(12)
-	var isWidget = __webpack_require__(13)
-	var isThunk = __webpack_require__(14)
+	var isVNode = __webpack_require__(12)
+	var isVText = __webpack_require__(13)
+	var isWidget = __webpack_require__(14)
+	var isThunk = __webpack_require__(15)
 	
 	module.exports = handleThunk
 	
@@ -6129,11 +6907,11 @@
 
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(17)
-	var isHook = __webpack_require__(18)
+	var isObject = __webpack_require__(18)
+	var isHook = __webpack_require__(19)
 	
 	module.exports = diffProps
 	
@@ -6193,7 +6971,7 @@
 
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -6204,7 +6982,7 @@
 
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports) {
 
 	module.exports = isHook
@@ -6217,24 +6995,24 @@
 
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var patch = __webpack_require__(20)
+	var patch = __webpack_require__(21)
 	
 	module.exports = patch
 
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var document = __webpack_require__(21)
-	var isArray = __webpack_require__(8)
+	var document = __webpack_require__(22)
+	var isArray = __webpack_require__(9)
 	
-	var render = __webpack_require__(23)
-	var domIndex = __webpack_require__(25)
-	var patchOp = __webpack_require__(26)
+	var render = __webpack_require__(24)
+	var domIndex = __webpack_require__(26)
+	var patchOp = __webpack_require__(27)
 	module.exports = patch
 	
 	function patch(rootNode, patches, renderOptions) {
@@ -6312,12 +7090,12 @@
 
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {var topLevel = typeof global !== 'undefined' ? global :
 	    typeof window !== 'undefined' ? window : {}
-	var minDoc = __webpack_require__(22);
+	var minDoc = __webpack_require__(23);
 	
 	if (typeof document !== 'undefined') {
 	    module.exports = document;
@@ -6334,23 +7112,23 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 23 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var document = __webpack_require__(21)
+	var document = __webpack_require__(22)
 	
-	var applyProperties = __webpack_require__(24)
+	var applyProperties = __webpack_require__(25)
 	
-	var isVNode = __webpack_require__(11)
-	var isVText = __webpack_require__(12)
-	var isWidget = __webpack_require__(13)
-	var handleThunk = __webpack_require__(15)
+	var isVNode = __webpack_require__(12)
+	var isVText = __webpack_require__(13)
+	var isWidget = __webpack_require__(14)
+	var handleThunk = __webpack_require__(16)
 	
 	module.exports = createElement
 	
@@ -6392,11 +7170,11 @@
 
 
 /***/ },
-/* 24 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(17)
-	var isHook = __webpack_require__(18)
+	var isObject = __webpack_require__(18)
+	var isHook = __webpack_require__(19)
 	
 	module.exports = applyProperties
 	
@@ -6495,7 +7273,7 @@
 
 
 /***/ },
-/* 25 */
+/* 26 */
 /***/ function(module, exports) {
 
 	// Maps a virtual DOM tree onto a real DOM tree in an efficient manner.
@@ -6586,15 +7364,15 @@
 
 
 /***/ },
-/* 26 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var applyProperties = __webpack_require__(24)
+	var applyProperties = __webpack_require__(25)
 	
-	var isWidget = __webpack_require__(13)
-	var VPatch = __webpack_require__(9)
+	var isWidget = __webpack_require__(14)
+	var VPatch = __webpack_require__(10)
 	
-	var updateWidget = __webpack_require__(27)
+	var updateWidget = __webpack_require__(28)
 	
 	module.exports = applyPatch
 	
@@ -6743,10 +7521,10 @@
 
 
 /***/ },
-/* 27 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isWidget = __webpack_require__(13)
+	var isWidget = __webpack_require__(14)
 	
 	module.exports = updateWidget
 	
@@ -6764,33 +7542,33 @@
 
 
 /***/ },
-/* 28 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var h = __webpack_require__(29)
+	var h = __webpack_require__(30)
 	
 	module.exports = h
 
 
 /***/ },
-/* 29 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var isArray = __webpack_require__(8);
+	var isArray = __webpack_require__(9);
 	
-	var VNode = __webpack_require__(30);
-	var VText = __webpack_require__(31);
-	var isVNode = __webpack_require__(11);
-	var isVText = __webpack_require__(12);
-	var isWidget = __webpack_require__(13);
-	var isHook = __webpack_require__(18);
-	var isVThunk = __webpack_require__(14);
+	var VNode = __webpack_require__(31);
+	var VText = __webpack_require__(32);
+	var isVNode = __webpack_require__(12);
+	var isVText = __webpack_require__(13);
+	var isWidget = __webpack_require__(14);
+	var isHook = __webpack_require__(19);
+	var isVThunk = __webpack_require__(15);
 	
-	var parseTag = __webpack_require__(32);
-	var softSetHook = __webpack_require__(34);
-	var evHook = __webpack_require__(35);
+	var parseTag = __webpack_require__(33);
+	var softSetHook = __webpack_require__(35);
+	var evHook = __webpack_require__(36);
 	
 	module.exports = h;
 	
@@ -6916,14 +7694,14 @@
 
 
 /***/ },
-/* 30 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(10)
-	var isVNode = __webpack_require__(11)
-	var isWidget = __webpack_require__(13)
-	var isThunk = __webpack_require__(14)
-	var isVHook = __webpack_require__(18)
+	var version = __webpack_require__(11)
+	var isVNode = __webpack_require__(12)
+	var isWidget = __webpack_require__(14)
+	var isThunk = __webpack_require__(15)
+	var isVHook = __webpack_require__(19)
 	
 	module.exports = VirtualNode
 	
@@ -6994,10 +7772,10 @@
 
 
 /***/ },
-/* 31 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(10)
+	var version = __webpack_require__(11)
 	
 	module.exports = VirtualText
 	
@@ -7010,12 +7788,12 @@
 
 
 /***/ },
-/* 32 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var split = __webpack_require__(33);
+	var split = __webpack_require__(34);
 	
 	var classIdSplit = /([\.#]?[a-zA-Z0-9\u007F-\uFFFF_:-]+)/;
 	var notClassId = /^\.|#/;
@@ -7070,7 +7848,7 @@
 
 
 /***/ },
-/* 33 */
+/* 34 */
 /***/ function(module, exports) {
 
 	/*!
@@ -7182,7 +7960,7 @@
 
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -7205,12 +7983,12 @@
 
 
 /***/ },
-/* 35 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var EvStore = __webpack_require__(36);
+	var EvStore = __webpack_require__(37);
 	
 	module.exports = EvHook;
 	
@@ -7238,12 +8016,12 @@
 
 
 /***/ },
-/* 36 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var OneVersionConstraint = __webpack_require__(37);
+	var OneVersionConstraint = __webpack_require__(38);
 	
 	var MY_VERSION = '7';
 	OneVersionConstraint('ev-store', MY_VERSION);
@@ -7264,12 +8042,12 @@
 
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var Individual = __webpack_require__(38);
+	var Individual = __webpack_require__(39);
 	
 	module.exports = OneVersion;
 	
@@ -7292,7 +8070,7 @@
 
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
@@ -7318,10 +8096,10 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 39 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var createElement = __webpack_require__(23)
+	var createElement = __webpack_require__(24)
 	
 	module.exports = createElement
 

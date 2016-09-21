@@ -30,9 +30,9 @@
       window.addEventListener("load", init, false);
     </script>
     
-  <title>Sudoku - the game sudoku implemented in fable-virtualdom - F# |> BABEL</title>
+  <title>Sudoku - the game sudoku implemented in fable-arch - F# |> BABEL</title>
   
-  <meta name="description" content="Sudoku - the game sudoku implemented in fable-virtualdom">
+  <meta name="description" content="Sudoku - the game sudoku implemented in fable-arch">
 
 </head>
 <body>
@@ -48,14 +48,14 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="//fable-compiler.github.io/fable-virtualdom">Fable</a>
+        <a class="navbar-brand" href="//fable-compiler.github.io/fable-arch">Fable</a>
       </div>
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav">
-          <li class=""><a href="//fable-compiler.github.io/fable-virtualdom">home</a></li>
-          <!--<li class="active"><a href="//fable-compiler.github.io/fable-virtualdom/samples.html">samples</a></li>-->
-          <li class=""><a href="//fable-compiler.github.io/fable-virtualdom/docs.html">docs</a></li>
-          <li><a href="https://github.com/fable-compiler/fable-virtualdom">source</a></li>
+          <li class=""><a href="//fable-compiler.github.io/fable-arch">home</a></li>
+          <!--<li class="active"><a href="//fable-compiler.github.io/fable-arch/samples.html">samples</a></li>-->
+          <li class=""><a href="//fable-compiler.github.io/fable-arch/docs.html">docs</a></li>
+          <li><a href="https://github.com/fable-compiler/fable-arch">source</a></li>
         </ul>
       </div>
     </div>
@@ -69,8 +69,8 @@
 <div class="container">
   <div class="row">
     <div class="col-sm-12">
-      <h1>Sudoku - the game sudoku implemented in fable-virtualdom</h1>
-      <p>Sudoku - the game sudoku implemented in fable-virtualdom (<a href="https://github.com/fable-compiler/fable-virtualdom/tree/master/samples/sudoku">go to source</a>)</p>
+      <h1>Sudoku - the game sudoku implemented in fable-arch</h1>
+      <p>Sudoku - the game sudoku implemented in fable-arch (<a href="https://github.com/fable-compiler/fable-arch/tree/master/samples/sudoku">go to source</a>)</p>
     </div>
   </div>
 </div>
@@ -274,10 +274,14 @@
 <span class="l">147: </span>
 <span class="l">148: </span>
 <span class="l">149: </span>
+<span class="l">150: </span>
+<span class="l">151: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// Load Fable.Core and bindings to JS global objects</span>
 <span class="prep">#r</span> <span class="s">&quot;node_modules/fable-core/Fable.Core.dll&quot;</span>
-<span class="prep">#load</span> <span class="s">&quot;node_modules/fable-import-virtualdom/Fable.Helpers.Virtualdom.fs&quot;</span>
+<span class="prep">#load</span> <span class="s">&quot;node_modules/fable-arch/Fable.Arch.Html.fs&quot;</span>
+<span class="prep">#load</span> <span class="s">&quot;node_modules/fable-arch/Fable.Arch.App.fs&quot;</span>
+<span class="prep">#load</span> <span class="s">&quot;node_modules/fable-arch/Fable.Arch.Virtualdom.fs&quot;</span>
 
 <span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 1)" onmouseover="showTip(event, 'fs1', 1)" class="i">System</span>
 <span class="k">open</span> <span onmouseout="hideTip(event, 'fs2', 2)" onmouseover="showTip(event, 'fs2', 2)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs3', 3)" onmouseover="showTip(event, 'fs3', 3)" class="i">Core</span>
@@ -380,50 +384,50 @@
              [<span class="n">0</span>; <span class="n">5</span>; <span class="n">0</span>;  <span class="n">0</span>; <span class="n">0</span>; <span class="n">0</span>;  <span class="n">0</span>; <span class="n">7</span>; <span class="n">4</span>]]
               <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs42', 233)" onmouseover="showTip(event, 'fs42', 233)" class="f">toSudoku</span>
 
-<span class="k">open</span> <span onmouseout="hideTip(event, 'fs2', 234)" onmouseover="showTip(event, 'fs2', 234)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs79', 235)" onmouseover="showTip(event, 'fs79', 235)" class="i">Helpers</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs80', 236)" onmouseover="showTip(event, 'fs80', 236)" class="i">Virtualdom</span>
-<span class="k">open</span> <span onmouseout="hideTip(event, 'fs2', 237)" onmouseover="showTip(event, 'fs2', 237)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs79', 238)" onmouseover="showTip(event, 'fs79', 238)" class="i">Helpers</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs80', 239)" onmouseover="showTip(event, 'fs80', 239)" class="i">Virtualdom</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs81', 240)" onmouseover="showTip(event, 'fs81', 240)" class="i">App</span>
-<span class="k">open</span> <span onmouseout="hideTip(event, 'fs2', 241)" onmouseover="showTip(event, 'fs2', 241)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs79', 242)" onmouseover="showTip(event, 'fs79', 242)" class="i">Helpers</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs80', 243)" onmouseover="showTip(event, 'fs80', 243)" class="i">Virtualdom</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs82', 244)" onmouseover="showTip(event, 'fs82', 244)" class="i">Html</span>
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs2', 234)" onmouseover="showTip(event, 'fs2', 234)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs79', 235)" onmouseover="showTip(event, 'fs79', 235)" class="i">Arch</span>
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs2', 236)" onmouseover="showTip(event, 'fs2', 236)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs79', 237)" onmouseover="showTip(event, 'fs79', 237)" class="i">Arch</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs80', 238)" onmouseover="showTip(event, 'fs80', 238)" class="i">App</span>
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs2', 239)" onmouseover="showTip(event, 'fs2', 239)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs79', 240)" onmouseover="showTip(event, 'fs79', 240)" class="i">Arch</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs81', 241)" onmouseover="showTip(event, 'fs81', 241)" class="i">Html</span>
 
-<span class="k">let</span> <span class="k">inline</span> <span onmouseout="hideTip(event, 'fs83', 245)" onmouseover="showTip(event, 'fs83', 245)" class="f">onInput</span> <span onmouseout="hideTip(event, 'fs84', 246)" onmouseover="showTip(event, 'fs84', 246)" class="f">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs85', 247)" onmouseover="showTip(event, 'fs85', 247)" class="f">onEvent</span> <span class="s">&quot;oninput&quot;</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs86', 248)" onmouseover="showTip(event, 'fs86', 248)" class="i">e</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs84', 249)" onmouseover="showTip(event, 'fs84', 249)" class="f">x</span> (<span onmouseout="hideTip(event, 'fs87', 250)" onmouseover="showTip(event, 'fs87', 250)" class="f">unbox</span> <span onmouseout="hideTip(event, 'fs86', 251)" onmouseover="showTip(event, 'fs86', 251)" class="i">e</span><span class="o">?</span><span class="i">target</span><span class="o">?</span><span class="i">value</span>))
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs88', 252)" onmouseover="showTip(event, 'fs88', 252)" class="f">maxlength</span> (<span onmouseout="hideTip(event, 'fs89', 253)" onmouseover="showTip(event, 'fs89', 253)" class="i">i</span><span class="o">:</span><span onmouseout="hideTip(event, 'fs9', 254)" onmouseover="showTip(event, 'fs9', 254)" class="t">int</span>) <span class="o">=</span> <span onmouseout="hideTip(event, 'fs90', 255)" onmouseover="showTip(event, 'fs90', 255)" class="f">attribute</span> <span class="s">&quot;maxlength&quot;</span> (<span onmouseout="hideTip(event, 'fs91', 256)" onmouseover="showTip(event, 'fs91', 256)" class="f">string</span> <span onmouseout="hideTip(event, 'fs89', 257)" onmouseover="showTip(event, 'fs89', 257)" class="i">i</span>) 
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs92', 258)" onmouseover="showTip(event, 'fs92', 258)" class="f">view</span> (<span onmouseout="hideTip(event, 'fs72', 259)" onmouseover="showTip(event, 'fs72', 259)" class="i">model</span><span class="o">:</span><span onmouseout="hideTip(event, 'fs10', 260)" onmouseover="showTip(event, 'fs10', 260)" class="t">Sudoku</span>) <span class="o">=</span> 
-    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs93', 261)" onmouseover="showTip(event, 'fs93', 261)" class="i">inputs</span> <span class="o">=</span>
-         <span onmouseout="hideTip(event, 'fs94', 262)" onmouseover="showTip(event, 'fs94', 262)" class="f">div</span> [] 
-            [<span class="k">for</span> <span onmouseout="hideTip(event, 'fs89', 263)" onmouseover="showTip(event, 'fs89', 263)" class="i">i</span> <span class="k">in</span> <span class="n">0</span> <span class="o">..</span> <span onmouseout="hideTip(event, 'fs72', 264)" onmouseover="showTip(event, 'fs72', 264)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs95', 265)" onmouseover="showTip(event, 'fs95', 265)" class="i">Length</span><span class="o">-</span><span class="n">1</span> <span class="k">-&gt;</span>
-              <span onmouseout="hideTip(event, 'fs94', 266)" onmouseover="showTip(event, 'fs94', 266)" class="f">div</span> 
+<span class="k">let</span> <span class="k">inline</span> <span onmouseout="hideTip(event, 'fs82', 242)" onmouseover="showTip(event, 'fs82', 242)" class="f">onInput</span> <span onmouseout="hideTip(event, 'fs83', 243)" onmouseover="showTip(event, 'fs83', 243)" class="f">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs84', 244)" onmouseover="showTip(event, 'fs84', 244)" class="f">onEvent</span> <span class="s">&quot;oninput&quot;</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs85', 245)" onmouseover="showTip(event, 'fs85', 245)" class="i">e</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs83', 246)" onmouseover="showTip(event, 'fs83', 246)" class="f">x</span> (<span onmouseout="hideTip(event, 'fs86', 247)" onmouseover="showTip(event, 'fs86', 247)" class="f">unbox</span> <span onmouseout="hideTip(event, 'fs85', 248)" onmouseover="showTip(event, 'fs85', 248)" class="i">e</span><span class="o">?</span><span class="i">target</span><span class="o">?</span><span class="i">value</span>))
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs87', 249)" onmouseover="showTip(event, 'fs87', 249)" class="f">maxlength</span> (<span onmouseout="hideTip(event, 'fs88', 250)" onmouseover="showTip(event, 'fs88', 250)" class="i">i</span><span class="o">:</span><span onmouseout="hideTip(event, 'fs9', 251)" onmouseover="showTip(event, 'fs9', 251)" class="t">int</span>) <span class="o">=</span> <span onmouseout="hideTip(event, 'fs89', 252)" onmouseover="showTip(event, 'fs89', 252)" class="f">attribute</span> <span class="s">&quot;maxlength&quot;</span> (<span onmouseout="hideTip(event, 'fs90', 253)" onmouseover="showTip(event, 'fs90', 253)" class="f">string</span> <span onmouseout="hideTip(event, 'fs88', 254)" onmouseover="showTip(event, 'fs88', 254)" class="i">i</span>) 
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs91', 255)" onmouseover="showTip(event, 'fs91', 255)" class="f">view</span> (<span onmouseout="hideTip(event, 'fs72', 256)" onmouseover="showTip(event, 'fs72', 256)" class="i">model</span><span class="o">:</span><span onmouseout="hideTip(event, 'fs10', 257)" onmouseover="showTip(event, 'fs10', 257)" class="t">Sudoku</span>) <span class="o">=</span> 
+    <span class="k">let</span> <span onmouseout="hideTip(event, 'fs92', 258)" onmouseover="showTip(event, 'fs92', 258)" class="i">inputs</span> <span class="o">=</span>
+         <span onmouseout="hideTip(event, 'fs93', 259)" onmouseover="showTip(event, 'fs93', 259)" class="f">div</span> [] 
+            [<span class="k">for</span> <span onmouseout="hideTip(event, 'fs88', 260)" onmouseover="showTip(event, 'fs88', 260)" class="i">i</span> <span class="k">in</span> <span class="n">0</span> <span class="o">..</span> <span onmouseout="hideTip(event, 'fs72', 261)" onmouseover="showTip(event, 'fs72', 261)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs94', 262)" onmouseover="showTip(event, 'fs94', 262)" class="i">Length</span><span class="o">-</span><span class="n">1</span> <span class="k">-&gt;</span>
+              <span onmouseout="hideTip(event, 'fs93', 263)" onmouseover="showTip(event, 'fs93', 263)" class="f">div</span> 
                 [] 
-                [ <span class="k">for</span> <span onmouseout="hideTip(event, 'fs96', 267)" onmouseover="showTip(event, 'fs96', 267)" class="i">j</span> <span class="k">in</span> <span class="n">0</span> <span class="o">..</span> <span onmouseout="hideTip(event, 'fs72', 268)" onmouseover="showTip(event, 'fs72', 268)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs95', 269)" onmouseover="showTip(event, 'fs95', 269)" class="i">Length</span><span class="o">-</span><span class="n">1</span> <span class="k">-&gt;</span>
-                        <span onmouseout="hideTip(event, 'fs97', 270)" onmouseover="showTip(event, 'fs97', 270)" class="f">input</span>
+                [ <span class="k">for</span> <span onmouseout="hideTip(event, 'fs95', 264)" onmouseover="showTip(event, 'fs95', 264)" class="i">j</span> <span class="k">in</span> <span class="n">0</span> <span class="o">..</span> <span onmouseout="hideTip(event, 'fs72', 265)" onmouseover="showTip(event, 'fs72', 265)" class="i">model</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs94', 266)" onmouseover="showTip(event, 'fs94', 266)" class="i">Length</span><span class="o">-</span><span class="n">1</span> <span class="k">-&gt;</span>
+                        <span onmouseout="hideTip(event, 'fs96', 267)" onmouseover="showTip(event, 'fs96', 267)" class="f">input</span>
                             [
-                                <span onmouseout="hideTip(event, 'fs88', 271)" onmouseover="showTip(event, 'fs88', 271)" class="f">maxlength</span> <span class="n">1</span>
-                                <span onmouseout="hideTip(event, 'fs98', 272)" onmouseover="showTip(event, 'fs98', 272)" class="f">property</span> <span class="s">&quot;value&quot;</span> 
-                                    (<span class="k">match</span> <span onmouseout="hideTip(event, 'fs72', 273)" onmouseover="showTip(event, 'fs72', 273)" class="i">model</span><span class="o">.</span>[<span onmouseout="hideTip(event, 'fs89', 274)" onmouseover="showTip(event, 'fs89', 274)" class="i">i</span>]<span class="o">.</span>[<span onmouseout="hideTip(event, 'fs96', 275)" onmouseover="showTip(event, 'fs96', 275)" class="i">j</span>] <span class="k">with</span>
-                                        | <span class="n">0</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs87', 276)" onmouseover="showTip(event, 'fs87', 276)" class="f">unbox</span> <span class="s">&quot;&quot;</span>
-                                        | <span onmouseout="hideTip(event, 'fs99', 277)" onmouseover="showTip(event, 'fs99', 277)" class="i">v</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs87', 278)" onmouseover="showTip(event, 'fs87', 278)" class="f">unbox</span> (<span onmouseout="hideTip(event, 'fs99', 279)" onmouseover="showTip(event, 'fs99', 279)" class="i">v</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs100', 280)" onmouseover="showTip(event, 'fs100', 280)" class="f">ToString</span>()))
-                                <span onmouseout="hideTip(event, 'fs83', 281)" onmouseover="showTip(event, 'fs83', 281)" class="f">onInput</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs101', 282)" onmouseover="showTip(event, 'fs101', 282)" class="i">x</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs70', 283)" onmouseover="showTip(event, 'fs70', 283)" class="p">ChangeBox</span> ((<span onmouseout="hideTip(event, 'fs89', 284)" onmouseover="showTip(event, 'fs89', 284)" class="i">i</span>,<span onmouseout="hideTip(event, 'fs96', 285)" onmouseover="showTip(event, 'fs96', 285)" class="i">j</span>), <span onmouseout="hideTip(event, 'fs9', 286)" onmouseover="showTip(event, 'fs9', 286)" class="f">int</span> (<span onmouseout="hideTip(event, 'fs87', 287)" onmouseover="showTip(event, 'fs87', 287)" class="f">unbox</span> <span onmouseout="hideTip(event, 'fs101', 288)" onmouseover="showTip(event, 'fs101', 288)" class="i">x</span>)))
+                                <span onmouseout="hideTip(event, 'fs87', 268)" onmouseover="showTip(event, 'fs87', 268)" class="f">maxlength</span> <span class="n">1</span>
+                                <span onmouseout="hideTip(event, 'fs97', 269)" onmouseover="showTip(event, 'fs97', 269)" class="f">property</span> <span class="s">&quot;value&quot;</span> 
+                                    (<span class="k">match</span> <span onmouseout="hideTip(event, 'fs72', 270)" onmouseover="showTip(event, 'fs72', 270)" class="i">model</span><span class="o">.</span>[<span onmouseout="hideTip(event, 'fs88', 271)" onmouseover="showTip(event, 'fs88', 271)" class="i">i</span>]<span class="o">.</span>[<span onmouseout="hideTip(event, 'fs95', 272)" onmouseover="showTip(event, 'fs95', 272)" class="i">j</span>] <span class="k">with</span>
+                                        | <span class="n">0</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs86', 273)" onmouseover="showTip(event, 'fs86', 273)" class="f">unbox</span> <span class="s">&quot;&quot;</span>
+                                        | <span onmouseout="hideTip(event, 'fs98', 274)" onmouseover="showTip(event, 'fs98', 274)" class="i">v</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs86', 275)" onmouseover="showTip(event, 'fs86', 275)" class="f">unbox</span> (<span onmouseout="hideTip(event, 'fs98', 276)" onmouseover="showTip(event, 'fs98', 276)" class="i">v</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs99', 277)" onmouseover="showTip(event, 'fs99', 277)" class="f">ToString</span>()))
+                                <span onmouseout="hideTip(event, 'fs82', 278)" onmouseover="showTip(event, 'fs82', 278)" class="f">onInput</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs100', 279)" onmouseover="showTip(event, 'fs100', 279)" class="i">x</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs70', 280)" onmouseover="showTip(event, 'fs70', 280)" class="p">ChangeBox</span> ((<span onmouseout="hideTip(event, 'fs88', 281)" onmouseover="showTip(event, 'fs88', 281)" class="i">i</span>,<span onmouseout="hideTip(event, 'fs95', 282)" onmouseover="showTip(event, 'fs95', 282)" class="i">j</span>), <span onmouseout="hideTip(event, 'fs9', 283)" onmouseover="showTip(event, 'fs9', 283)" class="f">int</span> (<span onmouseout="hideTip(event, 'fs86', 284)" onmouseover="showTip(event, 'fs86', 284)" class="f">unbox</span> <span onmouseout="hideTip(event, 'fs100', 285)" onmouseover="showTip(event, 'fs100', 285)" class="i">x</span>)))
                             ]
                 ]
             ]
 
 
-    <span onmouseout="hideTip(event, 'fs94', 289)" onmouseover="showTip(event, 'fs94', 289)" class="f">div</span> [] 
-        [ <span onmouseout="hideTip(event, 'fs102', 290)" onmouseover="showTip(event, 'fs102', 290)" class="f">h1</span> [ ] [<span onmouseout="hideTip(event, 'fs103', 291)" onmouseover="showTip(event, 'fs103', 291)" class="f">text</span> <span class="s">&quot;Sudoku&quot;</span>]
-          <span onmouseout="hideTip(event, 'fs94', 292)" onmouseover="showTip(event, 'fs94', 292)" class="f">div</span> [] 
+    <span onmouseout="hideTip(event, 'fs93', 286)" onmouseover="showTip(event, 'fs93', 286)" class="f">div</span> [] 
+        [ <span onmouseout="hideTip(event, 'fs101', 287)" onmouseover="showTip(event, 'fs101', 287)" class="f">h1</span> [ ] [<span onmouseout="hideTip(event, 'fs102', 288)" onmouseover="showTip(event, 'fs102', 288)" class="f">text</span> <span class="s">&quot;Sudoku&quot;</span>]
+          <span onmouseout="hideTip(event, 'fs93', 289)" onmouseover="showTip(event, 'fs93', 289)" class="f">div</span> [] 
             [
-                <span onmouseout="hideTip(event, 'fs93', 293)" onmouseover="showTip(event, 'fs93', 293)" class="i">inputs</span>
-                <span onmouseout="hideTip(event, 'fs104', 294)" onmouseover="showTip(event, 'fs104', 294)" class="f">br</span> []
-                <span onmouseout="hideTip(event, 'fs105', 295)" onmouseover="showTip(event, 'fs105', 295)" class="f">button</span> [
-                    <span onmouseout="hideTip(event, 'fs90', 296)" onmouseover="showTip(event, 'fs90', 296)" class="f">attribute</span> <span class="s">&quot;class&quot;</span> <span class="s">&quot;button&quot;</span>
-                    <span onmouseout="hideTip(event, 'fs106', 297)" onmouseover="showTip(event, 'fs106', 297)" class="f">onMouseClick</span> (<span class="k">fun</span> _ <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs69', 298)" onmouseover="showTip(event, 'fs69', 298)" class="p">Solve</span> )
-                ] [ <span onmouseout="hideTip(event, 'fs103', 299)" onmouseover="showTip(event, 'fs103', 299)" class="f">text</span> <span class="s">&quot;Solve&quot;</span> ]
+                <span onmouseout="hideTip(event, 'fs92', 290)" onmouseover="showTip(event, 'fs92', 290)" class="i">inputs</span>
+                <span onmouseout="hideTip(event, 'fs103', 291)" onmouseover="showTip(event, 'fs103', 291)" class="f">br</span> []
+                <span onmouseout="hideTip(event, 'fs104', 292)" onmouseover="showTip(event, 'fs104', 292)" class="f">button</span> [
+                    <span onmouseout="hideTip(event, 'fs89', 293)" onmouseover="showTip(event, 'fs89', 293)" class="f">attribute</span> <span class="s">&quot;class&quot;</span> <span class="s">&quot;button&quot;</span>
+                    <span onmouseout="hideTip(event, 'fs105', 294)" onmouseover="showTip(event, 'fs105', 294)" class="f">onMouseClick</span> (<span class="k">fun</span> _ <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs69', 295)" onmouseover="showTip(event, 'fs69', 295)" class="p">Solve</span> )
+                ] [ <span onmouseout="hideTip(event, 'fs102', 296)" onmouseover="showTip(event, 'fs102', 296)" class="f">text</span> <span class="s">&quot;Solve&quot;</span> ]
             ]
         ]
 
-<span class="k">open</span> <span onmouseout="hideTip(event, 'fs2', 300)" onmouseover="showTip(event, 'fs2', 300)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 301)" onmouseover="showTip(event, 'fs5', 301)" class="i">Import</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs107', 302)" onmouseover="showTip(event, 'fs107', 302)" class="i">Browser</span>
-<span onmouseout="hideTip(event, 'fs108', 303)" onmouseover="showTip(event, 'fs108', 303)" class="f">createApp</span> <span onmouseout="hideTip(event, 'fs78', 304)" onmouseover="showTip(event, 'fs78', 304)" class="i">initModel</span> <span onmouseout="hideTip(event, 'fs92', 305)" onmouseover="showTip(event, 'fs92', 305)" class="f">view</span> <span onmouseout="hideTip(event, 'fs71', 306)" onmouseover="showTip(event, 'fs71', 306)" class="f">update</span>
-<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs109', 307)" onmouseover="showTip(event, 'fs109', 307)" class="f">withStartNodeSelector</span> <span class="s">&quot;#todoapp&quot;</span>
-<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs110', 308)" onmouseover="showTip(event, 'fs110', 308)" class="f">withSubscriber</span> <span class="s">&quot;allseeingeye&quot;</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs111', 309)" onmouseover="showTip(event, 'fs111', 309)" class="i">x</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs112', 310)" onmouseover="showTip(event, 'fs112', 310)" class="i">window</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs113', 311)" onmouseover="showTip(event, 'fs113', 311)" class="i">console</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs114', 312)" onmouseover="showTip(event, 'fs114', 312)" class="f">log</span>(<span class="s">&quot;Something happened: &quot;</span>, <span onmouseout="hideTip(event, 'fs111', 313)" onmouseover="showTip(event, 'fs111', 313)" class="i">x</span>))
-<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs115', 314)" onmouseover="showTip(event, 'fs115', 314)" class="f">start</span> <span onmouseout="hideTip(event, 'fs116', 315)" onmouseover="showTip(event, 'fs116', 315)" class="i">renderer</span> 
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs2', 297)" onmouseover="showTip(event, 'fs2', 297)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 298)" onmouseover="showTip(event, 'fs5', 298)" class="i">Import</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs106', 299)" onmouseover="showTip(event, 'fs106', 299)" class="i">Browser</span>
+<span onmouseout="hideTip(event, 'fs107', 300)" onmouseover="showTip(event, 'fs107', 300)" class="f">createApp</span> <span onmouseout="hideTip(event, 'fs78', 301)" onmouseover="showTip(event, 'fs78', 301)" class="i">initModel</span> <span onmouseout="hideTip(event, 'fs91', 302)" onmouseover="showTip(event, 'fs91', 302)" class="f">view</span> <span onmouseout="hideTip(event, 'fs71', 303)" onmouseover="showTip(event, 'fs71', 303)" class="f">update</span> <span onmouseout="hideTip(event, 'fs108', 304)" onmouseover="showTip(event, 'fs108', 304)" class="t">Virtualdom</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs109', 305)" onmouseover="showTip(event, 'fs109', 305)" class="i">renderer</span>
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs110', 306)" onmouseover="showTip(event, 'fs110', 306)" class="f">withStartNodeSelector</span> <span class="s">&quot;#todoapp&quot;</span>
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs111', 307)" onmouseover="showTip(event, 'fs111', 307)" class="f">withSubscriber</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs112', 308)" onmouseover="showTip(event, 'fs112', 308)" class="i">x</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs113', 309)" onmouseover="showTip(event, 'fs113', 309)" class="i">window</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs114', 310)" onmouseover="showTip(event, 'fs114', 310)" class="i">console</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs115', 311)" onmouseover="showTip(event, 'fs115', 311)" class="f">log</span>(<span class="s">&quot;Something happened: &quot;</span>, <span onmouseout="hideTip(event, 'fs112', 312)" onmouseover="showTip(event, 'fs112', 312)" class="i">x</span>))
+<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs116', 313)" onmouseover="showTip(event, 'fs116', 313)" class="f">start</span>
 </code></pre></td>
 </tr>
 </table>
@@ -507,44 +511,44 @@
 <div class="tip" id="fs76">val v : Val</div>
 <div class="tip" id="fs77">val m : Sudoku</div>
 <div class="tip" id="fs78">val initModel : Sudoku<br /><br />Full name: Sudoku.initModel</div>
-<div class="tip" id="fs79">namespace Fable.Helpers</div>
-<div class="tip" id="fs80">module Virtualdom<br /><br />from Fable.Helpers</div>
-<div class="tip" id="fs81">module App<br /><br />from Fable.Helpers.Virtualdom</div>
-<div class="tip" id="fs82">module Html<br /><br />from Fable.Helpers.Virtualdom</div>
-<div class="tip" id="fs83">val onInput : x:(&#39;a -&gt; &#39;b) -&gt; Attribute&lt;&#39;b&gt;<br /><br />Full name: Sudoku.onInput</div>
-<div class="tip" id="fs84">val x : (&#39;a -&gt; &#39;b)</div>
-<div class="tip" id="fs85">val onEvent : eventType:string -&gt; f:(obj -&gt; &#39;c) -&gt; Attribute&lt;&#39;c&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Events.onEvent</div>
-<div class="tip" id="fs86">val e : obj</div>
-<div class="tip" id="fs87">val unbox : value:obj -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Core.Operators.unbox</div>
-<div class="tip" id="fs88">val maxlength : i:int -&gt; Attribute&lt;&#39;a&gt;<br /><br />Full name: Sudoku.maxlength</div>
-<div class="tip" id="fs89">val i : int</div>
-<div class="tip" id="fs90">val attribute : key:string -&gt; value:string -&gt; Attribute&lt;&#39;b&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Attributes.attribute</div>
-<div class="tip" id="fs91">Multiple items<br />val string : value:&#39;T -&gt; string<br /><br />Full name: Microsoft.FSharp.Core.Operators.string<br /><br />--------------------<br />type string = String<br /><br />Full name: Microsoft.FSharp.Core.string</div>
-<div class="tip" id="fs92">val view : model:Sudoku -&gt; DomNode&lt;Actions&gt;<br /><br />Full name: Sudoku.view</div>
-<div class="tip" id="fs93">val inputs : DomNode&lt;Actions&gt;</div>
-<div class="tip" id="fs94">val div : x:Attribute&lt;&#39;a&gt; list -&gt; (DomNode&lt;&#39;a&gt; list -&gt; DomNode&lt;&#39;a&gt;)<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Tags.div</div>
-<div class="tip" id="fs95">property Array.Length: int</div>
-<div class="tip" id="fs96">val j : int</div>
-<div class="tip" id="fs97">val input : x:Attribute&lt;&#39;a&gt; list -&gt; DomNode&lt;&#39;a&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Tags.input</div>
-<div class="tip" id="fs98">val property : key:string -&gt; value:string -&gt; Attribute&lt;&#39;a&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Attributes.property</div>
-<div class="tip" id="fs99">val v : Box</div>
-<div class="tip" id="fs100">Int32.ToString() : string<br />Int32.ToString(provider: IFormatProvider) : string<br />Int32.ToString(format: string) : string<br />Int32.ToString(format: string, provider: IFormatProvider) : string</div>
-<div class="tip" id="fs101">val x : obj</div>
-<div class="tip" id="fs102">val h1 : x:Attribute&lt;&#39;a&gt; list -&gt; (DomNode&lt;&#39;a&gt; list -&gt; DomNode&lt;&#39;a&gt;)<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Tags.h1</div>
-<div class="tip" id="fs103">val text : x:string -&gt; DomNode&lt;&#39;a&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Tags.text</div>
-<div class="tip" id="fs104">val br : x:Attribute&lt;&#39;a&gt; list -&gt; DomNode&lt;&#39;a&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Tags.br</div>
-<div class="tip" id="fs105">val button : x:Attribute&lt;&#39;a&gt; list -&gt; (DomNode&lt;&#39;a&gt; list -&gt; DomNode&lt;&#39;a&gt;)<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Tags.button</div>
-<div class="tip" id="fs106">val onMouseClick : x:(obj -&gt; &#39;a) -&gt; Attribute&lt;&#39;a&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.Html.Events.onMouseClick</div>
-<div class="tip" id="fs107">module Browser<br /><br />from Fable.Import</div>
-<div class="tip" id="fs108">val createApp : model:&#39;a -&gt; view:(&#39;a -&gt; DomNode&lt;&#39;b&gt;) -&gt; update:(&#39;a -&gt; &#39;b -&gt; &#39;a * Action&lt;&#39;b&gt; list) -&gt; App&lt;&#39;a,&#39;b&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.App.createApp</div>
-<div class="tip" id="fs109">val withStartNodeSelector : selector:string -&gt; app:App&lt;&#39;a,&#39;b&gt; -&gt; App&lt;&#39;a,&#39;b&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.App.withStartNodeSelector</div>
-<div class="tip" id="fs110">val withSubscriber : subscriberId:string -&gt; subscriber:Subscriber&lt;&#39;a,&#39;b&gt; -&gt; app:App&lt;&#39;b,&#39;a&gt; -&gt; App&lt;&#39;b,&#39;a&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.App.withSubscriber</div>
-<div class="tip" id="fs111">val x : AppEvents&lt;Actions,Sudoku&gt;</div>
-<div class="tip" id="fs112">val window : Window<br /><br />Full name: Fable.Import.Browser.window</div>
-<div class="tip" id="fs113">property WindowConsole.console: Console</div>
-<div class="tip" id="fs114">abstract member Console.log : ?message:obj * [&lt;ParamArray&gt;] optionalParams:obj [] -&gt; unit</div>
-<div class="tip" id="fs115">val start : renderer:Renderer&lt;&#39;a&gt; -&gt; app:App&lt;&#39;b,&#39;a&gt; -&gt; MailboxProcessor&lt;AppMessage&lt;&#39;a&gt;&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.App.start</div>
-<div class="tip" id="fs116">val renderer : Renderer&lt;&#39;a&gt;<br /><br />Full name: Fable.Helpers.Virtualdom.renderer</div>
+<div class="tip" id="fs79">namespace Fable.Arch</div>
+<div class="tip" id="fs80">module App<br /><br />from Fable.Arch</div>
+<div class="tip" id="fs81">module Html<br /><br />from Fable.Arch</div>
+<div class="tip" id="fs82">val onInput : x:(&#39;a -&gt; &#39;b) -&gt; Attribute&lt;&#39;b&gt;<br /><br />Full name: Sudoku.onInput</div>
+<div class="tip" id="fs83">val x : (&#39;a -&gt; &#39;b)</div>
+<div class="tip" id="fs84">val onEvent : eventType:string -&gt; f:(obj -&gt; &#39;c) -&gt; Attribute&lt;&#39;c&gt;<br /><br />Full name: Fable.Arch.Html.Events.onEvent</div>
+<div class="tip" id="fs85">val e : obj</div>
+<div class="tip" id="fs86">val unbox : value:obj -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Core.Operators.unbox</div>
+<div class="tip" id="fs87">val maxlength : i:int -&gt; Attribute&lt;&#39;a&gt;<br /><br />Full name: Sudoku.maxlength</div>
+<div class="tip" id="fs88">val i : int</div>
+<div class="tip" id="fs89">val attribute : key:string -&gt; value:string -&gt; Attribute&lt;&#39;b&gt;<br /><br />Full name: Fable.Arch.Html.Attributes.attribute</div>
+<div class="tip" id="fs90">Multiple items<br />val string : value:&#39;T -&gt; string<br /><br />Full name: Microsoft.FSharp.Core.Operators.string<br /><br />--------------------<br />type string = String<br /><br />Full name: Microsoft.FSharp.Core.string</div>
+<div class="tip" id="fs91">val view : model:Sudoku -&gt; DomNode&lt;Actions&gt;<br /><br />Full name: Sudoku.view</div>
+<div class="tip" id="fs92">val inputs : DomNode&lt;Actions&gt;</div>
+<div class="tip" id="fs93">val div : x:Attribute&lt;&#39;a&gt; list -&gt; (DomNode&lt;&#39;a&gt; list -&gt; DomNode&lt;&#39;a&gt;)<br /><br />Full name: Fable.Arch.Html.Tags.div</div>
+<div class="tip" id="fs94">property Array.Length: int</div>
+<div class="tip" id="fs95">val j : int</div>
+<div class="tip" id="fs96">val input : x:Attribute&lt;&#39;a&gt; list -&gt; DomNode&lt;&#39;a&gt;<br /><br />Full name: Fable.Arch.Html.Tags.input</div>
+<div class="tip" id="fs97">val property : key:string -&gt; value:string -&gt; Attribute&lt;&#39;a&gt;<br /><br />Full name: Fable.Arch.Html.Attributes.property</div>
+<div class="tip" id="fs98">val v : Box</div>
+<div class="tip" id="fs99">Int32.ToString() : string<br />Int32.ToString(provider: IFormatProvider) : string<br />Int32.ToString(format: string) : string<br />Int32.ToString(format: string, provider: IFormatProvider) : string</div>
+<div class="tip" id="fs100">val x : obj</div>
+<div class="tip" id="fs101">val h1 : x:Attribute&lt;&#39;a&gt; list -&gt; (DomNode&lt;&#39;a&gt; list -&gt; DomNode&lt;&#39;a&gt;)<br /><br />Full name: Fable.Arch.Html.Tags.h1</div>
+<div class="tip" id="fs102">val text : x:string -&gt; DomNode&lt;&#39;a&gt;<br /><br />Full name: Fable.Arch.Html.Tags.text</div>
+<div class="tip" id="fs103">val br : x:Attribute&lt;&#39;a&gt; list -&gt; DomNode&lt;&#39;a&gt;<br /><br />Full name: Fable.Arch.Html.Tags.br</div>
+<div class="tip" id="fs104">val button : x:Attribute&lt;&#39;a&gt; list -&gt; (DomNode&lt;&#39;a&gt; list -&gt; DomNode&lt;&#39;a&gt;)<br /><br />Full name: Fable.Arch.Html.Tags.button</div>
+<div class="tip" id="fs105">val onMouseClick : x:(obj -&gt; &#39;a) -&gt; Attribute&lt;&#39;a&gt;<br /><br />Full name: Fable.Arch.Html.Events.onMouseClick</div>
+<div class="tip" id="fs106">module Browser<br /><br />from Fable.Import</div>
+<div class="tip" id="fs107">val createApp : state:&#39;a -&gt; view:(&#39;a -&gt; &#39;b) -&gt; update:(&#39;a -&gt; &#39;c -&gt; &#39;a * Action&lt;&#39;c&gt; list) -&gt; renderer:Renderer&lt;&#39;c,&#39;b,&#39;d&gt; -&gt; AppSpecification&lt;&#39;a,&#39;c,&#39;b,&#39;d&gt;<br /><br />Full name: Fable.Arch.App.AppApi.createApp</div>
+<div class="tip" id="fs108">module Virtualdom<br /><br />from Fable.Arch</div>
+<div class="tip" id="fs109">val renderer : Renderer&lt;&#39;a,DomNode&lt;&#39;a&gt;,Virtualdom.ViewState&lt;&#39;b&gt;&gt;<br /><br />Full name: Fable.Arch.Virtualdom.renderer</div>
+<div class="tip" id="fs110">val withStartNodeSelector : selector:Selector -&gt; app:AppSpecification&lt;&#39;a,&#39;b,&#39;c,&#39;d&gt; -&gt; AppSpecification&lt;&#39;a,&#39;b,&#39;c,&#39;d&gt;<br /><br />Full name: Fable.Arch.App.AppApi.withStartNodeSelector</div>
+<div class="tip" id="fs111">val withSubscriber : subscriber:(ModelChanged&lt;&#39;a,&#39;b&gt; -&gt; unit) -&gt; app:AppSpecification&lt;&#39;b,&#39;a,&#39;a0,&#39;b1&gt; -&gt; AppSpecification&lt;&#39;b,&#39;a,&#39;a0,&#39;b1&gt;<br /><br />Full name: Fable.Arch.App.AppApi.withSubscriber</div>
+<div class="tip" id="fs112">val x : ModelChanged&lt;Actions,Sudoku&gt;</div>
+<div class="tip" id="fs113">val window : Window<br /><br />Full name: Fable.Import.Browser.window</div>
+<div class="tip" id="fs114">property WindowConsole.console: Console</div>
+<div class="tip" id="fs115">abstract member Console.log : ?message:obj * [&lt;ParamArray&gt;] optionalParams:obj [] -&gt; unit</div>
+<div class="tip" id="fs116">val start : appSpec:AppSpecification&lt;&#39;a,&#39;b,&#39;c,&#39;d&gt; -&gt; MailboxProcessor&lt;AppMessage&lt;&#39;b,&#39;a&gt;&gt;<br /><br />Full name: Fable.Arch.App.AppApi.start</div>
 
     </div>
     <div class="col-md-1 col-lg-2"></div>
@@ -553,6 +557,6 @@
 
   </div>
 
-  <a class="gh-forkme" href="https://github.com/fable-compiler/fable-virtualdom"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+  <a class="gh-forkme" href="https://github.com/fable-compiler/fable-arch"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
 </body>
 </html>

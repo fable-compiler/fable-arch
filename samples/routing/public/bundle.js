@@ -44,7 +44,7 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1), __webpack_require__(2), __webpack_require__(38)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore, _FableHelpers, _FableHelpers2) {
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1), __webpack_require__(2), __webpack_require__(3), __webpack_require__(4), __webpack_require__(5)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore, _FableArch, _FableArch2, _FableArch3, _FableArch4) {
 	    "use strict";
 	
 	    Object.defineProperty(exports, "__esModule", {
@@ -136,111 +136,116 @@
 	    _fableCore.Util.setInterfaces(CounterAction.prototype, ["FSharpUnion", "System.IEquatable", "System.IComparable"], "Routing.CounterAction");
 	
 	    function counterUpdate(model, command) {
-	        return command.Case === "Increment" ? function () {
-	            var x = command.Fields[0];
-	            return new Model(model.Count + x, model.Show);
-	        }() : function () {
-	            var x = command.Fields[0];
-	            return new Model(model.Count - x, model.Show);
-	        }();
+	        return command.Case === "Increment" ? new Model(model.Count + command.Fields[0], model.Show) : new Model(model.Count - command.Fields[0], model.Show);
 	    }
 	
 	    function counterView(model) {
-	        var bgColor = function () {
-	            var matchValue = model.Count;
-	
-	            if (function () {
-	                var x = matchValue;
-	                return x > 10;
-	            }()) {
-	                var x = matchValue;
-	                return "red";
-	            } else {
-	                if (function () {
-	                    var x = matchValue;
-	                    return x < 0;
-	                }()) {
-	                    var x = matchValue;
-	                    return "blue";
-	                } else {
-	                    return "green";
-	                }
-	            }
-	        }();
-	
+	        var bgColor = model.Count > 10 ? "red" : model.Count < 0 ? "blue" : "green";
 	        return function () {
 	            var tagName = "div";
 	            return function (children) {
-	                return new _FableHelpers.Html.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableHelpers.Html.Types.Attribute("Style", [_fableCore.List.ofArray([["display", model.Show ? "" : "none"]])])])], children]);
+	                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Style", [_fableCore.List.ofArray([["display", model.Show ? "" : "none"]])])])], children]);
 	            };
 	        }()(_fableCore.List.ofArray([function () {
 	            var tagName = "div";
 	            return function (children) {
-	                return new _FableHelpers.Html.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableHelpers.Html.Types.Attribute("Style", [_fableCore.List.ofArray([["width", "120px"], ["height", "120px"]])])])], children]);
+	                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Style", [_fableCore.List.ofArray([["width", "120px"], ["height", "120px"]])])])], children]);
 	            };
 	        }()(_fableCore.List.ofArray([function () {
 	            var tagName = "svg";
 	            return function (children) {
-	                return new _FableHelpers.Html.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([_FableHelpers.Html.Svg.svgNS()], _fableCore.List.ofArray([new _FableHelpers.Html.Types.Attribute("Attribute", [["width", "120"]]), new _FableHelpers.Html.Types.Attribute("Attribute", [["height", "120"]]), new _FableHelpers.Html.Types.Attribute("Attribute", [["viewBox", "0 0 100 100"]])]))], children]);
+	                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([_FableArch.Svg.svgNS()], _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["width", "120"]]), new _FableArch.Types.Attribute("Attribute", [["height", "120"]]), new _FableArch.Types.Attribute("Attribute", [["viewBox", "0 0 100 100"]])]))], children]);
 	            };
 	        }()(_fableCore.List.ofArray([function () {
 	            var tagName = "rect";
 	            return function (children) {
-	                return new _FableHelpers.Html.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([_FableHelpers.Html.Svg.svgNS()], _fableCore.List.ofArray([new _FableHelpers.Html.Types.Attribute("Attribute", [["width", "110"]]), new _FableHelpers.Html.Types.Attribute("Attribute", [["height", "110"]]), new _FableHelpers.Html.Types.Attribute("Attribute", [["fill", bgColor]])]))], children]);
+	                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([_FableArch.Svg.svgNS()], _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["width", "110"]]), new _FableArch.Types.Attribute("Attribute", [["height", "110"]]), new _FableArch.Types.Attribute("Attribute", [["fill", bgColor]])]))], children]);
 	            };
 	        }()(new _fableCore.List())]))])), function () {
 	            var tagName = "div";
 	            return function (children) {
-	                return new _FableHelpers.Html.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableHelpers.Html.Types.Attribute("Style", [_fableCore.List.ofArray([["border", "1px solid blue"]])]), new _FableHelpers.Html.Types.Attribute("EventHandler", [["onclick", function (x) {
-	                    return new CounterAction("Increment", [1]);
-	                }]]), new _FableHelpers.Html.Types.Attribute("EventHandler", [["ondblclick", function (x) {
-	                    return new CounterAction("Increment", [10]);
-	                }]])])], children]);
+	                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Style", [_fableCore.List.ofArray([["border", "1px solid blue"]])]), function () {
+	                    var h = function h(e) {
+	                        e.stopPropagation();
+	                        e.preventDefault();
+	                        return function (x) {
+	                            return new CounterAction("Increment", [1]);
+	                        }(e);
+	                    };
+	
+	                    return new _FableArch.Types.Attribute("EventHandler", [["onclick", h]]);
+	                }(), function () {
+	                    var h = function h(e) {
+	                        e.stopPropagation();
+	                        e.preventDefault();
+	                        return function (x) {
+	                            return new CounterAction("Increment", [10]);
+	                        }(e);
+	                    };
+	
+	                    return new _FableArch.Types.Attribute("EventHandler", [["ondblclick", h]]);
+	                }()])], children]);
 	            };
-	        }()(_fableCore.List.ofArray([new _FableHelpers.Html.Types.DomNode("Text", ["Increment"])])), function () {
+	        }()(_fableCore.List.ofArray([new _FableArch.Types.DomNode("Text", ["Increment"])])), function () {
 	            var tagName = "div";
 	            return function (children) {
-	                return new _FableHelpers.Html.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableHelpers.Html.Types.Attribute("Style", [_fableCore.List.ofArray([["background-color", bgColor], ["color", "white"]])])])], children]);
+	                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Style", [_fableCore.List.ofArray([["background-color", bgColor], ["color", "white"]])])])], children]);
 	            };
-	        }()(_fableCore.List.ofArray([new _FableHelpers.Html.Types.DomNode("Text", [String(model.Count)])])), function () {
+	        }()(_fableCore.List.ofArray([new _FableArch.Types.DomNode("Text", [String(model.Count)])])), function () {
 	            var tagName = "div";
 	            return function (children) {
-	                return new _FableHelpers.Html.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableHelpers.Html.Types.Attribute("Style", [_fableCore.List.ofArray([["border", "1px solid green"], ["height", String(7 + model.Count) + "px"]])]), new _FableHelpers.Html.Types.Attribute("EventHandler", [["onclick", function (x) {
-	                    return new CounterAction("Decrement", [1]);
-	                }]]), new _FableHelpers.Html.Types.Attribute("EventHandler", [["ondblclick", function (x) {
-	                    return new CounterAction("Decrement", [5]);
-	                }]])])], children]);
+	                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Style", [_fableCore.List.ofArray([["border", "1px solid green"], ["height", String(7 + model.Count) + "px"]])]), function () {
+	                    var h = function h(e) {
+	                        e.stopPropagation();
+	                        e.preventDefault();
+	                        return function (x) {
+	                            return new CounterAction("Decrement", [1]);
+	                        }(e);
+	                    };
+	
+	                    return new _FableArch.Types.Attribute("EventHandler", [["onclick", h]]);
+	                }(), function () {
+	                    var h = function h(e) {
+	                        e.stopPropagation();
+	                        e.preventDefault();
+	                        return function (x) {
+	                            return new CounterAction("Decrement", [5]);
+	                        }(e);
+	                    };
+	
+	                    return new _FableArch.Types.Attribute("EventHandler", [["ondblclick", h]]);
+	                }()])], children]);
 	            };
-	        }()(_fableCore.List.ofArray([new _FableHelpers.Html.Types.DomNode("Text", ["Decrement"])])), function () {
+	        }()(_fableCore.List.ofArray([new _FableArch.Types.DomNode("Text", ["Decrement"])])), function () {
 	            var tagName = "div";
 	            return function (children) {
-	                return new _FableHelpers.Html.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableHelpers.Html.Types.Attribute("Attribute", [["class", "cnt-links"]])])], children]);
+	                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["class", "cnt-links"]])])], children]);
 	            };
 	        }()(_fableCore.List.ofArray([function () {
 	            var tagName = "a";
 	            return function (children) {
-	                return new _FableHelpers.Html.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableHelpers.Html.Types.Attribute("Attribute", [["href", "#counter1"]])])], children]);
+	                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["href", "#counter1"]])])], children]);
 	            };
-	        }()(_fableCore.List.ofArray([new _FableHelpers.Html.Types.DomNode("Text", ["counter1"])])), function () {
+	        }()(_fableCore.List.ofArray([new _FableArch.Types.DomNode("Text", ["counter1"])])), function () {
 	            var tagName = "a";
 	            return function (children) {
-	                return new _FableHelpers.Html.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableHelpers.Html.Types.Attribute("Attribute", [["href", "#counter2"]])])], children]);
+	                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["href", "#counter2"]])])], children]);
 	            };
-	        }()(_fableCore.List.ofArray([new _FableHelpers.Html.Types.DomNode("Text", ["counter2"])])), function () {
+	        }()(_fableCore.List.ofArray([new _FableArch.Types.DomNode("Text", ["counter2"])])), function () {
 	            var tagName = "a";
 	            return function (children) {
-	                return new _FableHelpers.Html.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableHelpers.Html.Types.Attribute("Attribute", [["href", _fableCore.String.fsFormat("#counter1/%i")(function (x) {
+	                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["href", _fableCore.String.fsFormat("#counter1/%i")(function (x) {
 	                    return x;
 	                })(model.Count * 2)]])])], children]);
 	            };
-	        }()(_fableCore.List.ofArray([new _FableHelpers.Html.Types.DomNode("Text", ["counter1 with count"])])), function () {
+	        }()(_fableCore.List.ofArray([new _FableArch.Types.DomNode("Text", ["counter1 with count"])])), function () {
 	            var tagName = "a";
 	            return function (children) {
-	                return new _FableHelpers.Html.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableHelpers.Html.Types.Attribute("Attribute", [["href", _fableCore.String.fsFormat("#counter2/%i")(function (x) {
+	                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch.Types.Attribute("Attribute", [["href", _fableCore.String.fsFormat("#counter2/%i")(function (x) {
 	                    return x;
 	                })(-model.Count)]])])], children]);
 	            };
-	        }()(_fableCore.List.ofArray([new _FableHelpers.Html.Types.DomNode("Text", ["counter2 with count"])]))]))]));
+	        }()(_fableCore.List.ofArray([new _FableArch.Types.DomNode("Text", ["counter2 with count"])]))]))]));
 	    }
 	
 	    var NestedModel = exports.NestedModel = function () {
@@ -295,57 +300,42 @@
 	
 	    function nestedUpdate(model, action) {
 	        return action.Case === "Top" ? function () {
-	            var ca = action.Fields[0];
-	            var res = counterUpdate(model.Top, ca);
+	            var res = counterUpdate(model.Top, action.Fields[0]);
 	            return new NestedModel(res, model.Bottom);
 	        }() : action.Case === "Bottom" ? function () {
-	            var ca = action.Fields[0];
-	            var res = counterUpdate(model.Bottom, ca);
+	            var res = counterUpdate(model.Bottom, action.Fields[0]);
 	            return new NestedModel(model.Top, res);
-	        }() : action.Case === "Show1WithCnt" ? function () {
-	            var i = action.Fields[0];
-	            return new NestedModel(function () {
-	                var inputRecord = model.Top;
-	                var Show = true;
-	                return new Model(i, Show);
-	            }(), function () {
-	                var inputRecord = model.Bottom;
-	                var Show = false;
-	                return new Model(inputRecord.Count, Show);
-	            }());
-	        }() : action.Case === "Show2WithCnt" ? function () {
-	            var i = action.Fields[0];
-	
+	        }() : action.Case === "Show1WithCnt" ? new NestedModel(function () {
+	            var Show = true;
+	            return new Model(action.Fields[0], Show);
+	        }(), function () {
+	            var Show = false;
+	            return new Model(model.Bottom.Count, Show);
+	        }()) : action.Case === "Show2WithCnt" ? function () {
 	            var Bottom = function () {
-	                var inputRecord = model.Bottom;
 	                var Show = true;
-	                return new Model(i, Show);
+	                return new Model(action.Fields[0], Show);
 	            }();
 	
 	            return new NestedModel(function () {
-	                var inputRecord = model.Top;
 	                var Show = false;
-	                return new Model(inputRecord.Count, Show);
+	                return new Model(model.Top.Count, Show);
 	            }(), Bottom);
 	        }() : action.Case === "Show1" ? new NestedModel(function () {
-	            var inputRecord = model.Top;
 	            var Show = true;
-	            return new Model(inputRecord.Count, Show);
+	            return new Model(model.Top.Count, Show);
 	        }(), function () {
-	            var inputRecord = model.Bottom;
 	            var Show = false;
-	            return new Model(inputRecord.Count, Show);
+	            return new Model(model.Bottom.Count, Show);
 	        }()) : action.Case === "Show2" ? function () {
 	            var Bottom = function () {
-	                var inputRecord = model.Bottom;
 	                var Show = true;
-	                return new Model(inputRecord.Count, Show);
+	                return new Model(model.Bottom.Count, Show);
 	            }();
 	
 	            return new NestedModel(function () {
-	                var inputRecord = model.Top;
 	                var Show = false;
-	                return new Model(inputRecord.Count, Show);
+	                return new Model(model.Top.Count, Show);
 	            }(), Bottom);
 	        }() : new NestedModel(initCounter, initCounter);
 	    }
@@ -354,20 +344,28 @@
 	        return function () {
 	            var tagName = "div";
 	            return function (children) {
-	                return new _FableHelpers.Html.Types.DomNode("Element", [[tagName, new _fableCore.List()], children]);
+	                return new _FableArch.Types.DomNode("Element", [[tagName, new _fableCore.List()], children]);
 	            };
-	        }()(_fableCore.List.ofArray([_FableHelpers.Html.map(function (arg0) {
+	        }()(_fableCore.List.ofArray([(0, _FableArch.map)(function (arg0) {
 	            return new NestedAction("Top", [arg0]);
-	        }, counterView(model.Top)), _FableHelpers.Html.map(function (arg0) {
+	        }, counterView(model.Top)), (0, _FableArch.map)(function (arg0) {
 	            return new NestedAction("Bottom", [arg0]);
 	        }, counterView(model.Bottom)), function () {
 	            var tagName = "button";
 	            return function (children) {
-	                return new _FableHelpers.Html.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableHelpers.Html.Types.Attribute("EventHandler", [["onclick", function (_arg1) {
-	                    return new NestedAction("Reset", []);
-	                }]])])], children]);
+	                return new _FableArch.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([function () {
+	                    var h = function h(e) {
+	                        e.stopPropagation();
+	                        e.preventDefault();
+	                        return function (_arg1) {
+	                            return new NestedAction("Reset", []);
+	                        }(e);
+	                    };
+	
+	                    return new _FableArch.Types.Attribute("EventHandler", [["onclick", h]]);
+	                }()])], children]);
 	            };
-	        }()(_fableCore.List.ofArray([new _FableHelpers.Html.Types.DomNode("Text", ["Reset"])]))]));
+	        }()(_fableCore.List.ofArray([new _FableArch.Types.DomNode("Text", ["Reset"])]))]));
 	    }
 	
 	    function resetEveryTenth(h) {
@@ -379,42 +377,42 @@
 	    var routes = exports.routes = _fableCore.List.ofArray([function () {
 	        var map = new NestedAction("Show1", []);
 	
-	        var route = function ($var7) {
-	            return _FableHelpers2.Parsing._end(_FableHelpers2.Parsing.drop($var7));
-	        }(_FableHelpers2.Parsing.pStaticStr("counter1"));
+	        var route = function ($var12) {
+	            return _FableArch2.Parsing._end(_FableArch2.Parsing.drop($var12));
+	        }(_FableArch2.Parsing.pStaticStr("counter1"));
 	
 	        return function (str) {
-	            return _FableHelpers2.Parsing.runM(map, route, str);
+	            return _FableArch2.Parsing.runM(map, route, str);
 	        };
 	    }(), function () {
 	        var map = new NestedAction("Show2", []);
 	
-	        var route = function ($var8) {
-	            return _FableHelpers2.Parsing._end(_FableHelpers2.Parsing.drop($var8));
-	        }(_FableHelpers2.Parsing.pStaticStr("counter2"));
+	        var route = function ($var13) {
+	            return _FableArch2.Parsing._end(_FableArch2.Parsing.drop($var13));
+	        }(_FableArch2.Parsing.pStaticStr("counter2"));
 	
 	        return function (str) {
-	            return _FableHelpers2.Parsing.runM(map, route, str);
+	            return _FableArch2.Parsing.runM(map, route, str);
 	        };
 	    }(), function () {
 	        var map = function map(arg0) {
 	            return new NestedAction("Show1WithCnt", [arg0]);
 	        };
 	
-	        var route = _FableHelpers2.Parsing.op_LessDivideDotGreater(_FableHelpers2.Parsing.pStaticStr("counter1"), _FableHelpers2.Parsing.pint);
+	        var route = _FableArch2.Parsing.op_LessDivideDotGreater(_FableArch2.Parsing.pStaticStr("counter1"), _FableArch2.Parsing.pint);
 	
 	        return function (str) {
-	            return _FableHelpers2.Parsing.runM1(map, route, str);
+	            return _FableArch2.Parsing.runM1(map, route, str);
 	        };
 	    }(), function () {
 	        var map = function map(arg0) {
 	            return new NestedAction("Show2WithCnt", [arg0]);
 	        };
 	
-	        var route = _FableHelpers2.Parsing.op_LessDivideDotGreater(_FableHelpers2.Parsing.pStaticStr("counter2"), _FableHelpers2.Parsing.pint);
+	        var route = _FableArch2.Parsing.op_LessDivideDotGreater(_FableArch2.Parsing.pStaticStr("counter2"), _FableArch2.Parsing.pint);
 	
 	        return function (str) {
-	            return _FableHelpers2.Parsing.runM1(map, route, str);
+	            return _FableArch2.Parsing.runM1(map, route, str);
 	        };
 	    }()]);
 	
@@ -423,30 +421,24 @@
 	            return x;
 	        }) : r.Case === "Show2" ? _fableCore.String.fsFormat("counter2")(function (x) {
 	            return x;
-	        }) : r.Case === "Show1WithCnt" ? function () {
-	            var i = r.Fields[0];
-	            return _fableCore.String.fsFormat("counter1/%i")(function (x) {
-	                return x;
-	            })(i);
-	        }() : r.Case === "Show2WithCnt" ? function () {
-	            var i = r.Fields[0];
-	            return _fableCore.String.fsFormat("counter2/%i")(function (x) {
-	                return x;
-	            })(i);
-	        }() : r.Case === "Reset" ? _fableCore.String.fsFormat("")(function (x) {
+	        }) : r.Case === "Show1WithCnt" ? _fableCore.String.fsFormat("counter1/%i")(function (x) {
+	            return x;
+	        })(r.Fields[0]) : r.Case === "Show2WithCnt" ? _fableCore.String.fsFormat("counter2/%i")(function (x) {
+	            return x;
+	        })(r.Fields[0]) : r.Case === "Reset" ? _fableCore.String.fsFormat("")(function (x) {
 	            return x;
 	        }) : null;
 	    }
 	
-	    var router = exports.router = _FableHelpers2.RouteParser.createRouter(routes, function (r) {
+	    var router = exports.router = _FableArch2.RouteParser.createRouter(routes, function (r) {
 	        return mapToRoute(r);
 	    });
 	
-	    var locationHandler = exports.locationHandler = new _FableHelpers2.RouteParser.LocationHandler(function (h) {
+	    var locationHandler = exports.locationHandler = new _FableArch2.RouteParser.LocationHandler(function (h) {
 	        window.addEventListener('hashchange', function (_arg1) {
 	            h(window.location.hash.substr(1));
 	            return null;
-	        }, null);
+	        });
 	    }, function (s) {
 	        location.assign(_fableCore.String.fsFormat("#%s")(function (x) {
 	            return x;
@@ -454,31 +446,28 @@
 	    });
 	
 	    function routerF(m) {
-	        return m.Case === "ActionReceived" ? function () {
-	            var msg = m.Fields[0];
-	            return router.Route(msg);
-	        }() : null;
+	        return router.Route(m.Message);
 	    }
 	
-	    _FableHelpers.App.start((0, _FableHelpers.renderer)(), _FableHelpers.App.withSubscriber("logger", _fableCore.String.fsFormat("%A")(function (x) {
+	    _FableArch3.AppApi.start(_FableArch3.AppApi.withSubscriber(_fableCore.String.fsFormat("%A")(function (x) {
 	        console.log(x);
-	    }), _FableHelpers.App.withSubscriber("route-subscriber", function () {
+	    }), _FableArch3.AppApi.withSubscriber(function () {
 	        var router_1 = function router_1(m) {
 	            return routerF(m);
 	        };
 	
 	        return function (message) {
-	            _FableHelpers2.RouteParser.routeSubscriber(locationHandler, router_1, message);
+	            _FableArch2.RouteParser.routeSubscriber(locationHandler, router_1, message);
 	        };
-	    }(), _FableHelpers.App.withProducer(function (handler) {
-	        _FableHelpers2.RouteParser.routeProducer(locationHandler, router, handler);
-	    }, _FableHelpers.App.withStartNodeSelector("#nested-counter", _FableHelpers.App.createSimpleApp(new NestedModel(initCounter, initCounter), function (model) {
+	    }(), _FableArch3.AppApi.withProducer(function (handler) {
+	        _FableArch2.RouteParser.routeProducer(locationHandler, router, handler);
+	    }, _FableArch3.AppApi.withStartNodeSelector("#nested-counter", _FableArch3.AppApi.createSimpleApp(new NestedModel(initCounter, initCounter), function (model) {
 	        return nestedView(model);
 	    }, function (model) {
 	        return function (action) {
 	            return nestedUpdate(model, action);
 	        };
-	    }))))));
+	    })((0, _FableArch4.renderer)()))))));
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
@@ -758,7 +747,41 @@
 	            }, {}, fields);
 	        };
 	
-	        Util.toJson = function toJson(o) {
+	        return Util;
+	    }();
+	
+	    Util.toPlainJsObj = function (source) {
+	        if (source != null && source.constructor != Object) {
+	            var target = {};
+	            var props = Object.getOwnPropertyNames(source);
+	            for (var i = 0; i < props.length; i++) {
+	                target[props[i]] = source[props[i]];
+	            }
+	            // Copy also properties from prototype, see #192
+	            var proto = Object.getPrototypeOf(source);
+	            if (proto != null) {
+	                props = Object.getOwnPropertyNames(proto);
+	                for (var _i = 0; _i < props.length; _i++) {
+	                    var prop = Object.getOwnPropertyDescriptor(proto, props[_i]);
+	                    if (prop.value) {
+	                        target[props[_i]] = prop.value;
+	                    } else if (prop.get) {
+	                        target[props[_i]] = prop.get.apply(source);
+	                    }
+	                }
+	            }
+	            return target;
+	        } else {
+	            return source;
+	        }
+	    };
+	
+	    var Serialize = exports.Serialize = function () {
+	        function Serialize() {
+	            _classCallCheck(this, Serialize);
+	        }
+	
+	        Serialize.toJson = function toJson(o) {
 	            return JSON.stringify(o, function (k, v) {
 	                if (ArrayBuffer.isView(v)) {
 	                    return Array.from(v);
@@ -790,7 +813,7 @@
 	            });
 	        };
 	
-	        Util.ofJson = function ofJson(json, expected) {
+	        Serialize.ofJson = function ofJson(json, expected) {
 	            var parsed = JSON.parse(json, function (k, v) {
 	                if (v == null) return v;else if ((typeof v === "undefined" ? "undefined" : _typeof(v)) === "object" && typeof v.$type === "string") {
 	                    // Remove generic args and assembly info added by Newtonsoft.Json
@@ -836,34 +859,8 @@
 	            return parsed;
 	        };
 	
-	        return Util;
+	        return Serialize;
 	    }();
-	
-	    Util.toPlainJsObj = function (source) {
-	        if (source != null && source.constructor != Object) {
-	            var target = {};
-	            var props = Object.getOwnPropertyNames(source);
-	            for (var i = 0; i < props.length; i++) {
-	                target[props[i]] = source[props[i]];
-	            }
-	            // Copy also properties from prototype, see #192
-	            var proto = Object.getPrototypeOf(source);
-	            if (proto != null) {
-	                props = Object.getOwnPropertyNames(proto);
-	                for (var _i = 0; _i < props.length; _i++) {
-	                    var prop = Object.getOwnPropertyDescriptor(proto, props[_i]);
-	                    if (prop.value) {
-	                        target[props[_i]] = prop.value;
-	                    } else if (prop.get) {
-	                        target[props[_i]] = prop.get.apply(source);
-	                    }
-	                }
-	            }
-	            return target;
-	        } else {
-	            return source;
-	        }
-	    };
 	
 	    var GenericComparer = exports.GenericComparer = function GenericComparer(f) {
 	        _classCallCheck(this, GenericComparer);
@@ -1340,9 +1337,12 @@
 	                        case "E":
 	                            rep = rep.toExponential(precision);
 	                            break;
+	                        case "O":
+	                            rep = Util.toString(rep);
+	                            break;
 	                        case "A":
 	                            try {
-	                                rep = (rep instanceof FMap ? "map " : rep instanceof FSet ? "set " : "") + JSON.stringify(rep, function (k, v) {
+	                                rep = JSON.stringify(rep, function (k, v) {
 	                                    return v && v[Symbol.iterator] && !Array.isArray(v) && isObject(v) ? Array.from(v) : v;
 	                                });
 	                            } catch (err) {
@@ -1358,7 +1358,8 @@
 	                        var ch = pad >= 0 && flags.indexOf("0") >= 0 ? "0" : " ";
 	                        rep = FString.padLeft(rep, Math.abs(pad) - (plusPrefix ? 1 : 0), ch, pad < 0);
 	                    }
-	                    return prefix + (plusPrefix ? "+" + rep : rep);
+	                    var once = prefix + (plusPrefix ? "+" + rep : rep);
+	                    return once.replace(/%/g, "%%");
 	                });
 	            }
 	            function makeFn(str) {
@@ -2223,6 +2224,16 @@
 	            return fst.value;
 	        };
 	
+	        Seq.except = function except(itemsToExclude, source) {
+	            var exclusionItems = Array.from(itemsToExclude);
+	            var testIsNotInExclusionItems = function testIsNotInExclusionItems(element) {
+	                return !exclusionItems.some(function (excludedItem) {
+	                    return Util.equals(excludedItem, element);
+	                });
+	            };
+	            return Seq.filter(testIsNotInExclusionItems, source);
+	        };
+	
 	        Seq.exists = function exists(f, xs) {
 	            function aux(iter) {
 	                var cur = iter.next();
@@ -2320,9 +2331,9 @@
 	        Seq.groupBy = function groupBy(f, xs) {
 	            return Seq.fold(function (acc, x) {
 	                var k = f(x),
-	                    vs = acc.get(k);
-	                return vs != null ? acc.set(k, new List(x, vs)) : acc.set(k, List.singleton(x));
-	            }, new Map(), xs);
+	                    vs = FMap.tryFind(k, acc);
+	                return FMap.add(k, vs != null ? new List(x, vs) : List.singleton(x), acc);
+	            }, FMap.create(), xs);
 	        };
 	
 	        Seq.tryHead = function tryHead(xs) {
@@ -2704,10 +2715,10 @@
 	            });
 	        };
 	
-	        Seq.tryFind = function tryFind(f, xs) {
+	        Seq.tryFind = function tryFind(f, xs, defaultValue) {
 	            for (var i = 0, iter = xs[Symbol.iterator]();; i++) {
 	                var cur = iter.next();
-	                if (cur.done) return null;
+	                if (cur.done) return defaultValue === void 0 ? null : defaultValue;
 	                if (f(cur.value, i)) return cur.value;
 	            }
 	        };
@@ -2716,11 +2727,11 @@
 	            return Seq.__failIfNone(Seq.tryFind(f, xs));
 	        };
 	
-	        Seq.tryFindBack = function tryFindBack(f, xs) {
+	        Seq.tryFindBack = function tryFindBack(f, xs, defaultValue) {
 	            var match = null;
 	            for (var i = 0, iter = xs[Symbol.iterator]();; i++) {
 	                var cur = iter.next();
-	                if (cur.done) return match;
+	                if (cur.done) return match === null ? defaultValue === void 0 ? null : defaultValue : match;
 	                if (f(cur.value, i)) match = cur.value;
 	            }
 	        };
@@ -2742,10 +2753,10 @@
 	        };
 	
 	        Seq.tryFindIndexBack = function tryFindIndexBack(f, xs) {
-	            var match = 0;
+	            var match = -1;
 	            for (var i = 0, iter = xs[Symbol.iterator]();; i++) {
 	                var cur = iter.next();
-	                if (cur.done) return match;
+	                if (cur.done) return match === -1 ? null : match;
 	                if (f(cur.value, i)) match = i;
 	            }
 	        };
@@ -4464,7 +4475,7 @@
 	        return AsyncBuilder;
 	    }();
 	
-	    var defaultAsyncBuilder = exports.defaultAsyncBuilder = new AsyncBuilder();
+	    AsyncBuilder.singleton = new AsyncBuilder();
 	
 	    var Async = exports.Async = function () {
 	        function Async() {
@@ -5054,16 +5065,118 @@
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1), __webpack_require__(3)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore, _virtualDom) {
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore) {
 	    "use strict";
 	
 	    Object.defineProperty(exports, "__esModule", {
 	        value: true
 	    });
-	    exports.App = exports.Html = undefined;
-	    exports.createTree = createTree;
-	    exports.render = render;
-	    exports.renderer = renderer;
+	    exports.Svg = exports.Events = exports.Attributes = exports.Tags = exports.Types = undefined;
+	    exports.mapEventHandler = mapEventHandler;
+	    exports.mapAttributes = mapAttributes;
+	    exports.mapElem = mapElem;
+	    exports.mapVoidElem = mapVoidElem;
+	    exports.map = map;
+	
+	    function _classCallCheck(instance, Constructor) {
+	        if (!(instance instanceof Constructor)) {
+	            throw new TypeError("Cannot call a class as a function");
+	        }
+	    }
+	
+	    var Types = exports.Types = function ($exports) {
+	        var Attribute = $exports.Attribute = function Attribute(caseName, fields) {
+	            _classCallCheck(this, Attribute);
+	
+	            this.Case = caseName;
+	            this.Fields = fields;
+	        };
+	
+	        _fableCore.Util.setInterfaces(Attribute.prototype, ["FSharpUnion"], "Fable.Arch.Html.Types.Attribute");
+	
+	        var DomNode = $exports.DomNode = function DomNode(caseName, fields) {
+	            _classCallCheck(this, DomNode);
+	
+	            this.Case = caseName;
+	            this.Fields = fields;
+	        };
+	
+	        _fableCore.Util.setInterfaces(DomNode.prototype, ["FSharpUnion"], "Fable.Arch.Html.Types.DomNode");
+	
+	        return $exports;
+	    }({});
+	
+	    function mapEventHandler(mapping, e, f) {
+	        return new Types.Attribute("EventHandler", [[e, function ($var1) {
+	            return mapping(f($var1));
+	        }]]);
+	    }
+	
+	    function mapAttributes(mapping, attribute) {
+	        return attribute.Case === "Style" ? new Types.Attribute("Style", [attribute.Fields[0]]) : attribute.Case === "Property" ? new Types.Attribute("Property", [attribute.Fields[0]]) : attribute.Case === "Attribute" ? new Types.Attribute("Attribute", [attribute.Fields[0]]) : mapEventHandler(mapping, attribute.Fields[0][0], attribute.Fields[0][1]);
+	    }
+	
+	    function mapElem(mapping, node_0, node_1) {
+	        var node = [node_0, node_1];
+	        return [node[0], _fableCore.List.map(function (attribute) {
+	            return mapAttributes(mapping, attribute);
+	        }, node[1])];
+	    }
+	
+	    function mapVoidElem(mapping, node_0, node_1) {
+	        var node = [node_0, node_1];
+	        return [node[0], _fableCore.List.map(function (attribute) {
+	            return mapAttributes(mapping, attribute);
+	        }, node[1])];
+	    }
+	
+	    function map(mapping, node) {
+	        return node.Case === "VoidElement" ? new Types.DomNode("VoidElement", [mapVoidElem(mapping, node.Fields[0][0], node.Fields[0][1])]) : node.Case === "Text" ? new Types.DomNode("Text", [node.Fields[0]]) : node.Case === "WhiteSpace" ? new Types.DomNode("WhiteSpace", [node.Fields[0]]) : node.Case === "Svg" ? new Types.DomNode("Element", [mapElem(mapping, node.Fields[0][0], node.Fields[0][1]), _fableCore.List.map(function (node_1) {
+	            return map(mapping, node_1);
+	        }, node.Fields[1])]) : new Types.DomNode("Element", [mapElem(mapping, node.Fields[0][0], node.Fields[0][1]), _fableCore.List.map(function (node_1) {
+	            return map(mapping, node_1);
+	        }, node.Fields[1])]);
+	    }
+	
+	    var Tags = exports.Tags = function ($exports) {
+	        return $exports;
+	    }({});
+	
+	    var Attributes = exports.Attributes = function ($exports) {
+	        return $exports;
+	    }({});
+	
+	    var Events = exports.Events = function ($exports) {
+	        return $exports;
+	    }({});
+	
+	    var Svg = exports.Svg = function ($exports) {
+	        var svgNS = $exports.svgNS = function svgNS() {
+	            return new Types.Attribute("Property", [["namespace", "http://www.w3.org/2000/svg"]]);
+	        };
+	
+	        return $exports;
+	    }({});
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore) {
+	    "use strict";
+	
+	    Object.defineProperty(exports, "__esModule", {
+	        value: true
+	    });
+	    exports.RouteParser = exports.Parsing = undefined;
+	
+	    function _classCallCheck(instance, Constructor) {
+	        if (!(instance instanceof Constructor)) {
+	            throw new TypeError("Cannot call a class as a function");
+	        }
+	    }
 	
 	    var _createClass = function () {
 	        function defineProperties(target, props) {
@@ -5083,169 +5196,16 @@
 	        };
 	    }();
 	
-	    function _classCallCheck(instance, Constructor) {
-	        if (!(instance instanceof Constructor)) {
-	            throw new TypeError("Cannot call a class as a function");
-	        }
-	    }
-	
-	    var Html = exports.Html = function ($exports) {
-	        var Types = $exports.Types = function ($exports) {
-	            var Attribute = $exports.Attribute = function Attribute(caseName, fields) {
-	                _classCallCheck(this, Attribute);
-	
-	                this.Case = caseName;
-	                this.Fields = fields;
-	            };
-	
-	            _fableCore.Util.setInterfaces(Attribute.prototype, ["FSharpUnion"], "Fable.Helpers.Virtualdom.Html.Types.Attribute");
-	
-	            var DomNode = $exports.DomNode = function DomNode(caseName, fields) {
-	                _classCallCheck(this, DomNode);
-	
-	                this.Case = caseName;
-	                this.Fields = fields;
-	            };
-	
-	            _fableCore.Util.setInterfaces(DomNode.prototype, ["FSharpUnion"], "Fable.Helpers.Virtualdom.Html.Types.DomNode");
-	
-	            return $exports;
-	        }({});
-	
-	        var mapEventHandler = $exports.mapEventHandler = function mapEventHandler(mapping, e, f) {
-	            return new Types.Attribute("EventHandler", [[e, function ($var1) {
-	                return mapping(f($var1));
-	            }]]);
-	        };
-	
-	        var mapAttributes = $exports.mapAttributes = function mapAttributes(mapping, attribute) {
-	            return attribute.Case === "Style" ? function () {
-	                var s = attribute.Fields[0];
-	                return new Types.Attribute("Style", [s]);
-	            }() : attribute.Case === "Property" ? function () {
-	                var kv = attribute.Fields[0];
-	                return new Types.Attribute("Property", [kv]);
-	            }() : attribute.Case === "Attribute" ? function () {
-	                var kv = attribute.Fields[0];
-	                return new Types.Attribute("Attribute", [kv]);
-	            }() : function () {
-	                var eb = attribute.Fields[0];
-	                var e = eb[0];
-	                var f = eb[1];
-	                return mapEventHandler(mapping, e, f);
-	            }();
-	        };
-	
-	        var mapElem = $exports.mapElem = function mapElem(mapping, node_0, node_1) {
-	            var node = [node_0, node_1];
-	            var tag = node[0];
-	            var attrs = node[1];
-	            return [tag, _fableCore.List.map(function (attribute) {
-	                return mapAttributes(mapping, attribute);
-	            }, attrs)];
-	        };
-	
-	        var mapVoidElem = $exports.mapVoidElem = function mapVoidElem(mapping, node_0, node_1) {
-	            var node = [node_0, node_1];
-	            var tag = node[0];
-	            var attrs = node[1];
-	            return [tag, _fableCore.List.map(function (attribute) {
-	                return mapAttributes(mapping, attribute);
-	            }, attrs)];
-	        };
-	
-	        var map = $exports.map = function map(mapping, node) {
-	            return node.Case === "VoidElement" ? function () {
-	                var ve = node.Fields[0];
-	                return new Types.DomNode("VoidElement", [function () {
-	                    var arg10_ = ve[0];
-	                    var arg11_ = ve[1];
-	                    return mapVoidElem(mapping, arg10_, arg11_);
-	                }()]);
-	            }() : node.Case === "Text" ? function () {
-	                var s = node.Fields[0];
-	                return new Types.DomNode("Text", [s]);
-	            }() : node.Case === "WhiteSpace" ? function () {
-	                var ws = node.Fields[0];
-	                return new Types.DomNode("WhiteSpace", [ws]);
-	            }() : node.Case === "Svg" ? function () {
-	                var ns = node.Fields[1];
-	                var e = node.Fields[0];
-	                return new Types.DomNode("Element", [function () {
-	                    var arg10_ = e[0];
-	                    var arg11_ = e[1];
-	                    return mapElem(mapping, arg10_, arg11_);
-	                }(), _fableCore.List.map(function (node_1) {
-	                    return map(mapping, node_1);
-	                }, ns)]);
-	            }() : function () {
-	                var ns = node.Fields[1];
-	                var e = node.Fields[0];
-	                return new Types.DomNode("Element", [function () {
-	                    var arg10_ = e[0];
-	                    var arg11_ = e[1];
-	                    return mapElem(mapping, arg10_, arg11_);
-	                }(), _fableCore.List.map(function (node_1) {
-	                    return map(mapping, node_1);
-	                }, ns)]);
-	            }();
-	        };
-	
-	        var Tags = $exports.Tags = function ($exports) {
-	            return $exports;
-	        }({});
-	
-	        var Attributes = $exports.Attributes = function ($exports) {
-	            return $exports;
-	        }({});
-	
-	        var Events = $exports.Events = function ($exports) {
-	            return $exports;
-	        }({});
-	
-	        var Svg = $exports.Svg = function ($exports) {
-	            var svgNS = $exports.svgNS = function svgNS() {
-	                return new Types.Attribute("Property", [["namespace", "http://www.w3.org/2000/svg"]]);
-	            };
-	
-	            return $exports;
-	        }({});
-	
-	        return $exports;
-	    }({});
-	
-	    var App = exports.App = function ($exports) {
-	        var mapAction = $exports.mapAction = function mapAction(mapping, action, x) {
-	            action(function ($var2) {
-	                return x(mapping($var2));
-	            });
-	        };
-	
-	        var mapActions = $exports.mapActions = function mapActions(m) {
-	            var mapping = function mapping(action) {
-	                return function (x) {
-	                    mapAction(m, action, x);
-	                };
-	            };
-	
-	            return function (list) {
-	                return _fableCore.List.map(mapping, list);
-	            };
-	        };
-	
-	        var toActionList = $exports.toActionList = function toActionList(a) {
-	            return _fableCore.List.ofArray([a]);
-	        };
-	
-	        var AppEvents = $exports.AppEvents = function () {
-	            function AppEvents(caseName, fields) {
-	                _classCallCheck(this, AppEvents);
+	    var Parsing = exports.Parsing = function ($exports) {
+	        var Result = $exports.Result = function () {
+	            function Result(caseName, fields) {
+	                _classCallCheck(this, Result);
 	
 	                this.Case = caseName;
 	                this.Fields = fields;
 	            }
 	
-	            _createClass(AppEvents, [{
+	            _createClass(Result, [{
 	                key: "Equals",
 	                value: function Equals(other) {
 	                    return _fableCore.Util.equalsUnions(this, other);
@@ -5257,10 +5217,862 @@
 	                }
 	            }]);
 	
-	            return AppEvents;
+	            return Result;
 	        }();
 	
-	        _fableCore.Util.setInterfaces(AppEvents.prototype, ["FSharpUnion", "System.IEquatable", "System.IComparable"], "Fable.Helpers.Virtualdom.App.AppEvents");
+	        _fableCore.Util.setInterfaces(Result.prototype, ["FSharpUnion", "System.IEquatable", "System.IComparable"], "Fable.Arch.RouteParser.Parsing.Result");
+	
+	        var Parser = $exports.Parser = function Parser(parseFn, label) {
+	            _classCallCheck(this, Parser);
+	
+	            this.parseFn = parseFn;
+	            this.label = label;
+	        };
+	
+	        _fableCore.Util.setInterfaces(Parser.prototype, ["FSharpRecord"], "Fable.Arch.RouteParser.Parsing.Parser");
+	
+	        var printResult = $exports.printResult = function printResult(result) {
+	            if (result.Case === "Failure") {
+	                var label = result.Fields[0][0];
+	                var error = result.Fields[0][1];
+	
+	                _fableCore.String.fsFormat("Error parsing %s\n%s")(function (x) {
+	                    console.log(x);
+	                })(label)(error);
+	            } else {
+	                var value = result.Fields[0][0];
+	                var input = result.Fields[0][1];
+	
+	                _fableCore.String.fsFormat("%A")(function (x) {
+	                    console.log(x);
+	                })(value);
+	            }
+	        };
+	
+	        var satisfy = $exports.satisfy = function satisfy(predicate, label) {
+	            var innerFn = function innerFn(input) {
+	                return _fableCore.String.isNullOrEmpty(input) ? new Result("Failure", [[label, "No more input"]]) : function () {
+	                    var first = input[0];
+	
+	                    if (predicate(first)) {
+	                        var remainingInput = input.substr(1);
+	                        return new Result("Success", [[first, remainingInput]]);
+	                    } else {
+	                        var err = _fableCore.String.fsFormat("Unexpected '%c'")(function (x) {
+	                            return x;
+	                        })(first);
+	
+	                        return new Result("Failure", [[label, err]]);
+	                    }
+	                }();
+	            };
+	
+	            return new Parser(innerFn, label);
+	        };
+	
+	        var pchar = $exports.pchar = function pchar(charToMatch) {
+	            var predicate = function predicate(ch) {
+	                return ch === charToMatch;
+	            };
+	
+	            var label = _fableCore.String.fsFormat("%c")(function (x) {
+	                return x;
+	            })(charToMatch);
+	
+	            return satisfy(predicate, label);
+	        };
+	
+	        var digitChar = $exports.digitChar = function () {
+	            var predicate = function predicate(c) {
+	                return function (source) {
+	                    return _fableCore.Seq.exists(function (x) {
+	                        return _fableCore.Util.equals(c, x);
+	                    }, source);
+	                }(_fableCore.Seq.toList(_fableCore.Seq.rangeChar("0", "9")));
+	            };
+	
+	            var label = "digit";
+	            return satisfy(predicate, label);
+	        }();
+	
+	        var run = $exports.run = function run(parser, input) {
+	            return parser.parseFn(input);
+	        };
+	
+	        var getLabel = $exports.getLabel = function getLabel(parser) {
+	            return parser.label;
+	        };
+	
+	        var setLabel = $exports.setLabel = function setLabel(parser, newLabel) {
+	            var newInnerFn = function newInnerFn(input) {
+	                var result = parser.parseFn(input);
+	
+	                if (result.Case === "Failure") {
+	                    var oldLabel = result.Fields[0][0];
+	                    var err = result.Fields[0][1];
+	                    return new Result("Failure", [[newLabel, err]]);
+	                } else {
+	                    return new Result("Success", [result.Fields[0]]);
+	                }
+	            };
+	
+	            return new Parser(newInnerFn, newLabel);
+	        };
+	
+	        var op_LessQmarkGreater = $exports.op_LessQmarkGreater = function op_LessQmarkGreater() {
+	            return function (parser) {
+	                return function (newLabel) {
+	                    return setLabel(parser, newLabel);
+	                };
+	            };
+	        };
+	
+	        var bindP = $exports.bindP = function bindP(f, p) {
+	            var label = "unknown";
+	
+	            var innerFn = function innerFn(input) {
+	                var result1 = run(p, input);
+	
+	                if (result1.Case === "Success") {
+	                    var value1 = result1.Fields[0][0];
+	                    var remainingInput = result1.Fields[0][1];
+	                    var p2 = f(value1);
+	                    return run(p2, remainingInput);
+	                } else {
+	                    var label_1 = result1.Fields[0][0];
+	                    var err = result1.Fields[0][1];
+	                    return new Result("Failure", [[label_1, err]]);
+	                }
+	            };
+	
+	            return new Parser(innerFn, label);
+	        };
+	
+	        var op_GreaterGreaterEquals = $exports.op_GreaterGreaterEquals = function op_GreaterGreaterEquals(p, f) {
+	            return bindP(f, p);
+	        };
+	
+	        var returnP = $exports.returnP = function returnP(x) {
+	            var label = _fableCore.String.fsFormat("%A")(function (x) {
+	                return x;
+	            })(x);
+	
+	            var innerFn = function innerFn(input) {
+	                return new Result("Success", [[x, input]]);
+	            };
+	
+	            return new Parser(innerFn, label);
+	        };
+	
+	        var mapP = $exports.mapP = function mapP(f) {
+	            var f_1 = function f_1($var9) {
+	                return function (x) {
+	                    return returnP(x);
+	                }(f($var9));
+	            };
+	
+	            return function (p) {
+	                return bindP(f_1, p);
+	            };
+	        };
+	
+	        var op_LessBangGreater = $exports.op_LessBangGreater = function op_LessBangGreater() {
+	            return function (f) {
+	                return mapP(f);
+	            };
+	        };
+	
+	        var op_BarGreaterGreater = $exports.op_BarGreaterGreater = function op_BarGreaterGreater(x, f) {
+	            return mapP(f)(x);
+	        };
+	
+	        var applyP = $exports.applyP = function applyP(fP, xP) {
+	            return op_GreaterGreaterEquals(fP, function (f) {
+	                return op_GreaterGreaterEquals(xP, function (x) {
+	                    return returnP(f(x));
+	                });
+	            });
+	        };
+	
+	        var op_LessMultiplyGreater = $exports.op_LessMultiplyGreater = function op_LessMultiplyGreater() {
+	            return function (fP) {
+	                return function (xP) {
+	                    return applyP(fP, xP);
+	                };
+	            };
+	        };
+	
+	        var lift2 = $exports.lift2 = function lift2(f, xP, yP) {
+	            return op_LessMultiplyGreater()(op_LessMultiplyGreater()(returnP(f))(xP))(yP);
+	        };
+	
+	        var andThen = $exports.andThen = function andThen(p1, p2) {
+	            var label = _fableCore.String.fsFormat("%s andThen %s")(function (x) {
+	                return x;
+	            })(getLabel(p1))(getLabel(p2));
+	
+	            return op_LessQmarkGreater()(op_GreaterGreaterEquals(p1, function (p1Result) {
+	                return op_GreaterGreaterEquals(p2, function (p2Result) {
+	                    return returnP([p1Result, p2Result]);
+	                });
+	            }))(label);
+	        };
+	
+	        var op_DotGreaterGreaterDot = $exports.op_DotGreaterGreaterDot = function op_DotGreaterGreaterDot() {
+	            return function (p1) {
+	                return function (p2) {
+	                    return andThen(p1, p2);
+	                };
+	            };
+	        };
+	
+	        var orElse = $exports.orElse = function orElse(parser1, parser2) {
+	            var label = _fableCore.String.fsFormat("%s orElse %s")(function (x) {
+	                return x;
+	            })(getLabel(parser1))(getLabel(parser2));
+	
+	            var innerFn = function innerFn(input) {
+	                var result1 = run(parser1, input);
+	
+	                if (result1.Case === "Failure") {
+	                    var err = result1.Fields[0][1];
+	                    var result2 = run(parser2, input);
+	
+	                    if (result2.Case === "Failure") {
+	                        var err_1 = result2.Fields[0][1];
+	                        return new Result("Failure", [[label, err_1]]);
+	                    } else {
+	                        return result2;
+	                    }
+	                } else {
+	                    return result1;
+	                }
+	            };
+	
+	            return new Parser(innerFn, label);
+	        };
+	
+	        var op_LessBarGreater = $exports.op_LessBarGreater = function op_LessBarGreater() {
+	            return function (parser1) {
+	                return function (parser2) {
+	                    return orElse(parser1, parser2);
+	                };
+	            };
+	        };
+	
+	        var choice = $exports.choice = function choice(listOfParsers) {
+	            return _fableCore.Seq.reduce(function ($var10, $var11) {
+	                return op_LessBarGreater()($var10)($var11);
+	            }, listOfParsers);
+	        };
+	
+	        var anyOf = $exports.anyOf = function anyOf(listOfChars) {
+	            var label = _fableCore.String.fsFormat("any of %A")(function (x) {
+	                return x;
+	            })(listOfChars);
+	
+	            return op_LessQmarkGreater()(choice(function (list) {
+	                return _fableCore.List.map(function (charToMatch) {
+	                    return pchar(charToMatch);
+	                }, list);
+	            }(listOfChars)))(label);
+	        };
+	
+	        var zeroOrOne = $exports.zeroOrOne = function zeroOrOne(parser) {
+	            var innerFn = function innerFn(input) {
+	                return input === "" ? new Result("Success", [["", ""]]) : run(parser, input);
+	            };
+	
+	            return new Parser(innerFn, "zeroOrOne");
+	        };
+	
+	        var parseZeroOrMore = $exports.parseZeroOrMore = function parseZeroOrMore(parser, input) {
+	            var firstResult = run(parser, input);
+	
+	            if (firstResult.Case === "Success") {
+	                var inputAfterFirstParse = firstResult.Fields[0][1];
+	                var firstValue = firstResult.Fields[0][0];
+	                var patternInput = parseZeroOrMore(parser, inputAfterFirstParse);
+	
+	                var values = _fableCore.List.ofArray([firstValue], patternInput[0]);
+	
+	                return [values, patternInput[1]];
+	            } else {
+	                return [new _fableCore.List(), input];
+	            }
+	        };
+	
+	        var parseXTimes = $exports.parseXTimes = function parseXTimes(count, parser) {
+	            var innerFn = function innerFn(input) {
+	                var innerParse = function innerParse(count_) {
+	                    return function (input_) {
+	                        return function (acc) {
+	                            return count_ === 0 ? new Result("Success", [[_fableCore.List.reverse(acc), input_]]) : function () {
+	                                var matchValue = run(parser, input_);
+	
+	                                if (matchValue.Case === "Success") {
+	                                    var v = matchValue.Fields[0][0];
+	                                    var rest = matchValue.Fields[0][1];
+	                                    return innerParse(count_ - 1)(rest)(_fableCore.List.ofArray([v], acc));
+	                                } else {
+	                                    var _label = matchValue.Fields[0][0];
+	                                    var error = matchValue.Fields[0][1];
+	
+	                                    var label_1 = _fableCore.String.fsFormat("Failed to parse \"%s\" %i number of times ")(function (x) {
+	                                        return x;
+	                                    })(_label)(count);
+	
+	                                    return new Result("Failure", [[label_1, error]]);
+	                                }
+	                            }();
+	                        };
+	                    };
+	                };
+	
+	                return innerParse(count)(input)(new _fableCore.List());
+	            };
+	
+	            var label = _fableCore.String.fsFormat("Failed to parse \"%s\" %i number of times ")(function (x) {
+	                return x;
+	            })(getLabel(parser))(count);
+	
+	            return new Parser(innerFn, label);
+	        };
+	
+	        var many = $exports.many = function many(parser) {
+	            var label = _fableCore.String.fsFormat("many %s")(function (x) {
+	                return x;
+	            })(getLabel(parser));
+	
+	            var innerFn = function innerFn(input) {
+	                return new Result("Success", [parseZeroOrMore(parser, input)]);
+	            };
+	
+	            return new Parser(innerFn, label);
+	        };
+	
+	        var many1 = $exports.many1 = function many1(p) {
+	            var label = _fableCore.String.fsFormat("many1 %s")(function (x) {
+	                return x;
+	            })(getLabel(p));
+	
+	            return op_LessQmarkGreater()(op_GreaterGreaterEquals(p, function (head) {
+	                return op_GreaterGreaterEquals(many(p), function (tail) {
+	                    return returnP(_fableCore.List.ofArray([head], tail));
+	                });
+	            }))(label);
+	        };
+	
+	        var op_DotGreaterGreater = $exports.op_DotGreaterGreater = function op_DotGreaterGreater(p1, p2) {
+	            return mapP(function (tupledArg) {
+	                return tupledArg[0];
+	            })(op_DotGreaterGreaterDot()(p1)(p2));
+	        };
+	
+	        var op_GreaterGreaterDot = $exports.op_GreaterGreaterDot = function op_GreaterGreaterDot(p1, p2) {
+	            return mapP(function (tupledArg) {
+	                return tupledArg[1];
+	            })(op_DotGreaterGreaterDot()(p1)(p2));
+	        };
+	
+	        var drop = $exports.drop = function drop(p) {
+	            var innerFn = function innerFn(input) {
+	                var matchValue = run(p, input);
+	
+	                if (matchValue.Case === "Failure") {
+	                    var label = matchValue.Fields[0][0];
+	                    var error = matchValue.Fields[0][1];
+	                    return new Result("Failure", [[label, error]]);
+	                } else {
+	                    var rest = matchValue.Fields[0][1];
+	                    return new Result("Success", [[null, rest]]);
+	                }
+	            };
+	
+	            return new Parser(innerFn, "drop");
+	        };
+	
+	        var opt = $exports.opt = function opt(p) {
+	            var label = _fableCore.String.fsFormat("opt %s")(function (x) {
+	                return x;
+	            })(getLabel(p));
+	
+	            var some = op_BarGreaterGreater(p, function (arg0) {
+	                return arg0;
+	            });
+	            var none = returnP();
+	            return op_LessQmarkGreater()(op_LessBarGreater()(some)(none))(label);
+	        };
+	
+	        var charListToStr = $exports.charListToStr = function charListToStr(charList) {
+	            return Array.from(charList).join('');
+	        };
+	
+	        var manyChars = $exports.manyChars = function manyChars(cp) {
+	            return op_BarGreaterGreater(many(cp), function (charList) {
+	                return charListToStr(charList);
+	            });
+	        };
+	
+	        var manyChars1 = $exports.manyChars1 = function manyChars1(cp) {
+	            return op_BarGreaterGreater(many1(cp), function (charList) {
+	                return charListToStr(charList);
+	            });
+	        };
+	
+	        var pint = $exports.pint = function () {
+	            var label = "integer";
+	
+	            var resultToInt = function resultToInt(tupledArg) {
+	                var i = Number.parseInt(tupledArg[1]);
+	
+	                if (tupledArg[0] == null) {
+	                    return i;
+	                } else {
+	                    return -i;
+	                }
+	            };
+	
+	            var digits = manyChars1(digitChar);
+	            return op_LessQmarkGreater()(mapP(resultToInt)(op_DotGreaterGreaterDot()(opt(pchar("-")))(digits)))(label);
+	        }();
+	
+	        var pfloat = $exports.pfloat = function () {
+	            var label = "float";
+	
+	            var resultToFloat = function resultToFloat(tupledArg) {
+	                var sign = tupledArg[0][0][0];
+	                var digits1 = tupledArg[0][0][1];
+	                var fl = Number.parseFloat(_fableCore.String.fsFormat("%s.%s")(function (x) {
+	                    return x;
+	                })(digits1)(tupledArg[1]));
+	
+	                if (sign == null) {
+	                    return fl;
+	                } else {
+	                    return -fl;
+	                }
+	            };
+	
+	            var digits = manyChars1(digitChar);
+	            return op_LessQmarkGreater()(mapP(resultToFloat)(op_DotGreaterGreaterDot()(op_DotGreaterGreaterDot()(op_DotGreaterGreaterDot()(opt(pchar("-")))(digits))(pchar(".")))(digits)))(label);
+	        }();
+	
+	        var sequence = $exports.sequence = function sequence(parserList) {
+	            var cons = function cons(head) {
+	                return function (tail) {
+	                    return _fableCore.List.ofArray([head], tail);
+	                };
+	            };
+	
+	            var consP = function () {
+	                var f = cons;
+	                return function (xP) {
+	                    return function (yP) {
+	                        return lift2(f, xP, yP);
+	                    };
+	                };
+	            }();
+	
+	            if (parserList.tail != null) {
+	                return consP(parserList.head)(sequence(parserList.tail));
+	            } else {
+	                return returnP(new _fableCore.List());
+	            }
+	        };
+	
+	        var pStaticStr = $exports.pStaticStr = function pStaticStr(str) {
+	            return op_LessQmarkGreater()(mapP(function (charList) {
+	                return charListToStr(charList);
+	            })(sequence(function (list) {
+	                return _fableCore.List.map(function (charToMatch) {
+	                    return pchar(charToMatch);
+	                }, list);
+	            }(_fableCore.Seq.toList(str)))))(str);
+	        };
+	
+	        var pString = $exports.pString = function () {
+	            var label = "string";
+	
+	            var predicate = function predicate(_arg1) {
+	                return true;
+	            };
+	
+	            return mapP(function (charList) {
+	                return charListToStr(charList);
+	            })(many(satisfy(predicate, "string")));
+	        }();
+	
+	        var pStringTo = $exports.pStringTo = function pStringTo(endingChar) {
+	            var label = _fableCore.String.fsFormat("string up to char %c")(function (x) {
+	                return x;
+	            })(endingChar);
+	
+	            var ending = pchar(endingChar);
+	
+	            var predicate = function predicate(c) {
+	                return c !== endingChar;
+	            };
+	
+	            var stringParser = mapP(function (charList) {
+	                return charListToStr(charList);
+	            })(many(satisfy(predicate, "string")));
+	            return op_DotGreaterGreater(stringParser, ending);
+	        };
+	
+	        var phexdigit = $exports.phexdigit = function () {
+	            var label = "hexadecimal";
+	
+	            var hexChars = _fableCore.List.concat(_fableCore.List.ofArray([_fableCore.Seq.toList(_fableCore.Seq.rangeChar("a", "f")), _fableCore.Seq.toList(_fableCore.Seq.rangeChar("A", "F")), _fableCore.Seq.toList(_fableCore.Seq.rangeChar("0", "9"))]));
+	
+	            return op_LessQmarkGreater()(anyOf(hexChars))("Expected valid hex digit");
+	        }();
+	
+	        var pguid = $exports.pguid = function () {
+	            var resultToGuid = function resultToGuid(tupledArg) {
+	                var guidStr = _fableCore.String.fsFormat("%s-%s-%s-%s-%s")(function (x) {
+	                    return x;
+	                })(tupledArg[0][0])(_fableCore.Seq.item(0, tupledArg[0][1]))(_fableCore.Seq.item(1, tupledArg[0][1]))(_fableCore.Seq.item(2, tupledArg[0][1]))(tupledArg[1]);
+	
+	                return guidStr;
+	            };
+	
+	            var parseMiddlePart = mapP(function (charList) {
+	                return charListToStr(charList);
+	            })(op_GreaterGreaterDot(pchar("-"), parseXTimes(4, phexdigit)));
+	            return op_LessQmarkGreater()(mapP(resultToGuid)(op_DotGreaterGreaterDot()(op_DotGreaterGreater(op_DotGreaterGreaterDot()(mapP(function (charList) {
+	                return charListToStr(charList);
+	            })(parseXTimes(8, phexdigit)))(parseXTimes(3, parseMiddlePart)), pchar("-")))(mapP(function (charList) {
+	                return charListToStr(charList);
+	            })(parseXTimes(12, phexdigit)))))("guid");
+	        }();
+	
+	        var op_LessDivideGreater = $exports.op_LessDivideGreater = function op_LessDivideGreater(p1, p2) {
+	            return op_DotGreaterGreaterDot()(op_DotGreaterGreater(p1, pchar("/")))(p2);
+	        };
+	
+	        var op_LessDotDivideGreater = $exports.op_LessDotDivideGreater = function op_LessDotDivideGreater(p1, p2) {
+	            return op_DotGreaterGreater(op_DotGreaterGreater(p1, pchar("/")), p2);
+	        };
+	
+	        var op_LessDivideDotGreater = $exports.op_LessDivideDotGreater = function op_LessDivideDotGreater(p1, p2) {
+	            return op_GreaterGreaterDot(op_GreaterGreaterDot(p1, pchar("/")), p2);
+	        };
+	
+	        var _end = $exports._end = function _end(parser) {
+	            var label = "End of input";
+	
+	            var innerFn = function innerFn(input) {
+	                var matchValue = run(parser, input);
+	
+	                if (matchValue.Case === "Failure") {
+	                    var label_1 = matchValue.Fields[0][0];
+	                    var err = matchValue.Fields[0][1];
+	                    return new Result("Failure", [[label_1, err]]);
+	                } else {
+	                    var x = matchValue.Fields[0][0];
+	                    var rest = matchValue.Fields[0][1];
+	
+	                    if (_fableCore.String.isNullOrEmpty(rest)) {
+	                        return new Result("Success", [[x, rest]]);
+	                    } else {
+	                        return new Result("Failure", [[label, _fableCore.String.fsFormat("Expected rest of input to be empty, got %s")(function (x) {
+	                            return x;
+	                        })(rest)]]);
+	                    }
+	                }
+	            };
+	
+	            return new Parser(innerFn, label);
+	        };
+	
+	        var choose = $exports.choose = function choose(routes, input) {
+	            return _fableCore.Seq.tryPick(function (r) {
+	                var matchValue = r(input);
+	
+	                if (matchValue.Case === "Failure") {
+	                    return null;
+	                } else {
+	                    return matchValue.Fields[0];
+	                }
+	            }, routes);
+	        };
+	
+	        var runM = $exports.runM = function runM(map, route, str) {
+	            var matchValue = run(route, str);
+	
+	            if (matchValue.Case === "Failure") {
+	                var y = matchValue.Fields[0][1];
+	                var x = matchValue.Fields[0][0];
+	                return new Result("Failure", [[x, y]]);
+	            } else {
+	                return new Result("Success", [map]);
+	            }
+	        };
+	
+	        var runM1 = $exports.runM1 = function runM1(map, route, str) {
+	            var matchValue = run(route, str);
+	
+	            if (matchValue.Case === "Failure") {
+	                var y = matchValue.Fields[0][1];
+	                var x = matchValue.Fields[0][0];
+	                return new Result("Failure", [[x, y]]);
+	            } else {
+	                var _x = matchValue.Fields[0][0];
+	                return new Result("Success", [map(_x)]);
+	            }
+	        };
+	
+	        var runM2 = $exports.runM2 = function runM2() {
+	            return function (map) {
+	                return function (route) {
+	                    return function (str) {
+	                        return runM1(map, route, str);
+	                    };
+	                };
+	            };
+	        };
+	
+	        var runM3 = $exports.runM3 = function runM3(map, route, str) {
+	            var matchValue = run(route, str);
+	
+	            if (matchValue.Case === "Failure") {
+	                var y = matchValue.Fields[0][1];
+	                var x = matchValue.Fields[0][0];
+	                return new Result("Failure", [[x, y]]);
+	            } else {
+	                var z = matchValue.Fields[0][0][1];
+	                var _y = matchValue.Fields[0][0][0][1];
+	                var _x2 = matchValue.Fields[0][0][0][0];
+	                return new Result("Success", [map([_x2, _y, z])]);
+	            }
+	        };
+	
+	        var runM4 = $exports.runM4 = function runM4(map, route, str) {
+	            var matchValue = run(route, str);
+	
+	            if (matchValue.Case === "Failure") {
+	                var y = matchValue.Fields[0][1];
+	                var x = matchValue.Fields[0][0];
+	                return new Result("Failure", [[x, y]]);
+	            } else {
+	                var z = matchValue.Fields[0][0][0][1];
+	                var _y2 = matchValue.Fields[0][0][0][0][1];
+	                var _x3 = matchValue.Fields[0][0][0][0][0];
+	                var v = matchValue.Fields[0][0][1];
+	                return new Result("Success", [map([_x3, _y2, z, v])]);
+	            }
+	        };
+	
+	        var runM5 = $exports.runM5 = function runM5(map, route, str) {
+	            var matchValue = run(route, str);
+	
+	            if (matchValue.Case === "Failure") {
+	                var y = matchValue.Fields[0][1];
+	                var x = matchValue.Fields[0][0];
+	                return new Result("Failure", [[x, y]]);
+	            } else {
+	                var z = matchValue.Fields[0][0][0][0][1];
+	                var _y3 = matchValue.Fields[0][0][0][0][0][1];
+	                var _x4 = matchValue.Fields[0][0][0][0][0][0];
+	                var w = matchValue.Fields[0][0][1];
+	                var v = matchValue.Fields[0][0][0][1];
+	                return new Result("Success", [map([_x4, _y3, z, v, w])]);
+	            }
+	        };
+	
+	        var runM6 = $exports.runM6 = function runM6(map, route, str) {
+	            var matchValue = run(route, str);
+	
+	            if (matchValue.Case === "Failure") {
+	                var y = matchValue.Fields[0][1];
+	                var x = matchValue.Fields[0][0];
+	                return new Result("Failure", [[x, y]]);
+	            } else {
+	                var z = matchValue.Fields[0][0][0][0][0][1];
+	                var _y4 = matchValue.Fields[0][0][0][0][0][0][1];
+	                var _x5 = matchValue.Fields[0][0][0][0][0][0][0];
+	                var w = matchValue.Fields[0][0][0][1];
+	                var v = matchValue.Fields[0][0][0][0][1];
+	                var u = matchValue.Fields[0][0][1];
+	                return new Result("Success", [map([_x5, _y4, z, v, w, u])]);
+	            }
+	        };
+	
+	        return $exports;
+	    }({});
+	
+	    var RouteParser = exports.RouteParser = function ($exports) {
+	        var LocationHandler = $exports.LocationHandler = function LocationHandler(subscribeToChange, pushChange) {
+	            _classCallCheck(this, LocationHandler);
+	
+	            this.SubscribeToChange = subscribeToChange;
+	            this.PushChange = pushChange;
+	        };
+	
+	        _fableCore.Util.setInterfaces(LocationHandler.prototype, ["FSharpRecord"], "Fable.Arch.RouteParser.RouteParser.LocationHandler");
+	
+	        var Router = $exports.Router = function Router(parse, route) {
+	            _classCallCheck(this, Router);
+	
+	            this.Parse = parse;
+	            this.Route = route;
+	        };
+	
+	        _fableCore.Util.setInterfaces(Router.prototype, ["FSharpRecord"], "Fable.Arch.RouteParser.RouteParser.Router");
+	
+	        var createRouter = $exports.createRouter = function createRouter(routes, mapRoute) {
+	            return new Router(function (input) {
+	                return Parsing.choose(routes, input);
+	            }, mapRoute);
+	        };
+	
+	        var routeProducer = $exports.routeProducer = function routeProducer(locationHandler, router, handler) {
+	            var changeHandler = function changeHandler(str) {
+	                var matchValue = router.Parse(str);
+	
+	                if (matchValue == null) {} else {
+	                    handler(matchValue);
+	                }
+	            };
+	
+	            locationHandler.SubscribeToChange(changeHandler);
+	        };
+	
+	        var routeSubscriber = $exports.routeSubscriber = function routeSubscriber(locationHandler, router, message) {
+	            (function (_arg1) {
+	                if (_arg1 == null) {} else {
+	                    locationHandler.PushChange(_arg1);
+	                }
+	            })(router(message));
+	        };
+	
+	        return $exports;
+	    }({});
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore) {
+	    "use strict";
+	
+	    Object.defineProperty(exports, "__esModule", {
+	        value: true
+	    });
+	    exports.AppApi = exports.Helpers = exports.App = exports.AppSpecification = exports.Renderer = exports.ScheduleMessage = exports.Types = undefined;
+	
+	    function _classCallCheck(instance, Constructor) {
+	        if (!(instance instanceof Constructor)) {
+	            throw new TypeError("Cannot call a class as a function");
+	        }
+	    }
+	
+	    var _createClass = function () {
+	        function defineProperties(target, props) {
+	            for (var i = 0; i < props.length; i++) {
+	                var descriptor = props[i];
+	                descriptor.enumerable = descriptor.enumerable || false;
+	                descriptor.configurable = true;
+	                if ("value" in descriptor) descriptor.writable = true;
+	                Object.defineProperty(target, descriptor.key, descriptor);
+	            }
+	        }
+	
+	        return function (Constructor, protoProps, staticProps) {
+	            if (protoProps) defineProperties(Constructor.prototype, protoProps);
+	            if (staticProps) defineProperties(Constructor, staticProps);
+	            return Constructor;
+	        };
+	    }();
+	
+	    var Types = exports.Types = function ($exports) {
+	        var ModelChanged = $exports.ModelChanged = function () {
+	            function ModelChanged(previousState, message, currentState) {
+	                _classCallCheck(this, ModelChanged);
+	
+	                this.PreviousState = previousState;
+	                this.Message = message;
+	                this.CurrentState = currentState;
+	            }
+	
+	            _createClass(ModelChanged, [{
+	                key: "Equals",
+	                value: function Equals(other) {
+	                    return _fableCore.Util.equalsRecords(this, other);
+	                }
+	            }, {
+	                key: "CompareTo",
+	                value: function CompareTo(other) {
+	                    return _fableCore.Util.compareRecords(this, other);
+	                }
+	            }]);
+	
+	            return ModelChanged;
+	        }();
+	
+	        _fableCore.Util.setInterfaces(ModelChanged.prototype, ["FSharpRecord", "System.IEquatable", "System.IComparable"], "Fable.Arch.App.Types.ModelChanged");
+	
+	        var AppEvent = $exports.AppEvent = function () {
+	            function AppEvent(caseName, fields) {
+	                _classCallCheck(this, AppEvent);
+	
+	                this.Case = caseName;
+	                this.Fields = fields;
+	            }
+	
+	            _createClass(AppEvent, [{
+	                key: "Equals",
+	                value: function Equals(other) {
+	                    return _fableCore.Util.equalsUnions(this, other);
+	                }
+	            }, {
+	                key: "CompareTo",
+	                value: function CompareTo(other) {
+	                    return _fableCore.Util.compareUnions(this, other);
+	                }
+	            }]);
+	
+	            return AppEvent;
+	        }();
+	
+	        _fableCore.Util.setInterfaces(AppEvent.prototype, ["FSharpUnion", "System.IEquatable", "System.IComparable"], "Fable.Arch.App.Types.AppEvent");
+	
+	        var AppMessage = $exports.AppMessage = function () {
+	            function AppMessage(caseName, fields) {
+	                _classCallCheck(this, AppMessage);
+	
+	                this.Case = caseName;
+	                this.Fields = fields;
+	            }
+	
+	            _createClass(AppMessage, [{
+	                key: "Equals",
+	                value: function Equals(other) {
+	                    return _fableCore.Util.equalsUnions(this, other);
+	                }
+	            }, {
+	                key: "CompareTo",
+	                value: function CompareTo(other) {
+	                    return _fableCore.Util.compareUnions(this, other);
+	                }
+	            }]);
+	
+	            return AppMessage;
+	        }();
+	
+	        _fableCore.Util.setInterfaces(AppMessage.prototype, ["FSharpUnion", "System.IEquatable", "System.IComparable"], "Fable.Arch.App.Types.AppMessage");
+	
+	        var Plugin = $exports.Plugin = function Plugin(producer, subscriber) {
+	            _classCallCheck(this, Plugin);
+	
+	            this.Producer = producer;
+	            this.Subscriber = subscriber;
+	        };
+	
+	        _fableCore.Util.setInterfaces(Plugin.prototype, ["FSharpRecord"], "Fable.Arch.App.Types.Plugin");
 	
 	        var RenderState = $exports.RenderState = function () {
 	            function RenderState(caseName, fields) {
@@ -5285,279 +6097,384 @@
 	            return RenderState;
 	        }();
 	
-	        _fableCore.Util.setInterfaces(RenderState.prototype, ["FSharpUnion", "System.IEquatable", "System.IComparable"], "Fable.Helpers.Virtualdom.App.RenderState");
+	        _fableCore.Util.setInterfaces(RenderState.prototype, ["FSharpUnion", "System.IEquatable", "System.IComparable"], "Fable.Arch.App.Types.RenderState");
 	
-	        var App = $exports.App = function App(model, view, update, initMessage, actions, producers, node, currentTree, subscribers, nodeSelector, renderState) {
-	            _classCallCheck(this, App);
+	        return $exports;
+	    }({});
 	
-	            this.Model = model;
-	            this.View = view;
-	            this.Update = update;
-	            this.InitMessage = initMessage;
-	            this.Actions = actions;
-	            this.Producers = producers;
-	            this.Node = node;
-	            this.CurrentTree = currentTree;
-	            this.Subscribers = subscribers;
-	            this.NodeSelector = nodeSelector;
-	            this.RenderState = renderState;
-	        };
+	    var ScheduleMessage = exports.ScheduleMessage = function ScheduleMessage(caseName, fields) {
+	        _classCallCheck(this, ScheduleMessage);
 	
-	        _fableCore.Util.setInterfaces(App.prototype, ["FSharpRecord"], "Fable.Helpers.Virtualdom.App.App");
+	        this.Case = caseName;
+	        this.Fields = fields;
+	    };
 	
-	        var ScheduleMessage = $exports.ScheduleMessage = function ScheduleMessage(caseName, fields) {
-	            _classCallCheck(this, ScheduleMessage);
+	    _fableCore.Util.setInterfaces(ScheduleMessage.prototype, ["FSharpUnion"], "Fable.Arch.App.ScheduleMessage");
 	
-	            this.Case = caseName;
-	            this.Fields = fields;
-	        };
+	    var Renderer = exports.Renderer = function Renderer(render, init) {
+	        _classCallCheck(this, Renderer);
 	
-	        _fableCore.Util.setInterfaces(ScheduleMessage.prototype, ["FSharpUnion"], "Fable.Helpers.Virtualdom.App.ScheduleMessage");
+	        this.Render = render;
+	        this.Init = init;
+	    };
 	
-	        var AppMessage = $exports.AppMessage = function AppMessage(caseName, fields) {
-	            _classCallCheck(this, AppMessage);
+	    _fableCore.Util.setInterfaces(Renderer.prototype, ["FSharpRecord"], "Fable.Arch.App.Renderer");
 	
-	            this.Case = caseName;
-	            this.Fields = fields;
-	        };
+	    var AppSpecification = exports.AppSpecification = function AppSpecification(initState, view, update, initMessage, renderer, nodeSelector, producers, subscribers) {
+	        _classCallCheck(this, AppSpecification);
 	
-	        _fableCore.Util.setInterfaces(AppMessage.prototype, ["FSharpUnion"], "Fable.Helpers.Virtualdom.App.AppMessage");
+	        this.InitState = initState;
+	        this.View = view;
+	        this.Update = update;
+	        this.InitMessage = initMessage;
+	        this.Renderer = renderer;
+	        this.NodeSelector = nodeSelector;
+	        this.Producers = producers;
+	        this.Subscribers = subscribers;
+	    };
 	
-	        var Renderer = $exports.Renderer = function Renderer(render, diff, patch, createElement) {
-	            _classCallCheck(this, Renderer);
+	    _fableCore.Util.setInterfaces(AppSpecification.prototype, ["FSharpRecord"], "Fable.Arch.App.AppSpecification");
 	
-	            this.Render = render;
-	            this.Diff = diff;
-	            this.Patch = patch;
-	            this.CreateElement = createElement;
-	        };
+	    var App = exports.App = function App(model, actions, viewState, renderState) {
+	        _classCallCheck(this, App);
 	
-	        _fableCore.Util.setInterfaces(Renderer.prototype, ["FSharpRecord"], "Fable.Helpers.Virtualdom.App.Renderer");
+	        this.Model = model;
+	        this.Actions = actions;
+	        this.ViewState = viewState;
+	        this.RenderState = renderState;
+	    };
 	
-	        var createApp = $exports.createApp = function createApp(model, view, update) {
-	            var NodeSelector = null;
-	            var InitMessage = null;
-	            var Producers = new _fableCore.List();
+	    _fableCore.Util.setInterfaces(App.prototype, ["FSharpRecord"], "Fable.Arch.App.App");
 	
-	            var Subscribers = _fableCore.Map.create(null, new _fableCore.GenericComparer(function (x, y) {
-	                return x < y ? -1 : x > y ? 1 : 0;
-	            }));
-	
-	            var CurrentTree = null;
-	            var RenderState_1 = new RenderState("NoRequest", []);
-	            return new App(model, view, update, InitMessage, new _fableCore.List(), Producers, null, CurrentTree, Subscribers, NodeSelector, RenderState_1);
-	        };
-	
-	        var createSimpleApp = $exports.createSimpleApp = function createSimpleApp(model, view, update) {
-	            return createApp(model, view, function (x) {
-	                return function (y) {
-	                    return [update(x)(y), new _fableCore.List()];
-	                };
-	            });
-	        };
-	
-	        var withStartNodeSelector = $exports.withStartNodeSelector = function withStartNodeSelector(selector, app) {
-	            var NodeSelector = selector;
-	            return new App(app.Model, app.View, app.Update, app.InitMessage, app.Actions, app.Producers, app.Node, app.CurrentTree, app.Subscribers, NodeSelector, app.RenderState);
-	        };
-	
-	        var withInitMessage = $exports.withInitMessage = function withInitMessage(msg, app) {
-	            var InitMessage = msg;
-	            return new App(app.Model, app.View, app.Update, InitMessage, app.Actions, app.Producers, app.Node, app.CurrentTree, app.Subscribers, app.NodeSelector, app.RenderState);
-	        };
-	
-	        var withProducer = $exports.withProducer = function withProducer(p, app) {
-	            var Producers = _fableCore.List.ofArray([p], app.Producers);
-	
-	            return new App(app.Model, app.View, app.Update, app.InitMessage, app.Actions, Producers, app.Node, app.CurrentTree, app.Subscribers, app.NodeSelector, app.RenderState);
-	        };
-	
-	        var withSubscriber = $exports.withSubscriber = function withSubscriber(subscriberId, subscriber, app) {
-	            var subsribers = function (table) {
-	                return _fableCore.Map.add(subscriberId, subscriber, table);
-	            }(app.Subscribers);
-	
-	            return new App(app.Model, app.View, app.Update, app.InitMessage, app.Actions, app.Producers, app.Node, app.CurrentTree, subsribers, app.NodeSelector, app.RenderState);
-	        };
-	
+	    var Helpers = exports.Helpers = function ($exports) {
 	        var createScheduler = $exports.createScheduler = function createScheduler() {
 	            return _fableCore.MailboxProcessor.start(function (inbox) {
 	                var loop = function loop(unitVar0) {
 	                    return function (builder_) {
 	                        return builder_.Delay(function (unitVar) {
 	                            return builder_.Bind(inbox.receive(), function (_arg1) {
-	                                var message = _arg1;
-	                                var milliseconds = message.Fields[0];
-	                                var cb = message.Fields[1];
-	                                window.setTimeout(cb, milliseconds);
+	                                window.setTimeout(_arg1.Fields[1], _arg1.Fields[0]);
 	                                return builder_.ReturnFrom(loop());
 	                            });
 	                        });
-	                    }(_fableCore.defaultAsyncBuilder);
+	                    }(_fableCore.AsyncBuilder.singleton);
 	                };
 	
 	                return loop();
 	            });
 	        };
 	
-	        var createFirstLoopState = $exports.createFirstLoopState = function createFirstLoopState(renderTree, startElem, post, renderer, state) {
-	            var tree = renderTree(state.View)(post)(state.Model);
-	            var rootNode = renderer.CreateElement(tree);
-	            startElem.appendChild(rootNode);
-	            {
-	                var matchValue = state.InitMessage;
+	        var application = $exports.application = function application(handleMessage, handleDraw, handleReplay, configureProducers, createInitApp, inbox) {
+	            var scheduler = createScheduler();
 	
-	                if (matchValue != null) {
-	                    var init = matchValue;
-	                    init(post);
-	                }
-	            }
-	            var CurrentTree = tree;
-	            var _Node = rootNode;
-	            return new App(state.Model, state.View, state.Update, state.InitMessage, state.Actions, state.Producers, _Node, CurrentTree, state.Subscribers, state.NodeSelector, state.RenderState);
+	            var scheduleDraw = function scheduleDraw(unitVar0) {
+	                scheduler.post(new ScheduleMessage("PingIn", [1000 / 60, function (unitVar0_1) {
+	                    inbox.post(new Types.AppMessage("Draw", []));
+	                }]));
+	            };
+	
+	            var post = function post(msg) {
+	                inbox.post(msg);
+	            };
+	
+	            var postMessage = function postMessage($var2) {
+	                return post(function (arg0) {
+	                    return new Types.AppMessage("Message", [arg0]);
+	                }($var2));
+	            };
+	
+	            configureProducers(post);
+	
+	            var inner = function inner(state) {
+	                return function (builder_) {
+	                    return builder_.Delay(function (unitVar) {
+	                        return builder_.Bind(inbox.receive(), function (_arg1) {
+	                            return _arg1.Case === "Draw" ? builder_.ReturnFrom(inner(handleDraw(postMessage)(state))) : _arg1.Case === "Replay" ? builder_.ReturnFrom(inner(handleReplay(postMessage)([_arg1.Fields[0], _arg1.Fields[1]])(state))) : builder_.ReturnFrom(inner(handleMessage(scheduleDraw)(post)(_arg1.Fields[0])(state)));
+	                        });
+	                    });
+	                }(_fableCore.AsyncBuilder.singleton);
+	            };
+	
+	            return inner(createInitApp(postMessage));
 	        };
 	
-	        var handleMessage = $exports.handleMessage = function handleMessage(msg, notify, schedule, state) {
-	            notify(state.Subscribers)(new AppEvents("ActionReceived", [msg]));
-	            var patternInput = state.Update(state.Model)(msg);
-	            var model_ = patternInput[0];
-	            var actions = patternInput[1];
+	        var render = $exports.render = function render(post, viewFn, renderer, app) {
+	            var view = viewFn(app.Model);
+	            var viewState_ = renderer.Render(post)(view)(app.ViewState);
+	            return new App(app.Model, app.Actions, viewState_, app.RenderState);
+	        };
 	
-	            var renderState = function () {
-	                var matchValue = state.RenderState;
+	        var executeActions = $exports.executeActions = function executeActions(post) {
+	            var action = function action(a) {
+	                a(function ($var3) {
+	                    return post(function (arg0) {
+	                        return new Types.AppMessage("Message", [arg0]);
+	                    }($var3));
+	                });
+	            };
 	
-	                if (matchValue.Case === "InProgress") {
-	                    return new RenderState("InProgress", []);
-	                } else {
-	                    schedule();
-	                    return new RenderState("InProgress", []);
-	                }
+	            return function (list) {
+	                _fableCore.Seq.iterate(action, list);
+	            };
+	        };
+	
+	        var notifySubscribers = $exports.notifySubscribers = function notifySubscribers(subscribers, msg) {
+	            _fableCore.Seq.iterate(function (s) {
+	                s(msg);
+	            }, subscribers);
+	        };
+	
+	        var requestDraw = $exports.requestDraw = function requestDraw(scheduleDraw, _arg1) {
+	            return _arg1.Case === "InProgress" ? new Types.RenderState("InProgress", []) : function () {
+	                scheduleDraw();
+	                return new Types.RenderState("InProgress", []);
 	            }();
-	
-	            var Actions = _fableCore.List.append(state.Actions, actions);
-	
-	            return new App(model_, state.View, state.Update, state.InitMessage, Actions, state.Producers, state.Node, state.CurrentTree, state.Subscribers, state.NodeSelector, renderState);
 	        };
 	
-	        var handleDraw = $exports.handleDraw = function handleDraw(renderTree, renderer, post, notify, rootNode, currentTree, state) {
-	            var matchValue = state.RenderState;
-	
-	            if (matchValue.Case === "NoRequest") {
-	                throw "Shouldn't happen";
-	            } else {
-	                notify(state.Subscribers)(new AppEvents("DrawStarted", []));
-	                var model = state.Model;
-	                var tree = renderTree(state.View)(post)(model);
-	                var patches = renderer.Diff(currentTree)(tree);
-	                renderer.Patch(rootNode)(patches);
-	
-	                _fableCore.Seq.iterate(function (i) {
-	                    i(post);
-	                }, state.Actions);
-	
-	                notify(state.Subscribers)(new AppEvents("ModelChanged", [model, state.Model]));
-	                var RenderState_1 = new RenderState("NoRequest", []);
-	                var CurrentTree = tree;
-	                var Actions = new _fableCore.List();
-	                return new App(state.Model, state.View, state.Update, state.InitMessage, Actions, state.Producers, state.Node, CurrentTree, state.Subscribers, state.NodeSelector, RenderState_1);
-	            }
+	        var handleMessage = $exports.handleMessage = function handleMessage(update, subscribers, scheduleDraw, post, message, app) {
+	            notifySubscribers(subscribers, new Types.AppEvent("ActionReceived", [message]));
+	            var patternInput = update(app.Model)(message);
+	            var modelChanged = new Types.AppEvent("ModelChanged", [new Types.ModelChanged(app.Model, message, patternInput[0])]);
+	            var renderState = requestDraw(scheduleDraw, app.RenderState);
+	            executeActions(post)(patternInput[1]);
+	            notifySubscribers(subscribers, modelChanged);
+	            return new App(patternInput[0], app.Actions, app.ViewState, renderState);
 	        };
 	
-	        var start = $exports.start = function start(renderer, app) {
-	            var renderTree = function renderTree(view) {
-	                return function (handler) {
-	                    return function (model) {
-	                        return renderer.Render(handler)(view(model));
-	                    };
+	        var handleDraw = $exports.handleDraw = function handleDraw(viewFn, renderer, post, app) {
+	            return function (s) {
+	                var RenderState = new Types.RenderState("NoRequest", []);
+	                return new App(s.Model, s.Actions, s.ViewState, RenderState);
+	            }(render(post, viewFn, renderer, app));
+	        };
+	
+	        var calculateModelChanges = $exports.calculateModelChanges = function calculateModelChanges(initState, update, actions) {
+	            var execUpdate = function execUpdate(r) {
+	                return function (a) {
+	                    var m = r.tail != null ? r.head[1] : initState;
+	                    var msg = a[1];
+	                    var patternInput = update(m)(a[1]);
+	                    var id = a[0];
+	                    return [id, patternInput[0]];
 	                };
 	            };
 	
-	            var startElem = function () {
-	                var matchValue = app.NodeSelector;
+	            return _fableCore.Seq.fold(function (s, a) {
+	                return _fableCore.List.ofArray([execUpdate(s)(a)], s);
+	            }, new _fableCore.List(), actions);
+	        };
 	
-	                if (matchValue != null) {
-	                    var sel = matchValue;
-	                    return document.body.querySelector(sel);
-	                } else {
-	                    return document.body;
-	                }
-	            }();
+	        var handleReplay = $exports.handleReplay = function handleReplay(viewFn, updateFn, renderer, subscribers, post, fromModel, actions, app) {
+	            var result = calculateModelChanges(fromModel, updateFn, actions);
+	            var model = result.tail == null ? fromModel : result.head[1];
 	
-	            var scheduler = createScheduler();
-	            return _fableCore.MailboxProcessor.start(function (inbox) {
-	                var post = function post(message) {
-	                    inbox.post(new AppMessage("Message", [message]));
-	                };
+	            var app_ = function (app_1) {
+	                return render(post, viewFn, renderer, app_1);
+	            }(new App(model, app.Actions, app.ViewState, app.RenderState));
 	
-	                var notifySubscribers = function notifySubscribers(subs) {
-	                    return function (model) {
-	                        _fableCore.Map.iterate(function (key, handler) {
-	                            handler(model);
-	                        }, subs);
-	                    };
-	                };
+	            (function (msg) {
+	                notifySubscribers(subscribers, msg);
+	            })(new Types.AppEvent("Replayed", [result]));
 	
-	                _fableCore.Seq.iterate(function (p) {
-	                    p(post);
-	                }, app.Producers);
-	
-	                var schedule = function schedule(unitVar0) {
-	                    scheduler.post(new ScheduleMessage("PingIn", [1000 / 60, function (unitVar0_1) {
-	                        inbox.post(new AppMessage("Draw", []));
-	                    }]));
-	                };
-	
-	                var loop = function loop(state) {
-	                    return function (builder_) {
-	                        return builder_.Delay(function (unitVar) {
-	                            var matchValue = [state.Node, state.CurrentTree];
-	
-	                            if (matchValue[0] != null) {
-	                                if (matchValue[1] != null) {
-	                                    var currentTree = matchValue[1];
-	                                    var rootNode = matchValue[0];
-	                                    return builder_.Bind(inbox.receive(), function (_arg1) {
-	                                        var message = _arg1;
-	
-	                                        if (message.Case === "Message") {
-	                                            var msg = message.Fields[0];
-	                                            var state_ = handleMessage(msg, notifySubscribers, schedule, state);
-	                                            return builder_.ReturnFrom(loop(state_));
-	                                        } else {
-	                                            if (message.Case === "Draw") {
-	                                                var state_ = handleDraw(renderTree, renderer, post, notifySubscribers, rootNode, currentTree, state);
-	                                                return builder_.ReturnFrom(loop(state_));
-	                                            } else {
-	                                                return builder_.ReturnFrom(loop(state));
-	                                            }
-	                                        }
-	                                    });
-	                                } else {
-	                                    throw "Shouldn't happen";
-	                                    return builder_.Zero();
-	                                }
-	                            } else {
-	                                var state_ = createFirstLoopState(renderTree, startElem, post, renderer, state);
-	                                return builder_.ReturnFrom(loop(state_));
-	                            }
-	                        });
-	                    }(_fableCore.defaultAsyncBuilder);
-	                };
-	
-	                return loop(app);
-	            });
+	            return app_;
 	        };
 	
 	        return $exports;
 	    }({});
 	
+	    var AppApi = exports.AppApi = function ($exports) {
+	        var mapAction = $exports.mapAction = function mapAction(mapping, action, x) {
+	            action(function ($var4) {
+	                return x(mapping($var4));
+	            });
+	        };
+	
+	        var mapActions = $exports.mapActions = function mapActions(m) {
+	            var mapping = function mapping(action) {
+	                return function (x) {
+	                    mapAction(m, action, x);
+	                };
+	            };
+	
+	            return function (list) {
+	                return _fableCore.List.map(mapping, list);
+	            };
+	        };
+	
+	        var toActionList = $exports.toActionList = function toActionList(a) {
+	            return _fableCore.List.ofArray([a]);
+	        };
+	
+	        var createApp = $exports.createApp = function createApp(state, view, update, renderer) {
+	            return new AppSpecification(state, view, update, null, renderer, "body", new _fableCore.List(), new _fableCore.List());
+	        };
+	
+	        var createSimpleApp = $exports.createSimpleApp = function createSimpleApp(model, view, update) {
+	            var update_1 = function update_1(x) {
+	                return function (y) {
+	                    return [update(x)(y), new _fableCore.List()];
+	                };
+	            };
+	
+	            return function (renderer) {
+	                return createApp(model, view, update_1, renderer);
+	            };
+	        };
+	
+	        var withStartNodeSelector = $exports.withStartNodeSelector = function withStartNodeSelector(selector, app) {
+	            return new AppSpecification(app.InitState, app.View, app.Update, app.InitMessage, app.Renderer, selector, app.Producers, app.Subscribers);
+	        };
+	
+	        var withInitMessage = $exports.withInitMessage = function withInitMessage(msg, app) {
+	            var InitMessage = msg;
+	            return new AppSpecification(app.InitState, app.View, app.Update, InitMessage, app.Renderer, app.NodeSelector, app.Producers, app.Subscribers);
+	        };
+	
+	        var withInstrumentationProducer = function withInstrumentationProducer(p, app) {
+	            var Producers = _fableCore.List.ofArray([p], app.Producers);
+	
+	            return new AppSpecification(app.InitState, app.View, app.Update, app.InitMessage, app.Renderer, app.NodeSelector, Producers, app.Subscribers);
+	        };
+	
+	        var withProducer = $exports.withProducer = function withProducer(producer, app) {
+	            var lift = function lift(h) {
+	                return function ($var5) {
+	                    return h(function (arg0) {
+	                        return new Types.AppMessage("Message", [arg0]);
+	                    }($var5));
+	                };
+	            };
+	
+	            var producer_ = function producer_($var6) {
+	                return producer(lift($var6));
+	            };
+	
+	            return withInstrumentationProducer(producer_, app);
+	        };
+	
+	        var withInstrumentationSubscriber = $exports.withInstrumentationSubscriber = function withInstrumentationSubscriber(subscriber, app) {
+	            var Subscribers = _fableCore.List.ofArray([subscriber], app.Subscribers);
+	
+	            return new AppSpecification(app.InitState, app.View, app.Update, app.InitMessage, app.Renderer, app.NodeSelector, app.Producers, Subscribers);
+	        };
+	
+	        var withSubscriber = $exports.withSubscriber = function withSubscriber(subscriber, app) {
+	            var subscriber_ = function subscriber_(_arg1) {
+	                if (_arg1.Case === "ModelChanged") {
+	                    subscriber(_arg1.Fields[0]);
+	                }
+	            };
+	
+	            return withInstrumentationSubscriber(subscriber_, app);
+	        };
+	
+	        var withPlugin = $exports.withPlugin = function withPlugin(plugin) {
+	            return function ($var7) {
+	                return withInstrumentationProducer(plugin.Producer, withInstrumentationSubscriber(plugin.Subscriber, $var7));
+	            };
+	        };
+	
+	        var configureProducers = $exports.configureProducers = function configureProducers(producers, post) {
+	            _fableCore.Seq.iterate(function (p) {
+	                p(post);
+	            }, producers);
+	        };
+	
+	        var start = $exports.start = function start(appSpec) {
+	            var createInitApp = function createInitApp(post) {
+	                var view = appSpec.View(appSpec.InitState);
+	                var viewState = appSpec.Renderer.Init(appSpec.NodeSelector)(post)(view);
+	                var render = appSpec.Renderer.Render;
+	                var RenderState = new Types.RenderState("NoRequest", []);
+	                return new App(appSpec.InitState, new _fableCore.List(), viewState, RenderState);
+	            };
+	
+	            var handleMessage_ = function handleMessage_(scheduleDraw) {
+	                return function (post) {
+	                    return function (message) {
+	                        return function (app) {
+	                            return Helpers.handleMessage(appSpec.Update, appSpec.Subscribers, scheduleDraw, post, message, app);
+	                        };
+	                    };
+	                };
+	            };
+	
+	            var handleDraw_ = function handleDraw_(post) {
+	                return function (app) {
+	                    return Helpers.handleDraw(appSpec.View, appSpec.Renderer, post, app);
+	                };
+	            };
+	
+	            var handleReplay_ = function handleReplay_(post) {
+	                return function (tupledArg) {
+	                    return function (app) {
+	                        return Helpers.handleReplay(appSpec.View, appSpec.Update, appSpec.Renderer, appSpec.Subscribers, post, tupledArg[0], tupledArg[1], app);
+	                    };
+	                };
+	            };
+	
+	            var configureProducers_ = function configureProducers_(post) {
+	                configureProducers(appSpec.Producers, post);
+	            };
+	
+	            return _fableCore.MailboxProcessor.start(function () {
+	                var createInitApp_1 = createInitApp;
+	                return function (inbox) {
+	                    return Helpers.application(handleMessage_, handleDraw_, handleReplay_, configureProducers_, createInitApp_1, inbox);
+	                };
+	            }());
+	        };
+	
+	        return $exports;
+	    }({});
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1), __webpack_require__(6), __webpack_require__(4)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore, _virtualDom, _FableArch) {
+	    "use strict";
+	
+	    Object.defineProperty(exports, "__esModule", {
+	        value: true
+	    });
+	    exports.render$27 = exports.ViewState = undefined;
+	    exports.createTree = createTree;
+	    exports.renderSomething = renderSomething;
+	    exports.render = render;
+	    exports.init = init;
+	    exports.renderer = renderer;
+	
+	    function _classCallCheck(instance, Constructor) {
+	        if (!(instance instanceof Constructor)) {
+	            throw new TypeError("Cannot call a class as a function");
+	        }
+	    }
+	
+	    var _createClass = function () {
+	        function defineProperties(target, props) {
+	            for (var i = 0; i < props.length; i++) {
+	                var descriptor = props[i];
+	                descriptor.enumerable = descriptor.enumerable || false;
+	                descriptor.configurable = true;
+	                if ("value" in descriptor) descriptor.writable = true;
+	                Object.defineProperty(target, descriptor.key, descriptor);
+	            }
+	        }
+	
+	        return function (Constructor, protoProps, staticProps) {
+	            if (protoProps) defineProperties(Constructor.prototype, protoProps);
+	            if (staticProps) defineProperties(Constructor, staticProps);
+	            return Constructor;
+	        };
+	    }();
+	
 	    function createTree(handler, tag, attributes, children) {
 	        var toAttrs = function toAttrs(attrs) {
 	            var elAttributes = function (_arg2) {
-	                return _arg2.tail == null ? null : function () {
-	                    var v = _arg2;
-	                    return ["attributes", _fableCore.Util.createObj(v)];
-	                }();
+	                return _arg2.tail == null ? null : ["attributes", _fableCore.Util.createObj(_arg2)];
 	            }(_fableCore.List.choose(function (x) {
 	                return x;
 	            }, _fableCore.List.map(function (_arg1) {
@@ -5569,18 +6486,15 @@
 	            }, attrs)));
 	
 	            var props = _fableCore.List.map(function (_arg4) {
-	                return _arg4.Case === "Style" ? function () {
-	                    var style = _arg4.Fields[0];
-	                    return ["style", _fableCore.Util.createObj(style)];
-	                }() : _arg4.Case === "Property" ? function () {
+	                return _arg4.Case === "Style" ? ["style", _fableCore.Util.createObj(_arg4.Fields[0])] : _arg4.Case === "Property" ? function () {
 	                    var v = _arg4.Fields[0][1];
 	                    var k = _arg4.Fields[0][0];
 	                    return [k, v];
 	                }() : _arg4.Case === "EventHandler" ? function () {
 	                    var f = _arg4.Fields[0][1];
 	                    var ev = _arg4.Fields[0][0];
-	                    return [ev, function ($var3) {
-	                        return handler(f($var3));
+	                    return [ev, function ($var8) {
+	                        return handler(f($var8));
 	                    }];
 	                }() : function () {
 	                    throw "Shouldn't happen";
@@ -5589,20 +6503,37 @@
 	                return _arg3.Case === "Attribute" ? false : true;
 	            }, attrs));
 	
-	            return _fableCore.Util.createObj(elAttributes != null ? function () {
-	                var x = elAttributes;
-	                return _fableCore.List.ofArray([x], props);
-	            }() : props);
+	            return _fableCore.Util.createObj(elAttributes != null ? _fableCore.List.ofArray([elAttributes], props) : props);
 	        };
 	
 	        var elem = (0, _virtualDom.h)(tag, toAttrs(attributes), Array.from(children));
 	        return elem;
 	    }
 	
-	    function render(handler, node) {
+	    var ViewState = exports.ViewState = function () {
+	        function ViewState(currentTree, node) {
+	            _classCallCheck(this, ViewState);
+	
+	            this.CurrentTree = currentTree;
+	            this.Node = node;
+	        }
+	
+	        _createClass(ViewState, [{
+	            key: "Equals",
+	            value: function Equals(other) {
+	                return _fableCore.Util.equalsRecords(this, other);
+	            }
+	        }]);
+	
+	        return ViewState;
+	    }();
+	
+	    _fableCore.Util.setInterfaces(ViewState.prototype, ["FSharpRecord", "System.IEquatable"], "Fable.Arch.Virtualdom.ViewState");
+	
+	    function renderSomething(handler, node) {
 	        var $target0 = function $target0(attrs, nodes, tag) {
 	            return createTree(handler, tag, attrs, _fableCore.List.map(function (node_1) {
-	                return render(handler, node_1);
+	                return renderSomething(handler, node_1);
 	            }, nodes));
 	        };
 	
@@ -5615,12 +6546,10 @@
 	                return createTree(handler, tag, attrs, new _fableCore.List());
 	            } else {
 	                if (node.Case === "Text") {
-	                    var str = node.Fields[0];
-	                    return str;
+	                    return node.Fields[0];
 	                } else {
 	                    if (node.Case === "WhiteSpace") {
-	                        var str = node.Fields[0];
-	                        return str;
+	                        return node.Fields[0];
 	                    } else {
 	                        return $target0(node.Fields[0][1], node.Fields[1], node.Fields[0][0]);
 	                    }
@@ -5629,36 +6558,56 @@
 	        }
 	    }
 	
+	    function render(handler, view, viewState) {
+	        var tree = renderSomething(handler, view);
+	        return new ViewState(tree, viewState.Node);
+	    }
+	
+	    function init(selector, handler, view) {
+	        var node = document.body.querySelector(selector);
+	        var tree = renderSomething(handler, view);
+	        var vdomNode = (0, _virtualDom.create)(tree);
+	        node.appendChild(vdomNode);
+	        return new ViewState(tree, vdomNode);
+	    }
+	
+	    function render_(handler, view, viewState) {
+	        var viewState_ = render(handler, view, viewState);
+	        var patches = (0, _virtualDom.diff)(viewState.CurrentTree, viewState_.CurrentTree);
+	        (0, _virtualDom.patch)(viewState.Node, patches);
+	        return viewState_;
+	    }
+	
+	    exports.render$27 = render_;
+	
 	    function renderer() {
-	        return new App.Renderer(function (handler) {
-	            return function (node) {
-	                return render(handler, node);
+	        return new _FableArch.Renderer(function (handler) {
+	            return function (view) {
+	                return function (viewState) {
+	                    return render_(handler, view, viewState);
+	                };
 	            };
-	        }, function (tree1) {
-	            return function (tree2) {
-	                return (0, _virtualDom.diff)(tree1, tree2);
+	        }, function (selector) {
+	            return function (handler) {
+	                return function (view) {
+	                    return init(selector, handler, view);
+	                };
 	            };
-	        }, function (node) {
-	            return function (patches) {
-	                return (0, _virtualDom.patch)(node, patches);
-	            };
-	        }, function (e) {
-	            return (0, _virtualDom.create)(e);
 	        });
 	    }
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ },
-/* 3 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var diff = __webpack_require__(4)
-	var patch = __webpack_require__(17)
-	var h = __webpack_require__(26)
-	var create = __webpack_require__(37)
-	var VNode = __webpack_require__(28)
-	var VText = __webpack_require__(29)
+	var diff = __webpack_require__(7)
+	var patch = __webpack_require__(20)
+	var h = __webpack_require__(29)
+	var create = __webpack_require__(40)
+	var VNode = __webpack_require__(31)
+	var VText = __webpack_require__(32)
 	
 	module.exports = {
 	    diff: diff,
@@ -5671,28 +6620,28 @@
 
 
 /***/ },
-/* 4 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var diff = __webpack_require__(5)
+	var diff = __webpack_require__(8)
 	
 	module.exports = diff
 
 
 /***/ },
-/* 5 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isArray = __webpack_require__(6)
+	var isArray = __webpack_require__(9)
 	
-	var VPatch = __webpack_require__(7)
-	var isVNode = __webpack_require__(9)
-	var isVText = __webpack_require__(10)
-	var isWidget = __webpack_require__(11)
-	var isThunk = __webpack_require__(12)
-	var handleThunk = __webpack_require__(13)
+	var VPatch = __webpack_require__(10)
+	var isVNode = __webpack_require__(12)
+	var isVText = __webpack_require__(13)
+	var isWidget = __webpack_require__(14)
+	var isThunk = __webpack_require__(15)
+	var handleThunk = __webpack_require__(16)
 	
-	var diffProps = __webpack_require__(14)
+	var diffProps = __webpack_require__(17)
 	
 	module.exports = diff
 	
@@ -6113,7 +7062,7 @@
 
 
 /***/ },
-/* 6 */
+/* 9 */
 /***/ function(module, exports) {
 
 	var nativeIsArray = Array.isArray
@@ -6127,10 +7076,10 @@
 
 
 /***/ },
-/* 7 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(8)
+	var version = __webpack_require__(11)
 	
 	VirtualPatch.NONE = 0
 	VirtualPatch.VTEXT = 1
@@ -6155,17 +7104,17 @@
 
 
 /***/ },
-/* 8 */
+/* 11 */
 /***/ function(module, exports) {
 
 	module.exports = "2"
 
 
 /***/ },
-/* 9 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(8)
+	var version = __webpack_require__(11)
 	
 	module.exports = isVirtualNode
 	
@@ -6175,10 +7124,10 @@
 
 
 /***/ },
-/* 10 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(8)
+	var version = __webpack_require__(11)
 	
 	module.exports = isVirtualText
 	
@@ -6188,7 +7137,7 @@
 
 
 /***/ },
-/* 11 */
+/* 14 */
 /***/ function(module, exports) {
 
 	module.exports = isWidget
@@ -6199,7 +7148,7 @@
 
 
 /***/ },
-/* 12 */
+/* 15 */
 /***/ function(module, exports) {
 
 	module.exports = isThunk
@@ -6210,13 +7159,13 @@
 
 
 /***/ },
-/* 13 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isVNode = __webpack_require__(9)
-	var isVText = __webpack_require__(10)
-	var isWidget = __webpack_require__(11)
-	var isThunk = __webpack_require__(12)
+	var isVNode = __webpack_require__(12)
+	var isVText = __webpack_require__(13)
+	var isWidget = __webpack_require__(14)
+	var isThunk = __webpack_require__(15)
 	
 	module.exports = handleThunk
 	
@@ -6256,11 +7205,11 @@
 
 
 /***/ },
-/* 14 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(15)
-	var isHook = __webpack_require__(16)
+	var isObject = __webpack_require__(18)
+	var isHook = __webpack_require__(19)
 	
 	module.exports = diffProps
 	
@@ -6320,7 +7269,7 @@
 
 
 /***/ },
-/* 15 */
+/* 18 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -6331,7 +7280,7 @@
 
 
 /***/ },
-/* 16 */
+/* 19 */
 /***/ function(module, exports) {
 
 	module.exports = isHook
@@ -6344,24 +7293,24 @@
 
 
 /***/ },
-/* 17 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var patch = __webpack_require__(18)
+	var patch = __webpack_require__(21)
 	
 	module.exports = patch
 
 
 /***/ },
-/* 18 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var document = __webpack_require__(19)
-	var isArray = __webpack_require__(6)
+	var document = __webpack_require__(22)
+	var isArray = __webpack_require__(9)
 	
-	var render = __webpack_require__(21)
-	var domIndex = __webpack_require__(23)
-	var patchOp = __webpack_require__(24)
+	var render = __webpack_require__(24)
+	var domIndex = __webpack_require__(26)
+	var patchOp = __webpack_require__(27)
 	module.exports = patch
 	
 	function patch(rootNode, patches, renderOptions) {
@@ -6439,12 +7388,12 @@
 
 
 /***/ },
-/* 19 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {var topLevel = typeof global !== 'undefined' ? global :
 	    typeof window !== 'undefined' ? window : {}
-	var minDoc = __webpack_require__(20);
+	var minDoc = __webpack_require__(23);
 	
 	if (typeof document !== 'undefined') {
 	    module.exports = document;
@@ -6461,23 +7410,23 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 20 */
+/* 23 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 21 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var document = __webpack_require__(19)
+	var document = __webpack_require__(22)
 	
-	var applyProperties = __webpack_require__(22)
+	var applyProperties = __webpack_require__(25)
 	
-	var isVNode = __webpack_require__(9)
-	var isVText = __webpack_require__(10)
-	var isWidget = __webpack_require__(11)
-	var handleThunk = __webpack_require__(13)
+	var isVNode = __webpack_require__(12)
+	var isVText = __webpack_require__(13)
+	var isWidget = __webpack_require__(14)
+	var handleThunk = __webpack_require__(16)
 	
 	module.exports = createElement
 	
@@ -6519,11 +7468,11 @@
 
 
 /***/ },
-/* 22 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(15)
-	var isHook = __webpack_require__(16)
+	var isObject = __webpack_require__(18)
+	var isHook = __webpack_require__(19)
 	
 	module.exports = applyProperties
 	
@@ -6622,7 +7571,7 @@
 
 
 /***/ },
-/* 23 */
+/* 26 */
 /***/ function(module, exports) {
 
 	// Maps a virtual DOM tree onto a real DOM tree in an efficient manner.
@@ -6713,15 +7662,15 @@
 
 
 /***/ },
-/* 24 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var applyProperties = __webpack_require__(22)
+	var applyProperties = __webpack_require__(25)
 	
-	var isWidget = __webpack_require__(11)
-	var VPatch = __webpack_require__(7)
+	var isWidget = __webpack_require__(14)
+	var VPatch = __webpack_require__(10)
 	
-	var updateWidget = __webpack_require__(25)
+	var updateWidget = __webpack_require__(28)
 	
 	module.exports = applyPatch
 	
@@ -6870,10 +7819,10 @@
 
 
 /***/ },
-/* 25 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isWidget = __webpack_require__(11)
+	var isWidget = __webpack_require__(14)
 	
 	module.exports = updateWidget
 	
@@ -6891,33 +7840,33 @@
 
 
 /***/ },
-/* 26 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var h = __webpack_require__(27)
+	var h = __webpack_require__(30)
 	
 	module.exports = h
 
 
 /***/ },
-/* 27 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var isArray = __webpack_require__(6);
+	var isArray = __webpack_require__(9);
 	
-	var VNode = __webpack_require__(28);
-	var VText = __webpack_require__(29);
-	var isVNode = __webpack_require__(9);
-	var isVText = __webpack_require__(10);
-	var isWidget = __webpack_require__(11);
-	var isHook = __webpack_require__(16);
-	var isVThunk = __webpack_require__(12);
+	var VNode = __webpack_require__(31);
+	var VText = __webpack_require__(32);
+	var isVNode = __webpack_require__(12);
+	var isVText = __webpack_require__(13);
+	var isWidget = __webpack_require__(14);
+	var isHook = __webpack_require__(19);
+	var isVThunk = __webpack_require__(15);
 	
-	var parseTag = __webpack_require__(30);
-	var softSetHook = __webpack_require__(32);
-	var evHook = __webpack_require__(33);
+	var parseTag = __webpack_require__(33);
+	var softSetHook = __webpack_require__(35);
+	var evHook = __webpack_require__(36);
 	
 	module.exports = h;
 	
@@ -7043,14 +7992,14 @@
 
 
 /***/ },
-/* 28 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(8)
-	var isVNode = __webpack_require__(9)
-	var isWidget = __webpack_require__(11)
-	var isThunk = __webpack_require__(12)
-	var isVHook = __webpack_require__(16)
+	var version = __webpack_require__(11)
+	var isVNode = __webpack_require__(12)
+	var isWidget = __webpack_require__(14)
+	var isThunk = __webpack_require__(15)
+	var isVHook = __webpack_require__(19)
 	
 	module.exports = VirtualNode
 	
@@ -7121,10 +8070,10 @@
 
 
 /***/ },
-/* 29 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(8)
+	var version = __webpack_require__(11)
 	
 	module.exports = VirtualText
 	
@@ -7137,12 +8086,12 @@
 
 
 /***/ },
-/* 30 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var split = __webpack_require__(31);
+	var split = __webpack_require__(34);
 	
 	var classIdSplit = /([\.#]?[a-zA-Z0-9\u007F-\uFFFF_:-]+)/;
 	var notClassId = /^\.|#/;
@@ -7197,7 +8146,7 @@
 
 
 /***/ },
-/* 31 */
+/* 34 */
 /***/ function(module, exports) {
 
 	/*!
@@ -7309,7 +8258,7 @@
 
 
 /***/ },
-/* 32 */
+/* 35 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -7332,12 +8281,12 @@
 
 
 /***/ },
-/* 33 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var EvStore = __webpack_require__(34);
+	var EvStore = __webpack_require__(37);
 	
 	module.exports = EvHook;
 	
@@ -7365,12 +8314,12 @@
 
 
 /***/ },
-/* 34 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var OneVersionConstraint = __webpack_require__(35);
+	var OneVersionConstraint = __webpack_require__(38);
 	
 	var MY_VERSION = '7';
 	OneVersionConstraint('ev-store', MY_VERSION);
@@ -7391,12 +8340,12 @@
 
 
 /***/ },
-/* 35 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var Individual = __webpack_require__(36);
+	var Individual = __webpack_require__(39);
 	
 	module.exports = OneVersion;
 	
@@ -7419,7 +8368,7 @@
 
 
 /***/ },
-/* 36 */
+/* 39 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
@@ -7445,819 +8394,12 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 37 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var createElement = __webpack_require__(21)
+	var createElement = __webpack_require__(24)
 	
 	module.exports = createElement
-
-
-/***/ },
-/* 38 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore) {
-	    "use strict";
-	
-	    Object.defineProperty(exports, "__esModule", {
-	        value: true
-	    });
-	    exports.RouteParser = exports.Parsing = undefined;
-	
-	    function _classCallCheck(instance, Constructor) {
-	        if (!(instance instanceof Constructor)) {
-	            throw new TypeError("Cannot call a class as a function");
-	        }
-	    }
-	
-	    var _createClass = function () {
-	        function defineProperties(target, props) {
-	            for (var i = 0; i < props.length; i++) {
-	                var descriptor = props[i];
-	                descriptor.enumerable = descriptor.enumerable || false;
-	                descriptor.configurable = true;
-	                if ("value" in descriptor) descriptor.writable = true;
-	                Object.defineProperty(target, descriptor.key, descriptor);
-	            }
-	        }
-	
-	        return function (Constructor, protoProps, staticProps) {
-	            if (protoProps) defineProperties(Constructor.prototype, protoProps);
-	            if (staticProps) defineProperties(Constructor, staticProps);
-	            return Constructor;
-	        };
-	    }();
-	
-	    var Parsing = exports.Parsing = function ($exports) {
-	        var Result = $exports.Result = function () {
-	            function Result(caseName, fields) {
-	                _classCallCheck(this, Result);
-	
-	                this.Case = caseName;
-	                this.Fields = fields;
-	            }
-	
-	            _createClass(Result, [{
-	                key: "Equals",
-	                value: function Equals(other) {
-	                    return _fableCore.Util.equalsUnions(this, other);
-	                }
-	            }, {
-	                key: "CompareTo",
-	                value: function CompareTo(other) {
-	                    return _fableCore.Util.compareUnions(this, other);
-	                }
-	            }]);
-	
-	            return Result;
-	        }();
-	
-	        _fableCore.Util.setInterfaces(Result.prototype, ["FSharpUnion", "System.IEquatable", "System.IComparable"], "Fable.Helpers.Parsing.Result");
-	
-	        var Parser = $exports.Parser = function Parser(parseFn, label) {
-	            _classCallCheck(this, Parser);
-	
-	            this.parseFn = parseFn;
-	            this.label = label;
-	        };
-	
-	        _fableCore.Util.setInterfaces(Parser.prototype, ["FSharpRecord"], "Fable.Helpers.Parsing.Parser");
-	
-	        var printResult = $exports.printResult = function printResult(result) {
-	            if (result.Case === "Failure") {
-	                var label = result.Fields[0][0];
-	                var error = result.Fields[0][1];
-	
-	                _fableCore.String.fsFormat("Error parsing %s\n%s")(function (x) {
-	                    console.log(x);
-	                })(label)(error);
-	            } else {
-	                var value = result.Fields[0][0];
-	                var input = result.Fields[0][1];
-	
-	                _fableCore.String.fsFormat("%A")(function (x) {
-	                    console.log(x);
-	                })(value);
-	            }
-	        };
-	
-	        var satisfy = $exports.satisfy = function satisfy(predicate, label) {
-	            var innerFn = function innerFn(input) {
-	                return _fableCore.String.isNullOrEmpty(input) ? new Result("Failure", [[label, "No more input"]]) : function () {
-	                    var first = input[0];
-	
-	                    if (predicate(first)) {
-	                        var remainingInput = input.substr(1);
-	                        return new Result("Success", [[first, remainingInput]]);
-	                    } else {
-	                        var err = _fableCore.String.fsFormat("Unexpected '%c'")(function (x) {
-	                            return x;
-	                        })(first);
-	
-	                        return new Result("Failure", [[label, err]]);
-	                    }
-	                }();
-	            };
-	
-	            return new Parser(innerFn, label);
-	        };
-	
-	        var pchar = $exports.pchar = function pchar(charToMatch) {
-	            var predicate = function predicate(ch) {
-	                return ch === charToMatch;
-	            };
-	
-	            var label = _fableCore.String.fsFormat("%c")(function (x) {
-	                return x;
-	            })(charToMatch);
-	
-	            return satisfy(predicate, label);
-	        };
-	
-	        var digitChar = $exports.digitChar = function () {
-	            var predicate = function predicate(c) {
-	                return function (source) {
-	                    return _fableCore.Seq.exists(function (x) {
-	                        return _fableCore.Util.equals(c, x);
-	                    }, source);
-	                }(_fableCore.Seq.toList(_fableCore.Seq.rangeChar("0", "9")));
-	            };
-	
-	            var label = "digit";
-	            return satisfy(predicate, label);
-	        }();
-	
-	        var run = $exports.run = function run(parser, input) {
-	            var innerFn = parser.parseFn;
-	            return innerFn(input);
-	        };
-	
-	        var getLabel = $exports.getLabel = function getLabel(parser) {
-	            return parser.label;
-	        };
-	
-	        var setLabel = $exports.setLabel = function setLabel(parser, newLabel) {
-	            var newInnerFn = function newInnerFn(input) {
-	                var result = parser.parseFn(input);
-	
-	                if (result.Case === "Failure") {
-	                    var oldLabel = result.Fields[0][0];
-	                    var err = result.Fields[0][1];
-	                    return new Result("Failure", [[newLabel, err]]);
-	                } else {
-	                    var s = result.Fields[0];
-	                    return new Result("Success", [s]);
-	                }
-	            };
-	
-	            return new Parser(newInnerFn, newLabel);
-	        };
-	
-	        var op_LessQmarkGreater = $exports.op_LessQmarkGreater = function op_LessQmarkGreater() {
-	            return function (parser) {
-	                return function (newLabel) {
-	                    return setLabel(parser, newLabel);
-	                };
-	            };
-	        };
-	
-	        var bindP = $exports.bindP = function bindP(f, p) {
-	            var label = "unknown";
-	
-	            var innerFn = function innerFn(input) {
-	                var result1 = run(p, input);
-	
-	                if (result1.Case === "Success") {
-	                    var value1 = result1.Fields[0][0];
-	                    var remainingInput = result1.Fields[0][1];
-	                    var p2 = f(value1);
-	                    return run(p2, remainingInput);
-	                } else {
-	                    var label_1 = result1.Fields[0][0];
-	                    var err = result1.Fields[0][1];
-	                    return new Result("Failure", [[label_1, err]]);
-	                }
-	            };
-	
-	            return new Parser(innerFn, label);
-	        };
-	
-	        var op_GreaterGreaterEquals = $exports.op_GreaterGreaterEquals = function op_GreaterGreaterEquals(p, f) {
-	            return bindP(f, p);
-	        };
-	
-	        var returnP = $exports.returnP = function returnP(x) {
-	            var label = _fableCore.String.fsFormat("%A")(function (x) {
-	                return x;
-	            })(x);
-	
-	            var innerFn = function innerFn(input) {
-	                return new Result("Success", [[x, input]]);
-	            };
-	
-	            return new Parser(innerFn, label);
-	        };
-	
-	        var mapP = $exports.mapP = function mapP(f) {
-	            var f_1 = function f_1($var4) {
-	                return function (x) {
-	                    return returnP(x);
-	                }(f($var4));
-	            };
-	
-	            return function (p) {
-	                return bindP(f_1, p);
-	            };
-	        };
-	
-	        var op_LessBangGreater = $exports.op_LessBangGreater = function op_LessBangGreater() {
-	            return function (f) {
-	                return mapP(f);
-	            };
-	        };
-	
-	        var op_BarGreaterGreater = $exports.op_BarGreaterGreater = function op_BarGreaterGreater(x, f) {
-	            return mapP(f)(x);
-	        };
-	
-	        var applyP = $exports.applyP = function applyP(fP, xP) {
-	            return op_GreaterGreaterEquals(fP, function (f) {
-	                return op_GreaterGreaterEquals(xP, function (x) {
-	                    return returnP(f(x));
-	                });
-	            });
-	        };
-	
-	        var op_LessMultiplyGreater = $exports.op_LessMultiplyGreater = function op_LessMultiplyGreater() {
-	            return function (fP) {
-	                return function (xP) {
-	                    return applyP(fP, xP);
-	                };
-	            };
-	        };
-	
-	        var lift2 = $exports.lift2 = function lift2(f, xP, yP) {
-	            return op_LessMultiplyGreater()(op_LessMultiplyGreater()(returnP(f))(xP))(yP);
-	        };
-	
-	        var andThen = $exports.andThen = function andThen(p1, p2) {
-	            var label = _fableCore.String.fsFormat("%s andThen %s")(function (x) {
-	                return x;
-	            })(getLabel(p1))(getLabel(p2));
-	
-	            return op_LessQmarkGreater()(op_GreaterGreaterEquals(p1, function (p1Result) {
-	                return op_GreaterGreaterEquals(p2, function (p2Result) {
-	                    return returnP([p1Result, p2Result]);
-	                });
-	            }))(label);
-	        };
-	
-	        var op_DotGreaterGreaterDot = $exports.op_DotGreaterGreaterDot = function op_DotGreaterGreaterDot() {
-	            return function (p1) {
-	                return function (p2) {
-	                    return andThen(p1, p2);
-	                };
-	            };
-	        };
-	
-	        var orElse = $exports.orElse = function orElse(parser1, parser2) {
-	            var label = _fableCore.String.fsFormat("%s orElse %s")(function (x) {
-	                return x;
-	            })(getLabel(parser1))(getLabel(parser2));
-	
-	            var innerFn = function innerFn(input) {
-	                var result1 = run(parser1, input);
-	
-	                if (result1.Case === "Failure") {
-	                    var err = result1.Fields[0][1];
-	                    var result2 = run(parser2, input);
-	
-	                    if (result2.Case === "Failure") {
-	                        var err_1 = result2.Fields[0][1];
-	                        return new Result("Failure", [[label, err_1]]);
-	                    } else {
-	                        return result2;
-	                    }
-	                } else {
-	                    var result = result1.Fields[0];
-	                    return result1;
-	                }
-	            };
-	
-	            return new Parser(innerFn, label);
-	        };
-	
-	        var op_LessBarGreater = $exports.op_LessBarGreater = function op_LessBarGreater() {
-	            return function (parser1) {
-	                return function (parser2) {
-	                    return orElse(parser1, parser2);
-	                };
-	            };
-	        };
-	
-	        var choice = $exports.choice = function choice(listOfParsers) {
-	            return _fableCore.Seq.reduce(function ($var5, $var6) {
-	                return op_LessBarGreater()($var5)($var6);
-	            }, listOfParsers);
-	        };
-	
-	        var anyOf = $exports.anyOf = function anyOf(listOfChars) {
-	            var label = _fableCore.String.fsFormat("any of %A")(function (x) {
-	                return x;
-	            })(listOfChars);
-	
-	            return op_LessQmarkGreater()(choice(function (list) {
-	                return _fableCore.List.map(function (charToMatch) {
-	                    return pchar(charToMatch);
-	                }, list);
-	            }(listOfChars)))(label);
-	        };
-	
-	        var zeroOrOne = $exports.zeroOrOne = function zeroOrOne(parser) {
-	            var innerFn = function innerFn(input) {
-	                return input === "" ? new Result("Success", [["", ""]]) : run(parser, input);
-	            };
-	
-	            return new Parser(innerFn, "zeroOrOne");
-	        };
-	
-	        var parseZeroOrMore = $exports.parseZeroOrMore = function parseZeroOrMore(parser, input) {
-	            var firstResult = run(parser, input);
-	
-	            if (firstResult.Case === "Success") {
-	                var inputAfterFirstParse = firstResult.Fields[0][1];
-	                var firstValue = firstResult.Fields[0][0];
-	                var patternInput = parseZeroOrMore(parser, inputAfterFirstParse);
-	                var subsequentValues = patternInput[0];
-	                var remainingInput = patternInput[1];
-	
-	                var values = _fableCore.List.ofArray([firstValue], subsequentValues);
-	
-	                return [values, remainingInput];
-	            } else {
-	                return [new _fableCore.List(), input];
-	            }
-	        };
-	
-	        var parseXTimes = $exports.parseXTimes = function parseXTimes(count, parser) {
-	            var innerFn = function innerFn(input) {
-	                var innerParse = function innerParse(count_) {
-	                    return function (input_) {
-	                        return function (acc) {
-	                            return count_ === 0 ? new Result("Success", [[_fableCore.List.reverse(acc), input_]]) : function () {
-	                                var matchValue = run(parser, input_);
-	
-	                                if (matchValue.Case === "Success") {
-	                                    var v = matchValue.Fields[0][0];
-	                                    var rest = matchValue.Fields[0][1];
-	                                    return innerParse(count_ - 1)(rest)(_fableCore.List.ofArray([v], acc));
-	                                } else {
-	                                    var label = matchValue.Fields[0][0];
-	                                    var error = matchValue.Fields[0][1];
-	
-	                                    var label_1 = _fableCore.String.fsFormat("Failed to parse \"%s\" %i number of times ")(function (x) {
-	                                        return x;
-	                                    })(label)(count);
-	
-	                                    return new Result("Failure", [[label_1, error]]);
-	                                }
-	                            }();
-	                        };
-	                    };
-	                };
-	
-	                return innerParse(count)(input)(new _fableCore.List());
-	            };
-	
-	            var label = _fableCore.String.fsFormat("Failed to parse \"%s\" %i number of times ")(function (x) {
-	                return x;
-	            })(getLabel(parser))(count);
-	
-	            return new Parser(innerFn, label);
-	        };
-	
-	        var many = $exports.many = function many(parser) {
-	            var label = _fableCore.String.fsFormat("many %s")(function (x) {
-	                return x;
-	            })(getLabel(parser));
-	
-	            var innerFn = function innerFn(input) {
-	                return new Result("Success", [parseZeroOrMore(parser, input)]);
-	            };
-	
-	            return new Parser(innerFn, label);
-	        };
-	
-	        var many1 = $exports.many1 = function many1(p) {
-	            var label = _fableCore.String.fsFormat("many1 %s")(function (x) {
-	                return x;
-	            })(getLabel(p));
-	
-	            return op_LessQmarkGreater()(op_GreaterGreaterEquals(p, function (head) {
-	                return op_GreaterGreaterEquals(many(p), function (tail) {
-	                    return returnP(_fableCore.List.ofArray([head], tail));
-	                });
-	            }))(label);
-	        };
-	
-	        var op_DotGreaterGreater = $exports.op_DotGreaterGreater = function op_DotGreaterGreater(p1, p2) {
-	            return mapP(function (tupledArg) {
-	                var a = tupledArg[0];
-	                var b = tupledArg[1];
-	                return a;
-	            })(op_DotGreaterGreaterDot()(p1)(p2));
-	        };
-	
-	        var op_GreaterGreaterDot = $exports.op_GreaterGreaterDot = function op_GreaterGreaterDot(p1, p2) {
-	            return mapP(function (tupledArg) {
-	                var a = tupledArg[0];
-	                var b = tupledArg[1];
-	                return b;
-	            })(op_DotGreaterGreaterDot()(p1)(p2));
-	        };
-	
-	        var drop = $exports.drop = function drop(p) {
-	            var innerFn = function innerFn(input) {
-	                var matchValue = run(p, input);
-	
-	                if (matchValue.Case === "Failure") {
-	                    var label = matchValue.Fields[0][0];
-	                    var error = matchValue.Fields[0][1];
-	                    return new Result("Failure", [[label, error]]);
-	                } else {
-	                    var rest = matchValue.Fields[0][1];
-	                    return new Result("Success", [[null, rest]]);
-	                }
-	            };
-	
-	            return new Parser(innerFn, "drop");
-	        };
-	
-	        var opt = $exports.opt = function opt(p) {
-	            var label = _fableCore.String.fsFormat("opt %s")(function (x) {
-	                return x;
-	            })(getLabel(p));
-	
-	            var some = op_BarGreaterGreater(p, function (arg0) {
-	                return arg0;
-	            });
-	            var none = returnP();
-	            return op_LessQmarkGreater()(op_LessBarGreater()(some)(none))(label);
-	        };
-	
-	        var charListToStr = $exports.charListToStr = function charListToStr(charList) {
-	            return Array.from(charList).join('');
-	        };
-	
-	        var manyChars = $exports.manyChars = function manyChars(cp) {
-	            return op_BarGreaterGreater(many(cp), function (charList) {
-	                return charListToStr(charList);
-	            });
-	        };
-	
-	        var manyChars1 = $exports.manyChars1 = function manyChars1(cp) {
-	            return op_BarGreaterGreater(many1(cp), function (charList) {
-	                return charListToStr(charList);
-	            });
-	        };
-	
-	        var pint = $exports.pint = function () {
-	            var label = "integer";
-	
-	            var resultToInt = function resultToInt(tupledArg) {
-	                var sign = tupledArg[0];
-	                var digits = tupledArg[1];
-	                var i = Number.parseInt(digits);
-	
-	                if (sign == null) {
-	                    return i;
-	                } else {
-	                    var ch = sign;
-	                    return -i;
-	                }
-	            };
-	
-	            var digits = manyChars1(digitChar);
-	            return op_LessQmarkGreater()(mapP(resultToInt)(op_DotGreaterGreaterDot()(opt(pchar("-")))(digits)))(label);
-	        }();
-	
-	        var pfloat = $exports.pfloat = function () {
-	            var label = "float";
-	
-	            var resultToFloat = function resultToFloat(tupledArg) {
-	                var _arg1 = tupledArg[0];
-	                var digits2 = tupledArg[1];
-	                var sign = _arg1[0][0];
-	                var point = _arg1[1];
-	                var digits1 = _arg1[0][1];
-	                var fl = Number.parseFloat(_fableCore.String.fsFormat("%s.%s")(function (x) {
-	                    return x;
-	                })(digits1)(digits2));
-	
-	                if (sign == null) {
-	                    return fl;
-	                } else {
-	                    var ch = sign;
-	                    return -fl;
-	                }
-	            };
-	
-	            var digits = manyChars1(digitChar);
-	            return op_LessQmarkGreater()(mapP(resultToFloat)(op_DotGreaterGreaterDot()(op_DotGreaterGreaterDot()(op_DotGreaterGreaterDot()(opt(pchar("-")))(digits))(pchar(".")))(digits)))(label);
-	        }();
-	
-	        var sequence = $exports.sequence = function sequence(parserList) {
-	            var cons = function cons(head) {
-	                return function (tail) {
-	                    return _fableCore.List.ofArray([head], tail);
-	                };
-	            };
-	
-	            var consP = function () {
-	                var f = cons;
-	                return function (xP) {
-	                    return function (yP) {
-	                        return lift2(f, xP, yP);
-	                    };
-	                };
-	            }();
-	
-	            if (parserList.tail != null) {
-	                var tail = parserList.tail;
-	                var head = parserList.head;
-	                return consP(head)(sequence(tail));
-	            } else {
-	                return returnP(new _fableCore.List());
-	            }
-	        };
-	
-	        var pStaticStr = $exports.pStaticStr = function pStaticStr(str) {
-	            var label = str;
-	            return op_LessQmarkGreater()(mapP(function (charList) {
-	                return charListToStr(charList);
-	            })(sequence(function (list) {
-	                return _fableCore.List.map(function (charToMatch) {
-	                    return pchar(charToMatch);
-	                }, list);
-	            }(_fableCore.Seq.toList(str)))))(label);
-	        };
-	
-	        var pStringTo = $exports.pStringTo = function pStringTo(endingChar) {
-	            var label = _fableCore.String.fsFormat("string up to char %c")(function (x) {
-	                return x;
-	            })(endingChar);
-	
-	            var ending = pchar(endingChar);
-	
-	            var predicate = function predicate(c) {
-	                return c !== endingChar;
-	            };
-	
-	            var stringParser = mapP(function (charList) {
-	                return charListToStr(charList);
-	            })(many(satisfy(predicate, "string")));
-	            return op_DotGreaterGreater(stringParser, ending);
-	        };
-	
-	        var phexdigit = $exports.phexdigit = function () {
-	            var label = "hexadecimal";
-	
-	            var hexChars = _fableCore.List.concat(_fableCore.List.ofArray([_fableCore.Seq.toList(_fableCore.Seq.rangeChar("a", "f")), _fableCore.Seq.toList(_fableCore.Seq.rangeChar("A", "F")), _fableCore.Seq.toList(_fableCore.Seq.rangeChar("0", "9"))]));
-	
-	            return op_LessQmarkGreater()(anyOf(hexChars))("Expected valid hex digit");
-	        }();
-	
-	        var pguid = $exports.pguid = function () {
-	            var resultToGuid = function resultToGuid(tupledArg) {
-	                var _arg1 = tupledArg[0];
-	                var x3 = tupledArg[1];
-	                var x2 = _arg1[1];
-	                var x1 = _arg1[0];
-	
-	                var guidStr = _fableCore.String.fsFormat("%s-%s-%s-%s-%s")(function (x) {
-	                    return x;
-	                })(x1)(_fableCore.Seq.item(0, x2))(_fableCore.Seq.item(1, x2))(_fableCore.Seq.item(2, x2))(x3);
-	
-	                return guidStr;
-	            };
-	
-	            var parseMiddlePart = mapP(function (charList) {
-	                return charListToStr(charList);
-	            })(op_GreaterGreaterDot(pchar("-"), parseXTimes(4, phexdigit)));
-	            return op_LessQmarkGreater()(mapP(resultToGuid)(op_DotGreaterGreaterDot()(op_DotGreaterGreater(op_DotGreaterGreaterDot()(mapP(function (charList) {
-	                return charListToStr(charList);
-	            })(parseXTimes(8, phexdigit)))(parseXTimes(3, parseMiddlePart)), pchar("-")))(mapP(function (charList) {
-	                return charListToStr(charList);
-	            })(parseXTimes(12, phexdigit)))))("guid");
-	        }();
-	
-	        var op_LessDivideGreater = $exports.op_LessDivideGreater = function op_LessDivideGreater(p1, p2) {
-	            return op_DotGreaterGreaterDot()(op_DotGreaterGreater(p1, pchar("/")))(p2);
-	        };
-	
-	        var op_LessDotDivideGreater = $exports.op_LessDotDivideGreater = function op_LessDotDivideGreater(p1, p2) {
-	            return op_DotGreaterGreater(op_DotGreaterGreater(p1, pchar("/")), p2);
-	        };
-	
-	        var op_LessDivideDotGreater = $exports.op_LessDivideDotGreater = function op_LessDivideDotGreater(p1, p2) {
-	            return op_GreaterGreaterDot(op_GreaterGreaterDot(p1, pchar("/")), p2);
-	        };
-	
-	        var _end = $exports._end = function _end(parser) {
-	            var label = "End of input";
-	
-	            var innerFn = function innerFn(input) {
-	                var matchValue = run(parser, input);
-	
-	                if (matchValue.Case === "Failure") {
-	                    var label_1 = matchValue.Fields[0][0];
-	                    var err = matchValue.Fields[0][1];
-	                    return new Result("Failure", [[label_1, err]]);
-	                } else {
-	                    var x = matchValue.Fields[0][0];
-	                    var rest = matchValue.Fields[0][1];
-	
-	                    if (_fableCore.String.isNullOrEmpty(rest)) {
-	                        return new Result("Success", [[x, rest]]);
-	                    } else {
-	                        return new Result("Failure", [[label, _fableCore.String.fsFormat("Expected rest of input to be empty, got %s")(function (x) {
-	                            return x;
-	                        })(rest)]]);
-	                    }
-	                }
-	            };
-	
-	            return new Parser(innerFn, label);
-	        };
-	
-	        var choose = $exports.choose = function choose(routes, input) {
-	            return _fableCore.Seq.tryPick(function (r) {
-	                var matchValue = r(input);
-	
-	                if (matchValue.Case === "Failure") {
-	                    return null;
-	                } else {
-	                    var x = matchValue.Fields[0];
-	                    return x;
-	                }
-	            }, routes);
-	        };
-	
-	        var runM = $exports.runM = function runM(map, route, str) {
-	            var matchValue = run(route, str);
-	
-	            if (matchValue.Case === "Failure") {
-	                var y = matchValue.Fields[0][1];
-	                var x = matchValue.Fields[0][0];
-	                return new Result("Failure", [[x, y]]);
-	            } else {
-	                return new Result("Success", [map]);
-	            }
-	        };
-	
-	        var runM1 = $exports.runM1 = function runM1(map, route, str) {
-	            var matchValue = run(route, str);
-	
-	            if (matchValue.Case === "Failure") {
-	                var y = matchValue.Fields[0][1];
-	                var x = matchValue.Fields[0][0];
-	                return new Result("Failure", [[x, y]]);
-	            } else {
-	                var x = matchValue.Fields[0][0];
-	                return new Result("Success", [map(x)]);
-	            }
-	        };
-	
-	        var runM2 = $exports.runM2 = function runM2() {
-	            return function (map) {
-	                return function (route) {
-	                    return function (str) {
-	                        return runM1(map, route, str);
-	                    };
-	                };
-	            };
-	        };
-	
-	        var runM3 = $exports.runM3 = function runM3(map, route, str) {
-	            var matchValue = run(route, str);
-	
-	            if (matchValue.Case === "Failure") {
-	                var y = matchValue.Fields[0][1];
-	                var x = matchValue.Fields[0][0];
-	                return new Result("Failure", [[x, y]]);
-	            } else {
-	                var z = matchValue.Fields[0][0][1];
-	                var y = matchValue.Fields[0][0][0][1];
-	                var x = matchValue.Fields[0][0][0][0];
-	                return new Result("Success", [map([x, y, z])]);
-	            }
-	        };
-	
-	        var runM4 = $exports.runM4 = function runM4(map, route, str) {
-	            var matchValue = run(route, str);
-	
-	            if (matchValue.Case === "Failure") {
-	                var y = matchValue.Fields[0][1];
-	                var x = matchValue.Fields[0][0];
-	                return new Result("Failure", [[x, y]]);
-	            } else {
-	                var z = matchValue.Fields[0][0][0][1];
-	                var y = matchValue.Fields[0][0][0][0][1];
-	                var x = matchValue.Fields[0][0][0][0][0];
-	                var v = matchValue.Fields[0][0][1];
-	                return new Result("Success", [map([x, y, z, v])]);
-	            }
-	        };
-	
-	        var runM5 = $exports.runM5 = function runM5(map, route, str) {
-	            var matchValue = run(route, str);
-	
-	            if (matchValue.Case === "Failure") {
-	                var y = matchValue.Fields[0][1];
-	                var x = matchValue.Fields[0][0];
-	                return new Result("Failure", [[x, y]]);
-	            } else {
-	                var z = matchValue.Fields[0][0][0][0][1];
-	                var y = matchValue.Fields[0][0][0][0][0][1];
-	                var x = matchValue.Fields[0][0][0][0][0][0];
-	                var w = matchValue.Fields[0][0][1];
-	                var v = matchValue.Fields[0][0][0][1];
-	                return new Result("Success", [map([x, y, z, v, w])]);
-	            }
-	        };
-	
-	        var runM6 = $exports.runM6 = function runM6(map, route, str) {
-	            var matchValue = run(route, str);
-	
-	            if (matchValue.Case === "Failure") {
-	                var y = matchValue.Fields[0][1];
-	                var x = matchValue.Fields[0][0];
-	                return new Result("Failure", [[x, y]]);
-	            } else {
-	                var z = matchValue.Fields[0][0][0][0][0][1];
-	                var y = matchValue.Fields[0][0][0][0][0][0][1];
-	                var x = matchValue.Fields[0][0][0][0][0][0][0];
-	                var w = matchValue.Fields[0][0][0][1];
-	                var v = matchValue.Fields[0][0][0][0][1];
-	                var u = matchValue.Fields[0][0][1];
-	                return new Result("Success", [map([x, y, z, v, w, u])]);
-	            }
-	        };
-	
-	        return $exports;
-	    }({});
-	
-	    var RouteParser = exports.RouteParser = function ($exports) {
-	        var LocationHandler = $exports.LocationHandler = function LocationHandler(subscribeToChange, pushChange) {
-	            _classCallCheck(this, LocationHandler);
-	
-	            this.SubscribeToChange = subscribeToChange;
-	            this.PushChange = pushChange;
-	        };
-	
-	        _fableCore.Util.setInterfaces(LocationHandler.prototype, ["FSharpRecord"], "Fable.Helpers.RouteParser.LocationHandler");
-	
-	        var Router = $exports.Router = function Router(parse, route) {
-	            _classCallCheck(this, Router);
-	
-	            this.Parse = parse;
-	            this.Route = route;
-	        };
-	
-	        _fableCore.Util.setInterfaces(Router.prototype, ["FSharpRecord"], "Fable.Helpers.RouteParser.Router");
-	
-	        var createRouter = $exports.createRouter = function createRouter(routes, mapRoute) {
-	            return new Router(function (input) {
-	                return Parsing.choose(routes, input);
-	            }, mapRoute);
-	        };
-	
-	        var routeProducer = $exports.routeProducer = function routeProducer(locationHandler, router, handler) {
-	            var changeHandler = function changeHandler(str) {
-	                var matchValue = router.Parse(str);
-	
-	                if (matchValue == null) {} else {
-	                    var route = matchValue;
-	                    handler(route);
-	                }
-	            };
-	
-	            locationHandler.SubscribeToChange(changeHandler);
-	        };
-	
-	        var routeSubscriber = $exports.routeSubscriber = function routeSubscriber(locationHandler, router, message) {
-	            (function (_arg1) {
-	                if (_arg1 == null) {} else {
-	                    var s = _arg1;
-	                    locationHandler.PushChange(s);
-	                }
-	            })(router(message));
-	        };
-	
-	        return $exports;
-	    }({});
-	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
 /***/ }
