@@ -205,6 +205,15 @@ module Attributes =
             |> String.concat " "
             |> Class
 
+    /// Helper to build space separated class with a static part
+    let classBaseList b (list: (string*bool) seq) =
+        list
+            |> Seq.filter (fun (c,cond) -> cond)
+            |> Seq.map (fun (c, cond) -> c)
+            |> String.concat " "
+            |> sprintf "%s %s" b
+            |> Class
+
     let inline boolAttribute name (value: bool) =
         attribute name (string value)
 
