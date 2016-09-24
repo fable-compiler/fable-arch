@@ -194,8 +194,8 @@ module Attributes =
     let inline attribute key value = Attribute.Attribute (key,value)
     let inline property key value = Attribute.Property (key,value)
 
-    /// Class attribute helper
-    let inline Class value = attribute "class" value
+    /// class attribute helper
+    let inline classy value = attribute "class" value
 
     /// Helper to build space separated class
     let inline classList (list: (string*bool) seq) =
@@ -203,7 +203,16 @@ module Attributes =
             |> Seq.filter (fun (c,cond) -> cond)
             |> Seq.map (fun (c, cond) -> c)
             |> String.concat " "
-            |> Class
+            |> classy
+
+    /// Helper to build space separated class with a static part
+    let classBaseList b (list: (string*bool) seq) =
+        list
+            |> Seq.filter (fun (c,cond) -> cond)
+            |> Seq.map (fun (c, cond) -> c)
+            |> String.concat " "
+            |> sprintf "%s %s" b
+            |> classy
 
     let inline boolAttribute name (value: bool) =
         attribute name (string value)
