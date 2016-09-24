@@ -1,6 +1,6 @@
 {
     "module": "amd",
-    "sourceMaps": true,
+    "sourceMaps": false,
     "projFile": "./plugin.fsx",
     "outDir": "out",
     "scripts": {

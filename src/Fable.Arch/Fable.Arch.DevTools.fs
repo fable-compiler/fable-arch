@@ -230,6 +230,7 @@ let devToolsView model =
         sprintf "%s" (x?Case |> string)
 
     let rec renderThing thingName parentId (o:obj) =
+        Browser.window.console.log("Rendering thing: ", thingName, o)
         let thisId = sprintf "%s_%s" parentId thingName
         let collapsed = isCollapsed thisId model
         let extraClass = if collapsed then " collapsed" else ""
@@ -267,24 +268,37 @@ let devToolsView model =
             ]
 
         let renderItem children = 
+            Browser.window.console.log("Rendering item with children: ", (sprintf "%A" children))
             div [attribute "class" (sprintf "item%s" extraClass); attribute "id" thisId]
                 children
 
         let valueOnly typeName value = header thingName false None typeName (value.ToString())
         match o with
         | null -> [valueOnly "" o]
-        | x when x.GetType().Name = "FSharpList" ->
-            let list = listToArray o 
-            renderComplexType "array" ([0 .. ((-) (list?length |> string |> int)) 1] |> List.map string) "FSharpList" list
+        | :? List<obj> as list ->
+            let array = list |> List.toArray 
+            Browser.window.console.log("Render fsharp list")
+            renderComplexType "array" ([0 .. ((-) (array?length |> string |> int)) 1] |> List.map string) "FSharpList" array
         | x when instanceof x JS.Array ->
-            renderComplexType "array" ([0 .. ((-) (o?length |> string |> int)) 1] |> List.map string) (x.GetType().Name) x
+            Browser.window.console.log("Render array: ", x.ToString(), x, (o?length))
+
+            let a = renderComplexType "array" ([0 .. ((-) (o?length |> string |> int)) 1] |> List.map string) (x.GetType().Name) x
+            Browser.window.console.log("Rendered array: ", x.ToString(), x, (o?length))
+            a
         | x when instanceof x JS.Object-> 
+            Browser.window.console.log("Render object")
             renderComplexType "object" (Fable.Import.JS.Object.getOwnPropertyNames(o) |> Seq.toList) (x.GetType().Name) x
         | x when isNumber x -> 
-            [ valueOnly "number" x ]
+            Browser.window.console.log("Render number", x)
+            let a = [ valueOnly "number" x ]
+//            Browser.window.alert("What?")
+            Browser.window.console.log("Rendered number", x)
+            a
         | x when isString x -> 
+            Browser.window.console.log("Render string")
             [ valueOnly "string" x ]
         | x when isBool x -> 
+            Browser.window.console.log("Render bool")
             [ valueOnly "bool" x ]
         | _ -> [ valueOnly "???" o]
         |> renderItem
@@ -338,6 +352,8 @@ let devToolsView model =
 
     let renderAction a = 
         let toggleAction = Some (fun _ -> ToggleAction a.Id)
+        Browser.window.console.log("Action: ", (box (a.Message)), (sprintf "%A" (a.Message)))
+        Browser.window.console.log("State: ", (box (a.State)), (sprintf "%A" (a.State)))
         let content = 
             div []
                 [
