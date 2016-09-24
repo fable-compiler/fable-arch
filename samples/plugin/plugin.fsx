@@ -103,10 +103,16 @@ let nestedView model =
 let resetEveryTenth h =
     window.setInterval((fun _ -> Reset |> h), 10000) |> ignore
 
-let initModel = {Top = 0; Bottom = 0}
-createSimpleApp initModel nestedView nestedUpdate Virtualdom.createRender
-|> withStartNodeSelector "#nested-counter"
-//#if DEV
-|> withPlugin (Fable.Arch.DevTools.createDevTools<NestedAction, NestedModel> "something" initModel)
-//#endif
-|> start
+let makeListener() =
+    EventListenerOrEventListenerObject.Case1(EventListener (fun e -> 
+                    Browser.window.console.log("Starting")
+                    let initModel = {Top = 0; Bottom = 0}
+                    createSimpleApp initModel nestedView nestedUpdate Virtualdom.createRender
+                    |> withStartNodeSelector "#nested-counter"
+                    //#if DEV
+                    |> withPlugin (Fable.Arch.DevTools.createDevTools<NestedAction, NestedModel> "something" initModel)
+                    //#endif
+                    |> start
+                    |> ignore))
+//let listener = new EventListenerObject()
+document.addEventListener("DOMContentLoaded", (makeListener()))

@@ -268,7 +268,6 @@ let devToolsView model =
             ]
 
         let renderItem children = 
-            Browser.window.console.log("Rendering item with children: ", (sprintf "%A" children))
             div [attribute "class" (sprintf "item%s" extraClass); attribute "id" thisId]
                 children
 
