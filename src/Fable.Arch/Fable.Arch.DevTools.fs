@@ -6,6 +6,7 @@ open Fable.Arch.Html
 open Fable.Core
 open Fable.Import
 open System
+
 //open Fable.Import.Browser
 type ActionItem<'TAppMessage, 'TAppModel> = {
     Id: Guid
@@ -38,6 +39,7 @@ let isCollapsed str model =
     |> Option.fold (fun x y -> x || y) false
 
 let devToolsUpdate model action = 
+    log "red" "updating devtools" (sprintf "%A" (model,action))
     let model', messages = 
         match action with
         | Commit ->
@@ -290,7 +292,6 @@ let devToolsView model =
         | x when isNumber x -> 
             Browser.window.console.log("Render number", x)
             let a = [ valueOnly "number" x ]
-//            Browser.window.alert("What?")
             Browser.window.console.log("Rendered number", x)
             a
         | x when isString x -> 
@@ -362,9 +363,10 @@ let devToolsView model =
         row (a.Message |> getMessageTitle) toggleAction a.Excluded content
 
     let toolContent model = 
+        log "red" "toolContent, head" (sprintf "%A" model)
         let baseState = row "BASE" None false (model.LastCommited |> List.head |> renderThing "model" "_base")
-        let actions = 
-            model.Actions |> List.map renderAction
+        let actions = []
+//            model.Actions |> List.map (fun x -> log "red" "toolContent" (sprintf "%A" x); renderAction x)
         div [attribute "class" "action-list"]
             (baseState::actions)
 

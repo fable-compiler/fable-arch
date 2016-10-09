@@ -6,6 +6,9 @@ open System.Diagnostics
 
 open Html
 
+[<Emit("window._log($0, $1, $2);")>]
+let log (color:string) (key:string) (message:string): unit = failwith "JS only"
+
 [<AutoOpen>]
 module Types =
     type Handler<'TMessage> = 'TMessage -> unit

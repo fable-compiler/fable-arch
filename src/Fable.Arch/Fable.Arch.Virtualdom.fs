@@ -53,6 +53,7 @@ type ViewState<'TMessage> =
     }
 
 let rec renderSomething handler node = 
+    Fable.Import.Browser.window.console.log("Rendering something")
     match node with
     | Element((tag,attrs), nodes)
     | Svg((tag,attrs), nodes) -> createTree handler tag attrs (nodes |> List.map (renderSomething handler))

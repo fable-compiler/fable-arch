@@ -2,11 +2,74 @@
 <html>
 <head>
   <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+	<style>
+		#__log {
+			padding: 0;
+			margin: 0;
+			list-style: none;
+			width: 1000px;
+		}
+		#__log .log-item {
+			width: 100%;
+			padding: 10px;
+			background-color: #ababab;
+		}
+		#__log .log-item:nth-child(even) {
+			background-color: #cdcdcd;
+		}
+		#__log .log-item .log-item-key {
+			width: 30%;
+			display: inline-block;
+			vertical-align: top;
+		}
+		#__log .log-item .log-item-value {
+			width: 70%;
+			display: inline-block;
+		}
+
+		#__log .log-item-red {
+			color: red;
+		}
+		#__log .log-item-green {
+			color: green;
+		}
+		#__log .log-item-blue {
+			color: blue;
+		}
+		#__log .log-item-black {
+			color: black;
+		}
+	</style>
+	<script>
+window._log = function(color, keyText, text) {
+    var child = document.createElement('li'); 
+    child.className = 'log-item log-item-'+color; 
+    var key = document.createElement('span'); 
+    key.textContent = keyText; 
+    key.className = "log-item-key";
+    var value = document.createElement('span'); 
+    value.textContent = text; 
+    value.className = "log-item-value";
+    child.appendChild(key); 
+    child.appendChild(value); 
+		var parentElement = document.getElementById('__log');
+		var theFirstChild = parentElement.firstChild;
+		if(theFirstChild) {
+			parentElement.insertBefore(child, theFirstChild);
+		}
+		else {
+	    parentElement.appendChild(child);
+		}
+};
+	</script>
 </head>
 <body class="app-container">
 		<!-- [body] -->
 		<div id="nested-counter"></div>
     <script src="./public/bundle.js"></script>
 		<!-- [/body] -->
+		<ul id="__log">
+
+		</ul>
 </body>
 </html>
