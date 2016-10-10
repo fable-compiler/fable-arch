@@ -4,7 +4,6 @@ open Fable.Core
 open Fable.Core.JsInterop
 open System.Diagnostics
 
-open Fable.Import.Browser
 open Html
 
 [<AutoOpen>]
@@ -29,7 +28,7 @@ module Types =
     type Action<'TMessage> = ('TMessage -> unit) -> unit
 
     type Subscriber<'TMessage, 'TModel> = AppEvent<'TMessage, 'TModel> -> unit
-    type Producer<'TMessage, 'TModel> = (AppMessage<'TMessage, 'TModel> -> unit) -> unit
+    type Producer<'TMessage, 'TModel> = Action<AppMessage<'TMessage, 'TModel>>
     type Plugin<'TMessage, 'TModel> =
         {
             Producer: Producer<'TMessage, 'TModel>
@@ -55,7 +54,7 @@ type AppSpecification<'TModel, 'TMessage, 'TView, 'TViewState> =
         InitState: 'TModel
         View: 'TModel -> 'TView
         Update: 'TModel -> 'TMessage -> ('TModel * Action<'TMessage> list)
-        InitMessage: (('TMessage -> unit) -> unit)
+        InitMessage: Action<'TMessage>
         Renderer: Renderer<'TMessage, 'TView, 'TViewState>
         NodeSelector: Selector
         Producers: Producer<'TMessage, 'TModel> list
@@ -79,7 +78,7 @@ module internal Helpers =
                     let! message = inbox.Receive()
                     match message with
                     | PingIn (milliseconds, cb) ->
-                        window.setTimeout(cb, milliseconds) |> ignore
+                        Fable.Import.Browser.window.setTimeout(cb, milliseconds) |> ignore
                         return! loop()
                 }
             loop()
@@ -173,6 +172,19 @@ module AppApi =
     // Helper functions to map from one action type to another
     let mapAction<'T1,'T2> (mapping:'T1 -> 'T2) (action:Action<'T1>) : Action<'T2> = 
         fun x -> action (mapping >> x)  
+
+    let mapAppMessage map = function
+        | AppMessage.Message msg -> AppMessage.Message (map msg)
+        | Draw -> Draw
+        | Replay (x,messageList) -> Replay (x,messageList |> List.map (fun (id, m) -> id, map m))
+
+    let mapProducer map p = mapAction map p
+
+    let mapSubscriber mapModelChanged mapAction sub = function
+        | ModelChanged mc ->
+            mc |> mapModelChanged |> Option.map ModelChanged |> Option.iter sub
+        | ActionReceived m -> mapAction id m |> Option.map ActionReceived |> Option.iter sub
+        | Replayed lst -> sub (Replayed lst)
 
     let mapActions m = List.map (mapAction m)
     let toActionList a = [a]
