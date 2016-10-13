@@ -1,21 +1,21 @@
 {
-  "name": "fable-arch",
-  "version": "0.9.5",
-  "description": "Fable Arch is a generic version of the elm architecture implemented with Fable in F#.",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/fable-compiler/fable-arch"
-  },
-  "license": "Apache-2.0",
-  "author": "Tomas Jansson",
-  "keywords": [
-    "fable",
-    "fable-compiler",
-    "fsharp",
-    "F#"
-  ],
-  "devDependencies": {
-      "fable-core": "^0.6.3"
-  },
-  "homepage": "https://github.com/fable-compiler/Fable#readme"
+    "name": "fable-arch",
+    "version": "0.9.6",
+    "description": "Fable Arch is a generic version of the elm architecture implemented with Fable in F#.",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/fable-compiler/fable-arch"
+    },
+    "license": "Apache-2.0",
+    "author": "Tomas Jansson",
+    "keywords": [
+        "fable",
+        "fable-compiler",
+        "fsharp",
+        "F#"
+    ],
+    "devDependencies": {
+        "fable-core": "^0.6.3"
+    },
+    "homepage": "https://github.com/fable-compiler/Fable#readme"
 }
