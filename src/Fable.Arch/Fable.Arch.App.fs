@@ -84,24 +84,48 @@ module internal Helpers =
             loop()
         )
 
-    let application handleMessage handleDraw handleReplay configureProducers createInitApp (inbox:MailboxProcessor<AppMessage<'TMessage, 'TModel>>) =
-        let scheduler = createScheduler()
-        let scheduleDraw() = scheduler.Post(PingIn(1000./60., (fun() -> inbox.Post(Draw))))
-        let post msg = inbox.Post(msg)
+    let application<'TMessage, 'TModel, 'TViewState> handleMessage handleDraw handleReplay configureProducers createInitApp =
+        let elem = Fable.Import.Browser.document.createElement("div")
+        let post (msg:AppMessage<'TMessage,'TModel>) = 
+            let eventInit = 
+                { new Fable.Import.Browser.CustomEventInit with
+                    member this.detail 
+                        with get() = Some (box msg)
+                        and set(_) = ()
+                    member this.bubbles
+                        with get() = None
+                        and set(_) = ()
+                    member this.cancelable
+                        with get() = None
+                        and set(_) = ()
+                    }
+            let event = Fable.Import.Browser.CustomEvent.Create("FableArchEvent", eventInit) 
+            elem.dispatchEvent(event) |> ignore
         let postMessage = Message >> post
-        configureProducers post
-        let rec inner state =
-            async {
-                let! msg = inbox.Receive()
-                match msg with
-                | Message message -> 
-                    return! inner (handleMessage scheduleDraw post message state)
+
+        let scheduler = createScheduler()
+        let scheduleDraw() = scheduler.Post(PingIn(1000./60., (fun() -> post Draw)))
+
+        let mutable state = createInitApp postMessage
+
+        let handleEvent (e:Fable.Import.Browser.Event) =
+            let evt = e :?> Fable.Import.Browser.CustomEvent
+            let data = e?detail
+            let state' : App<'TModel, 'TMessage, 'TViewState> = 
+                match (evt.detail :?> (AppMessage<'TMessage, 'TModel>)) with
+                | Message message ->
+                    handleMessage scheduleDraw post message state
                 | Draw -> 
-                    return! inner (handleDraw postMessage state)
+                    handleDraw postMessage state
                 | Replay (model, messages) ->
-                    return! inner (handleReplay postMessage (model, messages) state)
-            }
-        inner (createInitApp postMessage)
+                    handleReplay postMessage (model, messages) state
+            state <- state'
+
+        let eventHandler = Fable.Import.Browser.EventListenerOrEventListenerObject.Case1(new Fable.Import.Browser.EventListener(handleEvent))
+
+        configureProducers post
+        elem.addEventListener("FableArchEvent", eventHandler)
+        post
 
     let render post viewFn renderer app =
         let view = viewFn app.Model
@@ -233,7 +257,7 @@ module AppApi =
         producers |> List.iter (fun p -> p post) 
 
     // Start the application
-    let start appSpec =
+    let start (appSpec:AppSpecification<'TModel, 'TMessage, 'TView, 'TViewState>) =
         let renderer = appSpec.Renderer
         let viewFn = appSpec.View
         let updateFn = appSpec.Update
@@ -254,4 +278,4 @@ module AppApi =
         let handleDraw' = handleDraw viewFn renderer
         let handleReplay' = handleReplay viewFn updateFn renderer appSpec.Subscribers
         let configureProducers' = configureProducers appSpec.Producers
-        MailboxProcessor.Start(application handleMessage' handleDraw' handleReplay' configureProducers' createInitApp)
+        application handleMessage' handleDraw' handleReplay' configureProducers' createInitApp

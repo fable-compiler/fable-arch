@@ -402,7 +402,7 @@ let createDevTools<'TMessage, 'TModel> pluginId initModel=
     {
         Producer = (fun h -> linkAgent.Post(SetHandler h)) 
         Subscriber = (function 
-                        | ModelChanged m -> devToolsAgent.Post(Message (AddMessage (m.Message, m.CurrentState)))
-                        | Replayed modelList -> devToolsAgent.Post(Message (MessagesReplayed modelList))
+                        | ModelChanged m -> devToolsAgent (Message (AddMessage (m.Message, m.CurrentState)))
+                        | Replayed modelList -> devToolsAgent (Message (MessagesReplayed modelList))
                         | _ -> ())
     }
