@@ -60,29 +60,23 @@ let rec renderSomething handler node =
     | Text str -> box(string str)
     | WhiteSpace str -> box(string str)
 
-
 let render handler view viewState =
     let tree = renderSomething handler view
     {viewState with CurrentTree = tree}
 
-let init selector handler view = 
+let createRender selector handler view =
     let node = document.body.querySelector(selector) :?> HTMLElement
     let tree = renderSomething handler view
     let vdomNode = createElement tree
     node.appendChild(vdomNode) |> ignore
-    {
-        CurrentTree = tree
-        Node = vdomNode
-    }    
-
-let render' handler view viewState = 
-    let viewState' = render handler view viewState
-    let patches = diff viewState.CurrentTree viewState'.CurrentTree
-    patch viewState.Node patches |> ignore
-    viewState'
-
-let renderer =
-    {
-        Render = render'
-        Init = init
-    }
+    let mutable viewState = 
+        {
+            CurrentTree = tree
+            Node = vdomNode
+        }
+    let render' handler view = 
+        let viewState' = render handler view viewState
+        let patches = diff viewState.CurrentTree viewState'.CurrentTree
+        patch viewState.Node patches |> ignore
+        viewState <- viewState'
+    render'

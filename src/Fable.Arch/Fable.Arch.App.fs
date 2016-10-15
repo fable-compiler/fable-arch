@@ -8,6 +8,8 @@ open Html
 
 [<AutoOpen>]
 module Types =
+    type Handler<'TMessage> = 'TMessage -> unit
+
     type ModelChanged<'TMessage, 'TModel> = 
         {
             PreviousState: 'TModel
@@ -25,7 +27,7 @@ module Types =
         | Replay of 'TModel*((System.Guid*'TMessage) list)
         | Draw
 
-    type Action<'TMessage> = ('TMessage -> unit) -> unit
+    type Action<'TMessage> = Handler<'TMessage> -> unit
 
     type Subscriber<'TMessage, 'TModel> = AppEvent<'TMessage, 'TModel> -> unit
     type Producer<'TMessage, 'TModel> = Action<AppMessage<'TMessage, 'TModel>>
@@ -40,33 +42,29 @@ module Types =
         | NoRequest
 
 type ScheduleMessage = 
-    | PingIn of float*(unit -> unit)
+    | PingIn of float*Handler<unit>
 
 type Selector = string
-type Renderer<'TMessage, 'TView, 'TViewState> = 
-    {
-        Render: ('TMessage -> unit) -> 'TView -> 'TViewState -> 'TViewState
-        Init: Selector -> ('TMessage -> unit) -> 'TView -> 'TViewState
-    }
 
-type AppSpecification<'TModel, 'TMessage, 'TView, 'TViewState> = 
+type AppSpecification<'TModel, 'TMessage, 'TView> = 
     {
         InitState: 'TModel
         View: 'TModel -> 'TView
         Update: 'TModel -> 'TMessage -> ('TModel * Action<'TMessage> list)
         InitMessage: Action<'TMessage>
-        Renderer: Renderer<'TMessage, 'TView, 'TViewState>
+        CreateRenderer: Selector -> Handler<'TMessage> -> 'TView -> (Handler<'TMessage> -> 'TView -> unit)
         NodeSelector: Selector
         Producers: Producer<'TMessage, 'TModel> list
         Subscribers: Subscriber<'TMessage, 'TModel> list
     }
 
-type App<'TModel, 'TMessage, 'TViewState> =
+type App<'TModel, 'TMessage, 'TView> =
     {
         Model: 'TModel
         Actions: Action<'TMessage> list
-        ViewState: 'TViewState
+//        ViewState: 'TViewState
         RenderState: RenderState
+        Render: Handler<'TMessage> -> 'TView -> unit
     }
 
 [<AutoOpen>]
@@ -127,10 +125,10 @@ module internal Helpers =
         elem.addEventListener("FableArchEvent", eventHandler)
         post
 
-    let render post viewFn renderer app =
+    let render post viewFn app =
         let view = viewFn app.Model
-        let viewState' = renderer.Render post view app.ViewState
-        {app with ViewState = viewState'}
+        app.Render post view
+        app
 
     let executeActions post = List.iter (fun a -> a (Message >> post))
     let notifySubscribers subscribers msg = 
@@ -160,9 +158,9 @@ module internal Helpers =
 
         {app with Model = model; RenderState = renderState}
 
-    let handleDraw viewFn renderer post app = 
-        render post viewFn renderer app
-        |> (fun s -> {s with RenderState = NoRequest})
+    let handleDraw viewFn post app = 
+        render post viewFn app
+        |> (fun app -> {app with RenderState = NoRequest})
 
     let calculateModelChanges initState update actions = 
         let execUpdate r a =
@@ -178,7 +176,7 @@ module internal Helpers =
         actions
         |> List.fold (fun s a -> (execUpdate s a)::s) []
 
-    let handleReplay viewFn updateFn renderer subscribers post (fromModel, actions) app = 
+    let handleReplay viewFn updateFn subscribers post (fromModel, actions) app = 
         let result = calculateModelChanges fromModel updateFn actions
         let model = 
             match result with 
@@ -186,7 +184,7 @@ module internal Helpers =
             | [] -> fromModel
         let app' = 
             {app with Model = model}
-            |> render post viewFn renderer
+            |> render post viewFn
 
         (Replayed result) |> notifySubscribers subscribers
         app'
@@ -214,13 +212,13 @@ module AppApi =
     let toActionList a = [a]
 
     // Starting point for creating an application
-    let createApp state view update renderer =
+    let createApp state view update createRenderer =
         {
             InitState = state
             View = view
             Update = update
             InitMessage = (fun _ -> ())
-            Renderer = renderer
+            CreateRenderer = createRenderer
             NodeSelector = "body"
             Producers = []
             Subscribers = []
@@ -257,25 +255,23 @@ module AppApi =
         producers |> List.iter (fun p -> p post) 
 
     // Start the application
-    let start (appSpec:AppSpecification<'TModel, 'TMessage, 'TView, 'TViewState>) =
-        let renderer = appSpec.Renderer
-        let viewFn = appSpec.View
+    let start (appSpec:AppSpecification<'TModel, 'TMessage, 'TView>) =
+        let viewFn : ('TModel -> 'TView) = appSpec.View
         let updateFn = appSpec.Update
 
         let createInitApp post = 
-            let view = viewFn appSpec.InitState
-            let viewState = renderer.Init appSpec.NodeSelector post view
+            let view : 'TView = viewFn appSpec.InitState
             appSpec.InitMessage post
-            let render = appSpec.Renderer.Render
+            let render = appSpec.CreateRenderer appSpec.NodeSelector post view
 
             {
                 Model = appSpec.InitState
-                ViewState = viewState
+                Render = render
                 RenderState = NoRequest
                 Actions = []
             }
         let handleMessage' = handleMessage updateFn appSpec.Subscribers
-        let handleDraw' = handleDraw viewFn renderer
-        let handleReplay' = handleReplay viewFn updateFn renderer appSpec.Subscribers
+        let handleDraw' = handleDraw viewFn
+        let handleReplay' = handleReplay viewFn updateFn appSpec.Subscribers
         let configureProducers' = configureProducers appSpec.Producers
         application handleMessage' handleDraw' handleReplay' configureProducers' createInitApp

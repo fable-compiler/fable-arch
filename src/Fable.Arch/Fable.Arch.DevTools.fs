@@ -389,7 +389,7 @@ let createDevTools<'TMessage, 'TModel> pluginId initModel=
     )
 
     let devToolsAgent = 
-        createApp {Base = initModel; Actions = []; Collapsed = Map.empty; LastCommited =[initModel]} devToolsView devToolsUpdate Virtualdom.renderer
+        createApp {Base = initModel; Actions = []; Collapsed = Map.empty; LastCommited =[initModel]} devToolsView devToolsUpdate Virtualdom.createRender
         |> withStartNodeSelector "#___devtools"
         |> withInstrumentationSubscriber (
             fun ae -> 
