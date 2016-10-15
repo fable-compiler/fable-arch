@@ -87,22 +87,24 @@ let withNavigation parser urlUpdate app =
 
     let initMessage = mapAction Message app.InitMessage
 
-    let renderer =
-        let render h =
-            app.Renderer.Render (Message >> h) 
-        let init sel h = 
-            app.Renderer.Init sel (Message >> h)
-        {
-            Render = render
-            Init = init
-        }
+    let mapCreateRenderer createRenderer =
+        let mapRenderer renderer = 
+            let renderer' handler view =
+                renderer (Message >> handler) view
+            renderer'
 
+        let createRenderer' sel handler view = 
+            createRenderer sel (Message >> handler) view
+            |> mapRenderer
+        createRenderer'
+
+    let createRenderer = mapCreateRenderer app.CreateRenderer
     {
         InitState = app.InitState
         View = app.View
         Update = update'
         InitMessage = initMessage 
-        Renderer = renderer
+        CreateRenderer = createRenderer
         NodeSelector = app.NodeSelector
         Producers = producers
         Subscribers = subscribers

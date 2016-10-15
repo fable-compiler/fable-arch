@@ -104,7 +104,7 @@ let resetEveryTenth h =
     window.setInterval((fun _ -> Reset |> h), 10000) |> ignore
 
 let initModel = {Top = 0; Bottom = 0}
-createSimpleApp initModel nestedView nestedUpdate Virtualdom.renderer
+createSimpleApp initModel nestedView nestedUpdate Virtualdom.createRender
 |> withStartNodeSelector "#nested-counter"
 //#if DEV
 |> withPlugin (Fable.Arch.DevTools.createDevTools<NestedAction, NestedModel> "something" initModel)

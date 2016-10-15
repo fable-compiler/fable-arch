@@ -61,7 +61,7 @@ let view model =
 // some of the other more advanced examples for how to
 // use createApp. In addition to the application functions
 // we also need to specify which renderer to use.
-createApp initValue view update Virtualdom.renderer
+createApp initValue view update Virtualdom.createRender
 |> withNavigation urlParser urlUpdate
 |> withStartNodeSelector "#hello"
 |> start
