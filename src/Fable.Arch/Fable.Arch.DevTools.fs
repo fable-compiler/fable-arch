@@ -121,7 +121,7 @@ let cssString = """
         margin: 0px;
         padding: 0px;
         margin-left: 0px;
-        overflow-y: scroll;
+        overflow-y: auto;
         height: 100%;
     }
 
