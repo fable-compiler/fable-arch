@@ -7,6 +7,8 @@ open Fable.Core
 open Fable.Import
 open System
 
+let devToolsId = "XXXdevTools"
+
 //open Fable.Import.Browser
 type ActionItem<'TAppMessage, 'TAppModel> = {
     Id: Guid
@@ -81,7 +83,52 @@ let devToolsUpdate model action =
         | Replay _ -> model,[]
 
     model', messages
+let cssString_ = """
+    ._fable_dev_tools {
+        background-color: #2d2a2a;
+        position: fixed;
+        top: 0;
+        right: 0;
+        min-width: 400px;
+        height: 100%;
+        font-family: 'Open Sans', sans-serif;
+        color: #e0e0e0;
+        z-index: 1000;
+    }
+    ._fable_dev_tools ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+    ._fable_dev_tools .actions {
+        margin-bottom: 5px;
+    }
 
+    ._fable_dev_tools .actions li {
+        color: #565656;
+        display: inline-block;
+        width: 90px;
+        text-align:center;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        margin-left: 5px;
+        margin-right: 5px;
+        font-weight: bold;
+    }
+    ._fable_dev_tools .actions li.active {
+        background-color: #565656;
+        color: #e0e0e0;
+        cursor: pointer;
+    }
+
+    ._fable_dev_tools .action-list {
+        margin: 0px;
+        padding: 0px;
+        margin-left: 0px;
+/*        overflow-y: scroll;*/
+        height: 100%;
+    }
+"""
 let cssString = """
     ._fable_dev_tools {
         background-color: #2d2a2a;
@@ -123,8 +170,8 @@ let cssString = """
         margin: 0px;
         padding: 0px;
         margin-left: 0px;
-        overflow-y: scroll;
-        height: 100%;
+        overflow-y: auto;
+        height: 100%
     }
 
     ._fable_dev_tools .action-list .row.excluded .content {
@@ -260,10 +307,13 @@ let devToolsView model =
                 ]                
 
         let renderComplexType t keys typeName o = 
+//            [text "complex type"]
             let length = keys |> List.length
             let itemWord = if t = "object" then "key" else "item"
             let headerText = (sprintf "%s (%i %s) " typeName length (pluralize itemWord length))
             [
+                // text "header"
+                // text "item value"
                 header thingName true (Some (fun _ -> ToggleObjectVisibility thisId)) t headerText
                 div [attribute "class" "item-value"]
                     (renderChildren keys o)
@@ -343,9 +393,7 @@ let devToolsView model =
             
         let inner = 
             (div headerAttributes [text headerText]) ::
-                    match excluded with
-                    | true -> []
-                    | false -> [ div [attribute "class" "content"] [content] ]
+                (if excluded then [] else [ div [attribute "class" "content"] [content] ])
 
         div [attribute "class" rowClass]
             inner
@@ -365,9 +413,11 @@ let devToolsView model =
     let toolContent model = 
         log "red" "toolContent, head" (sprintf "%A" model)
         let baseState = row "BASE" None false (model.LastCommited |> List.head |> renderThing "model" "_base")
-        let actions = []
-//            model.Actions |> List.map (fun x -> log "red" "toolContent" (sprintf "%A" x); renderAction x)
-        div [attribute "class" "action-list"]
+        let actions = 
+//            []
+            model.Actions |> List.map (fun x -> log "red" "toolContent" (sprintf "%A" x); renderAction x)
+        div [attribute "class" "action-list"] 
+//            []
             (baseState::actions)
 
     div [attribute "class" "_fable_dev_tools"]
@@ -388,7 +438,7 @@ type LinkState<'TMessage, 'TModel> =
 
 let createDevTools<'TMessage, 'TModel> pluginId initModel=
     let containerNode = Browser.window.document.createElement("div")
-    containerNode.id <- "___devtools"
+    containerNode.id <- devToolsId
     Browser.window.document.body.appendChild containerNode |> ignore
     
     let linkAgent = MailboxProcessor.Start(fun inbox ->
@@ -405,21 +455,28 @@ let createDevTools<'TMessage, 'TModel> pluginId initModel=
         loop ({Handler = (fun _ -> ())}:LinkState<'TMessage, 'TModel>)
     )
 
+    let post msg = 
+        match msg with
+        | Push m -> ()
+        | SetHandler h -> ()
+
     let devToolsAgent = 
         createApp {Base = initModel; Actions = []; Collapsed = Map.empty; LastCommited =[initModel]} devToolsView devToolsUpdate Virtualdom.createRender
-        |> withStartNodeSelector "#___devtools"
+        |> withStartNodeSelector (sprintf "#%s" devToolsId)
         |> withInstrumentationSubscriber (
             fun ae -> 
                 match ae with
                 | ActionReceived(Replay (s,m)) ->
+//                    post (Push (AppMessage.Replay (s,m)))
                     linkAgent.Post(Push (AppMessage.Replay (s,m)))
                 | _ -> ())
         |> start 
-    
+    let producer h = () //linkAgent.Post(SetHandler h)
+    let subscriber : AppEvent<'TMessage, 'TModel> -> unit = function 
+        | ModelChanged m -> devToolsAgent (Message (AddMessage (m.Message, m.CurrentState)))
+        | Replayed modelList -> devToolsAgent (Message (MessagesReplayed modelList))
+        | _ -> ()
     {
-        Producer = (fun h -> linkAgent.Post(SetHandler h)) 
-        Subscriber = (function 
-                        | ModelChanged m -> devToolsAgent (Message (AddMessage (m.Message, m.CurrentState)))
-                        | Replayed modelList -> devToolsAgent (Message (MessagesReplayed modelList))
-                        | _ -> ())
+        Producer = producer 
+        Subscriber = subscriber
     }
