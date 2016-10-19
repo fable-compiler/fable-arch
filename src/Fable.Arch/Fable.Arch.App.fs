@@ -61,10 +61,10 @@ type AppSpecification<'TModel, 'TMessage, 'TView> =
 type App<'TModel, 'TMessage, 'TView> =
     {
         Model: 'TModel
-        Actions: Action<'TMessage> list
-//        ViewState: 'TViewState
+        Actions: (unit -> unit) list
         RenderState: RenderState
         Render: Handler<'TMessage> -> 'TView -> unit
+        Subscribers: Subscriber<'TMessage, 'TModel> list
     }
 
 [<AutoOpen>]
@@ -101,6 +101,22 @@ module internal Helpers =
             elem.dispatchEvent(event) |> ignore
         let postMessage = Message >> post
 
+        let notifySubs (msg:AppEvent<'TMessage, 'TModel>) = 
+            let eventInit = 
+                { new Fable.Import.Browser.CustomEventInit with
+                    member this.detail 
+                        with get() = Some (box msg)
+                        and set(_) = ()
+                    member this.bubbles
+                        with get() = None
+                        and set(_) = ()
+                    member this.cancelable
+                        with get() = None
+                        and set(_) = ()
+                    }
+            let event = Fable.Import.Browser.CustomEvent.Create("FableArchNotifySubs", eventInit) 
+            elem.dispatchEvent(event) |> ignore
+
         let scheduler = createScheduler()
         let scheduleDraw() = scheduler.Post(PingIn(1000./60., (fun() -> post Draw)))
 
@@ -108,21 +124,28 @@ module internal Helpers =
 
         let handleEvent (e:Fable.Import.Browser.Event) =
             let evt = e :?> Fable.Import.Browser.CustomEvent
-            let data = e?detail
-            let state' : App<'TModel, 'TMessage, 'TViewState> = 
+            let (state', actions)  : App<'TModel, 'TMessage, 'TViewState>*(unit -> unit) list = 
                 match (evt.detail :?> (AppMessage<'TMessage, 'TModel>)) with
                 | Message message ->
-                    handleMessage scheduleDraw post message state
+                    handleMessage scheduleDraw post notifySubs message state
                 | Draw -> 
                     handleDraw postMessage state
                 | Replay (model, messages) ->
-                    handleReplay postMessage (model, messages) state
+                    handleReplay postMessage notifySubs (model, messages) state
             state <- state'
+            actions |> List.iter (fun x -> x())
+
+        let handleNotifyEvent (e:Fable.Import.Browser.Event) =
+            let evt = e :?> Fable.Import.Browser.CustomEvent
+            let detail = evt.detail :?> AppEvent<'TMessage, 'TModel>
+            state.Subscribers |> List.iter (fun s -> s detail)
 
         let eventHandler = Fable.Import.Browser.EventListenerOrEventListenerObject.Case1(new Fable.Import.Browser.EventListener(handleEvent))
+        let notifyEventHandler = Fable.Import.Browser.EventListenerOrEventListenerObject.Case1(new Fable.Import.Browser.EventListener(handleNotifyEvent))
 
         configureProducers post
         elem.addEventListener("FableArchEvent", eventHandler)
+        elem.addEventListener("FableArchNotifySubs", notifyEventHandler)
         post
 
     let render post viewFn app =
@@ -130,9 +153,7 @@ module internal Helpers =
         app.Render post view
         app
 
-    let executeActions post = List.iter (fun a -> a (Message >> post))
-    let notifySubscribers subscribers msg = 
-        subscribers |> List.iter (fun s -> msg |> s)
+    let createActions post = List.map (fun a -> fun () -> a (Message >> post))
 
     let requestDraw scheduleDraw = 
         function
@@ -141,8 +162,8 @@ module internal Helpers =
             InProgress
         | InProgress -> InProgress
     
-    let handleMessage update subscribers scheduleDraw post message app =
-        notifySubscribers subscribers (ActionReceived message)
+    let handleMessage update scheduleDraw post notifySubs message app =
+        notifySubs (ActionReceived message)
         let (model, actions) = update app.Model message
 
         let modelChanged = 
@@ -153,14 +174,14 @@ module internal Helpers =
             }
         let renderState = requestDraw scheduleDraw app.RenderState
         
-        executeActions post actions
-        notifySubscribers subscribers modelChanged
+        let actions = createActions post actions
+//        notifySubs modelChanged
 
-        {app with Model = model; RenderState = renderState}
+        {app with Model = model; RenderState = renderState}, (fun () -> (notifySubs modelChanged))::actions
 
     let handleDraw viewFn post app = 
         render post viewFn app
-        |> (fun app -> {app with RenderState = NoRequest})
+        |> (fun app -> {app with RenderState = NoRequest},[])
 
     let calculateModelChanges initState update actions = 
         let execUpdate r a =
@@ -176,7 +197,7 @@ module internal Helpers =
         actions
         |> List.fold (fun s a -> (execUpdate s a)::s) []
 
-    let handleReplay viewFn updateFn subscribers post (fromModel, actions) app = 
+    let handleReplay viewFn updateFn post notifySubs (fromModel, actions) app = 
         let result = calculateModelChanges fromModel updateFn actions
         let model = 
             match result with 
@@ -185,9 +206,8 @@ module internal Helpers =
         let app' = 
             {app with Model = model}
             |> render post viewFn
-
-        (Replayed result) |> notifySubscribers subscribers
-        app'
+        
+        app', [fun () -> (Replayed result) |> notifySubs]
 
 [<AutoOpen>]
 module AppApi = 
@@ -240,7 +260,7 @@ module AppApi =
         withInstrumentationProducer producer' app
 
     let withInstrumentationSubscriber subscriber app =
-        {app with Subscribers = subscriber::app.Subscribers}
+        {app with AppSpecification.Subscribers = subscriber::app.Subscribers}
     let withSubscriber (subscriber:ModelChanged<'a,'b> -> unit) app = 
         let subscriber' = function 
             | ModelChanged m -> m |> subscriber
@@ -268,10 +288,11 @@ module AppApi =
                 Model = appSpec.InitState
                 Render = render
                 RenderState = NoRequest
+                Subscribers = appSpec.Subscribers
                 Actions = []
-            }
-        let handleMessage' = handleMessage updateFn appSpec.Subscribers
+            } : App<'TModel, 'TMessage, 'TView>
+        let handleMessage' = handleMessage updateFn
         let handleDraw' = handleDraw viewFn
-        let handleReplay' = handleReplay viewFn updateFn appSpec.Subscribers
+        let handleReplay' = handleReplay viewFn updateFn
         let configureProducers' = configureProducers appSpec.Producers
         application handleMessage' handleDraw' handleReplay' configureProducers' createInitApp
