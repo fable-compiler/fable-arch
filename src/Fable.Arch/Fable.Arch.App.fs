@@ -59,67 +59,73 @@ module Types =
         }
 
     let application<'TMessage, 'TModel, 'TView> handleMessage handleReplay configureProducers createInitApp =
-        let elem = Fable.Import.Browser.document.createElement("div")
-        let post (msg:AppMessage<'TMessage,'TModel>) = 
-            let eventInit = 
-                { new Fable.Import.Browser.CustomEventInit with
-                    member this.detail 
-                        with get() = Some (box msg)
-                        and set(_) = ()
-                    member this.bubbles
-                        with get() = None
-                        and set(_) = ()
-                    member this.cancelable
-                        with get() = None
-                        and set(_) = ()
-                    }
-            let event = Fable.Import.Browser.CustomEvent.Create("FableArchEvent", eventInit) 
-            elem.dispatchEvent(event) |> ignore
-        let postMessage = Message >> post
+        let mutable state = None
 
-        let notifySubs (msg:AppEvent<'TMessage, 'TModel>) = 
-            let eventInit = 
-                { new Fable.Import.Browser.CustomEventInit with
-                    member this.detail 
-                        with get() = Some (box msg)
-                        and set(_) = ()
-                    member this.bubbles
-                        with get() = None
-                        and set(_) = ()
-                    member this.cancelable
-                        with get() = None
-                        and set(_) = ()
-                    }
-            let event = Fable.Import.Browser.CustomEvent.Create("FableArchNotifySubs", eventInit) 
-            elem.dispatchEvent(event) |> ignore
+        let notifySubs msg = 
+            match state with
+            | Some s -> 
+                s.Subscribers |> List.iter (fun sub -> sub msg)
+            | None -> ()
 
-        let mutable state = createInitApp postMessage
-
-        let handleEvent (e:Fable.Import.Browser.Event) =
-            let evt = e :?> Fable.Import.Browser.CustomEvent
+        let rec handleEvent evt =
             let (state', actions)  : App<'TModel, 'TMessage, 'TView>*(unit -> unit) list = 
-                match (evt.detail :?> (AppMessage<'TMessage, 'TModel>)) with
+                match evt with
                 | Message message ->
-                    handleMessage post notifySubs message state
-                // | Draw -> 
-                //     handleDraw postMessage state
+                    handleMessage handleEvent notifySubs message (state |> Option.get)
                 | Replay (model, messages) ->
-                    handleReplay post notifySubs (model, messages) state
-            state <- state'
+                    handleReplay handleEvent notifySubs (model, messages) (state |> Option.get)
+            state <- Some state'
             actions |> List.iter (fun x -> x())
 
-        let handleNotifyEvent (e:Fable.Import.Browser.Event) =
-            let evt = e :?> Fable.Import.Browser.CustomEvent
-            let detail = evt.detail :?> AppEvent<'TMessage, 'TModel>
-            state.Subscribers |> List.iter (fun s -> s detail)
+        state <- createInitApp (Message >> handleEvent)
 
-        let eventHandler = Fable.Import.Browser.EventListenerOrEventListenerObject.Case1(new Fable.Import.Browser.EventListener(handleEvent))
-        let notifyEventHandler = Fable.Import.Browser.EventListenerOrEventListenerObject.Case1(new Fable.Import.Browser.EventListener(handleNotifyEvent))
+        // let elem = Fable.Import.Browser.document.createElement("div")
+        // let post (msg:AppMessage<'TMessage,'TModel>) = 
+        //     let eventInit = 
+        //         { new Fable.Import.Browser.CustomEventInit with
+        //             member this.detail 
+        //                 with get() = Some (box msg)
+        //                 and set(_) = ()
+        //             member this.bubbles
+        //                 with get() = None
+        //                 and set(_) = ()
+        //             member this.cancelable
+        //                 with get() = None
+        //                 and set(_) = ()
+        //             }
+        //     let event = Fable.Import.Browser.CustomEvent.Create("FableArchEvent", eventInit) 
+        //     elem.dispatchEvent(event) |> ignore
+        // let postMessage = Message >> post
+        // let mutable state = createInitApp postMessage
 
-        configureProducers post
-        elem.addEventListener("FableArchEvent", eventHandler)
-        elem.addEventListener("FableArchNotifySubs", notifyEventHandler)
-        post
+        // let notifySubs (msg:AppEvent<'TMessage, 'TModel>) = 
+        //     let eventInit = 
+        //         { new Fable.Import.Browser.CustomEventInit with
+        //             member this.detail 
+        //                 with get() = Some (box msg)
+        //                 and set(_) = ()
+        //             member this.bubbles
+        //                 with get() = None
+        //                 and set(_) = ()
+        //             member this.cancelable
+        //                 with get() = None
+        //                 and set(_) = ()
+        //             }
+        //     let event = Fable.Import.Browser.CustomEvent.Create("FableArchNotifySubs", eventInit) 
+        //     elem.dispatchEvent(event) |> ignore
+
+        // let handleNotifyEvent (e:Fable.Import.Browser.Event) =
+        //     let evt = e :?> Fable.Import.Browser.CustomEvent
+        //     let detail = evt.detail :?> AppEvent<'TMessage, 'TModel>
+        //     state.Subscribers |> List.iter (fun s -> s detail)
+
+        // let eventHandler = Fable.Import.Browser.EventListenerOrEventListenerObject.Case1(new Fable.Import.Browser.EventListener(handleEvent))
+        // let notifyEventHandler = Fable.Import.Browser.EventListenerOrEventListenerObject.Case1(new Fable.Import.Browser.EventListener(handleNotifyEvent))
+
+        configureProducers handleEvent
+        // elem.addEventListener("FableArchEvent", eventHandler)
+        // elem.addEventListener("FableArchNotifySubs", notifyEventHandler)
+        // post
 
     let render post viewFn app =
         let view = viewFn app.Model
