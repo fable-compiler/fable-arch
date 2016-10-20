@@ -25,7 +25,6 @@ module Types =
     type AppMessage<'TMessage, 'TModel> =
         | Message of 'TMessage
         | Replay of 'TModel*((System.Guid*'TMessage) list)
-        | Draw
 
     type Action<'TMessage> = Handler<'TMessage> -> unit
 
@@ -37,112 +36,61 @@ module Types =
             Subscriber: Subscriber<'TMessage, 'TModel>
         }
 
-    type RenderState = 
-        | InProgress
-        | NoRequest
+    type Selector = string
 
-type ScheduleMessage = 
-    | PingIn of float*Handler<unit>
+    type AppSpecification<'TModel, 'TMessage, 'TView> = 
+        {
+            InitState: 'TModel
+            View: 'TModel -> 'TView
+            Update: 'TModel -> 'TMessage -> ('TModel * Action<'TMessage> list)
+            InitMessage: Action<'TMessage>
+            CreateRenderer: Selector -> Handler<'TMessage> -> 'TView -> (Handler<'TMessage> -> 'TView -> unit)
+            NodeSelector: Selector
+            Producers: Producer<'TMessage, 'TModel> list
+            Subscribers: Subscriber<'TMessage, 'TModel> list
+        }
 
-type Selector = string
+    type App<'TModel, 'TMessage, 'TView> =
+        {
+            Model: 'TModel
+            Actions: (unit -> unit) list
+            Render: Handler<'TMessage> -> 'TView -> unit
+            Subscribers: Subscriber<'TMessage, 'TModel> list
+        }
 
-type AppSpecification<'TModel, 'TMessage, 'TView> = 
-    {
-        InitState: 'TModel
-        View: 'TModel -> 'TView
-        Update: 'TModel -> 'TMessage -> ('TModel * Action<'TMessage> list)
-        InitMessage: Action<'TMessage>
-        CreateRenderer: Selector -> Handler<'TMessage> -> 'TView -> (Handler<'TMessage> -> 'TView -> unit)
-        NodeSelector: Selector
-        Producers: Producer<'TMessage, 'TModel> list
-        Subscribers: Subscriber<'TMessage, 'TModel> list
-    }
+    let application<'TMessage, 'TModel, 'TView> handleMessage handleReplay configureProducers createInitApp =
+        let mutable state = None
 
-type App<'TModel, 'TMessage, 'TView> =
-    {
-        Model: 'TModel
-        Actions: Action<'TMessage> list
-//        ViewState: 'TViewState
-        RenderState: RenderState
-        Render: Handler<'TMessage> -> 'TView -> unit
-    }
+        let notifySubs msg = 
+            match state with
+            | Some s -> 
+                s.Subscribers |> List.iter (fun sub -> sub msg)
+            | None -> ()
 
-[<AutoOpen>]
-module internal Helpers = 
-    let createScheduler() = 
-        MailboxProcessor.Start(fun inbox ->
-            let rec loop() = 
-                async {
-                    let! message = inbox.Receive()
-                    match message with
-                    | PingIn (milliseconds, cb) ->
-                        Fable.Import.Browser.window.setTimeout(cb, milliseconds) |> ignore
-                        return! loop()
-                }
-            loop()
-        )
-
-    let application<'TMessage, 'TModel, 'TViewState> handleMessage handleDraw handleReplay configureProducers createInitApp =
-        let elem = Fable.Import.Browser.document.createElement("div")
-        let post (msg:AppMessage<'TMessage,'TModel>) = 
-            let eventInit = 
-                { new Fable.Import.Browser.CustomEventInit with
-                    member this.detail 
-                        with get() = Some (box msg)
-                        and set(_) = ()
-                    member this.bubbles
-                        with get() = None
-                        and set(_) = ()
-                    member this.cancelable
-                        with get() = None
-                        and set(_) = ()
-                    }
-            let event = Fable.Import.Browser.CustomEvent.Create("FableArchEvent", eventInit) 
-            elem.dispatchEvent(event) |> ignore
-        let postMessage = Message >> post
-
-        let scheduler = createScheduler()
-        let scheduleDraw() = scheduler.Post(PingIn(1000./60., (fun() -> post Draw)))
-
-        let mutable state = createInitApp postMessage
-
-        let handleEvent (e:Fable.Import.Browser.Event) =
-            let evt = e :?> Fable.Import.Browser.CustomEvent
-            let data = e?detail
-            let state' : App<'TModel, 'TMessage, 'TViewState> = 
-                match (evt.detail :?> (AppMessage<'TMessage, 'TModel>)) with
+        let rec handleEvent (evt:AppMessage<'TMessage, 'TModel>) =
+            let (state', actions)  : App<'TModel, 'TMessage, 'TView>*(unit -> unit) list = 
+                match evt with
                 | Message message ->
-                    handleMessage scheduleDraw post message state
-                | Draw -> 
-                    handleDraw postMessage state
+                    handleMessage handleEvent notifySubs message (state |> Option.get)
                 | Replay (model, messages) ->
-                    handleReplay postMessage (model, messages) state
-            state <- state'
+                    handleReplay handleEvent notifySubs (model, messages) (state |> Option.get)
+            state <- Some state'
+            actions |> List.iter (fun x -> x())
 
-        let eventHandler = Fable.Import.Browser.EventListenerOrEventListenerObject.Case1(new Fable.Import.Browser.EventListener(handleEvent))
+        state <- createInitApp (Message >> handleEvent) |> Some
 
-        configureProducers post
-        elem.addEventListener("FableArchEvent", eventHandler)
-        post
+        configureProducers handleEvent
+        handleEvent
 
     let render post viewFn app =
         let view = viewFn app.Model
-        app.Render post view
+        app.Render (Message >> post) view
         app
 
-    let executeActions post = List.iter (fun a -> a (Message >> post))
-    let notifySubscribers subscribers msg = 
-        subscribers |> List.iter (fun s -> msg |> s)
-
-    let requestDraw scheduleDraw = 
-        function
-        | NoRequest -> 
-            scheduleDraw()
-            InProgress
-        | InProgress -> InProgress
+    let createActions post = List.map (fun a -> fun () -> a (Message >> post))
     
-    let handleMessage update subscribers scheduleDraw post message app =
-        notifySubscribers subscribers (ActionReceived message)
+    let handleMessage update viewFn post notifySubs message app =
+        notifySubs (ActionReceived message)
         let (model, actions) = update app.Model message
 
         let modelChanged = 
@@ -151,16 +99,13 @@ module internal Helpers =
                 PreviousState = app.Model
                 Message = message
             }
-        let renderState = requestDraw scheduleDraw app.RenderState
         
-        executeActions post actions
-        notifySubscribers subscribers modelChanged
+        let actions = createActions post actions
+        let app' = 
+            {app with Model = model}
+            |> render post viewFn
 
-        {app with Model = model; RenderState = renderState}
-
-    let handleDraw viewFn post app = 
-        render post viewFn app
-        |> (fun app -> {app with RenderState = NoRequest})
+        app', (fun () -> (notifySubs modelChanged))::actions
 
     let calculateModelChanges initState update actions = 
         let execUpdate r a =
@@ -176,7 +121,7 @@ module internal Helpers =
         actions
         |> List.fold (fun s a -> (execUpdate s a)::s) []
 
-    let handleReplay viewFn updateFn subscribers post (fromModel, actions) app = 
+    let handleReplay viewFn updateFn post notifySubs (fromModel, actions) app = 
         let result = calculateModelChanges fromModel updateFn actions
         let model = 
             match result with 
@@ -185,9 +130,8 @@ module internal Helpers =
         let app' = 
             {app with Model = model}
             |> render post viewFn
-
-        (Replayed result) |> notifySubscribers subscribers
-        app'
+        
+        app', [fun () -> (Replayed result) |> notifySubs]
 
 [<AutoOpen>]
 module AppApi = 
@@ -197,7 +141,6 @@ module AppApi =
 
     let mapAppMessage map = function
         | AppMessage.Message msg -> AppMessage.Message (map msg)
-        | Draw -> Draw
         | Replay (x,messageList) -> Replay (x,messageList |> List.map (fun (id, m) -> id, map m))
 
     let mapProducer map p = mapAction map p
@@ -240,7 +183,7 @@ module AppApi =
         withInstrumentationProducer producer' app
 
     let withInstrumentationSubscriber subscriber app =
-        {app with Subscribers = subscriber::app.Subscribers}
+        {app with AppSpecification.Subscribers = subscriber::app.Subscribers}
     let withSubscriber (subscriber:ModelChanged<'a,'b> -> unit) app = 
         let subscriber' = function 
             | ModelChanged m -> m |> subscriber
@@ -267,11 +210,10 @@ module AppApi =
             {
                 Model = appSpec.InitState
                 Render = render
-                RenderState = NoRequest
+                Subscribers = appSpec.Subscribers
                 Actions = []
-            }
-        let handleMessage' = handleMessage updateFn appSpec.Subscribers
-        let handleDraw' = handleDraw viewFn
-        let handleReplay' = handleReplay viewFn updateFn appSpec.Subscribers
+            } : App<'TModel, 'TMessage, 'TView>
+        let handleMessage' = handleMessage updateFn viewFn
+        let handleReplay' = handleReplay viewFn updateFn
         let configureProducers' = configureProducers appSpec.Producers
-        application handleMessage' handleDraw' handleReplay' configureProducers' createInitApp
+        application handleMessage' handleReplay' configureProducers' createInitApp

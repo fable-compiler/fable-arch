@@ -16,15 +16,15 @@ type ActionItem<'TAppMessage, 'TAppModel> = {
 type DevToolsModel<'TAppMessage, 'TAppModel> = 
     {
         Base: 'TAppModel
-        LastCommited: 'TAppModel list
+        LastCommited: 'TAppModel option
         Actions: ActionItem<'TAppMessage, 'TAppModel> list
         Collapsed: Map<string,bool>
+        PushToApp: 'TAppModel * ((Guid*'TAppMessage) list) -> unit
     }
 
 type DevToolsMessage<'TAppMessage, 'TAppModel> = 
     | AddMessage of 'TAppMessage * 'TAppModel
     | MessagesReplayed of (Guid*'TAppModel) list
-    | Replay of 'TAppModel * ((Guid*'TAppMessage) list)
     | ToggleObjectVisibility of string
     | ToggleAction of Guid
     | Commit
@@ -42,28 +42,32 @@ let devToolsUpdate model action =
         match action with
         | Commit ->
             let latestCommited = (model.Actions |> List.last).State
-            {model with LastCommited = latestCommited::model.LastCommited; Actions = []}, [fun h -> h (Replay (latestCommited,[]))]
+            {model with LastCommited = Some latestCommited; Actions = []}, [fun h -> model.PushToApp (latestCommited,[])]
         | AddMessage (msg, appModel) ->
             {model with Actions = model.Actions @ [{Id = Guid.NewGuid(); Excluded = false; Message = msg; State = appModel}]},[]
         | MessagesReplayed modelList ->
-            let state = 
-                modelList 
-                |> List.fold (fun s (id, m) -> {s with Actions = (s.Actions |> List.map (fun a -> if a.Id <> id then a else {a with State = m}))}) model
-            state,[]
+            let actions = 
+                modelList
+                |> List.fold (fun s (id, m) -> s |> List.map (fun a -> if a.Id = id then {a with State = m} else a)) model.Actions
+            {model with Actions = actions}, []
         | ToggleObjectVisibility str ->
             let currentValue = isCollapsed str model
             {model with Collapsed = model.Collapsed |> Map.add str (currentValue |> not)},[]
         | ToggleAction id ->
-            let m' = {model with Actions = model.Actions |> List.map (fun i -> if i.Id <> id then i else {i with Excluded = not i.Excluded})}
+            let actions =
+                model.Actions 
+                |> List.map (fun i -> if i.Id = id then {i with Excluded = not i.Excluded} else i)
+            let m' = {model with Actions = actions }
             
-            let actions = 
+            let actionsToReplay = 
                 m'.Actions
                 |> List.filter (fun i -> i.Excluded |> not)
                 |> List.map (fun i -> i.Id, i.Message)
 
+            let currentBase = defaultArg m'.LastCommited m'.Base
             let messages = 
                 [
-                    (fun h -> h (Replay (m'.Base,actions)))
+                    (fun h -> model.PushToApp (currentBase, actionsToReplay))
                 ]
             m', messages
         | Sweep ->
@@ -71,12 +75,12 @@ let devToolsUpdate model action =
             {model with Actions = actions}, []
         | Revert -> 
             match model.LastCommited with
-            | hd::rest -> 
-                {model with Actions = []; LastCommited = model.LastCommited}, [fun h -> h (Replay (hd, []))]
-            | [] -> model,[]
+            | Some m ->
+                {model with Actions = []},[fun h -> model.PushToApp (m,[])]
+            | None ->
+                model,[]
         | Reset -> 
-            {model with Actions = []; LastCommited = [model.Base]}, [fun h -> h (Replay (model.Base, []))]
-        | Replay _ -> model,[]
+            {model with Actions = []; LastCommited = None}, [fun h -> model.PushToApp (model.Base, [])]
 
     model', messages
 
@@ -220,7 +224,6 @@ let [<Emit("(function() {var x = []; $0.mapIndexed(function(idx,item) {x[idx] = 
 let [<Emit("$0 instanceof $1")>] instanceof (x: obj) (t: obj): bool = failwith "JS only"
 
 let devToolsView model =
-
     let pluralize str count = 
         if count <> 1 then sprintf "%s%s" str "s"
         else str
@@ -305,7 +308,7 @@ let devToolsView model =
 
         let excluded = actions |> List.exists (fun i -> i.Excluded)
         let anyNotExcluded = actions |> List.exists (fun i -> not i.Excluded)
-        let isCommited = (model.LastCommited |> List.length) > 1
+        let isCommited = model.LastCommited |> Option.isSome
         let anyActions = actions |> List.isEmpty |> not
 
         header [attribute "class" "actions"]
@@ -313,7 +316,7 @@ let devToolsView model =
                 ul []
                     [
                         headerAction "Reset" (if anyActions || isCommited then Some Reset else None)
-                        headerAction "Revert" (if isCommited then Some Revert else None)
+                        headerAction "Revert" (if isCommited && anyActions then Some Revert else None)
                         headerAction "Sweep" (if excluded then Some Sweep else None)
                         headerAction "Commit" (if anyNotExcluded then Some Commit else None)
                     ]
@@ -347,7 +350,8 @@ let devToolsView model =
         row (a.Message |> getMessageTitle) toggleAction a.Excluded content
 
     let toolContent model = 
-        let baseState = row "BASE" None false (model.LastCommited |> List.head |> renderThing "model" "_base")
+        let currentBase = defaultArg model.LastCommited model.Base
+        let baseState = row "BASE" None false (currentBase |> renderThing "model" "_base")
         let actions = 
             model.Actions |> List.map renderAction
         div [attribute "class" "action-list"]
@@ -389,14 +393,16 @@ let createDevTools<'TMessage, 'TModel> pluginId initModel=
     )
 
     let devToolsAgent = 
-        createApp {Base = initModel; Actions = []; Collapsed = Map.empty; LastCommited =[initModel]} devToolsView devToolsUpdate Virtualdom.createRender
+        let initModel = 
+            {
+                Base = initModel
+                Actions = []
+                Collapsed = Map.empty
+                LastCommited = None
+                PushToApp = (fun m -> linkAgent.Post (Push (AppMessage.Replay m)))
+            }
+        createApp initModel devToolsView devToolsUpdate Virtualdom.createRender
         |> withStartNodeSelector "#___devtools"
-        |> withInstrumentationSubscriber (
-            fun ae -> 
-                match ae with
-                | ActionReceived(Replay (s,m)) ->
-                    linkAgent.Post(Push (AppMessage.Replay (s,m)))
-                | _ -> ())
         |> start 
     
     {
