@@ -30,9 +30,9 @@
       window.addEventListener("load", init, false);
     </script>
     
-  <title>Plugin - F# |> BABEL</title>
+  <title>Devtools - F# |> BABEL</title>
   
-  <meta name="description" content="Nesting application implemented with fable-arch and a plugin attached">
+  <meta name="description" content="Devtools demo">
 
 </head>
 <body>
@@ -69,8 +69,8 @@
 <div class="container">
   <div class="row">
     <div class="col-sm-12">
-      <h1>Plugin</h1>
-      <p>Nesting application implemented with fable-arch and a plugin attached (<a href="https://github.com/fable-compiler/fable-arch/tree/master/samples/plugin">go to source</a>)</p>
+      <h1>Devtools</h1>
+      <p>Devtools demo (<a href="https://github.com/fable-compiler/fable-arch/tree/master/samples/plugin">go to source</a>)</p>
     </div>
   </div>
 </div>
@@ -99,56 +99,19 @@
   <div class="row">
     <div class="col-md-1 col-lg-2"></div>
     <div class="col-sm-12 col-md-10 col-lg-8">
-      <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
-<span class="l"> 2: </span>
-<span class="l"> 3: </span>
-<span class="l"> 4: </span>
-<span class="l"> 5: </span>
-<span class="l"> 6: </span>
-<span class="l"> 7: </span>
-<span class="l"> 8: </span>
-<span class="l"> 9: </span>
-<span class="l">10: </span>
-<span class="l">11: </span>
-<span class="l">12: </span>
-<span class="l">13: </span>
-<span class="l">14: </span>
-<span class="l">15: </span>
-<span class="l">16: </span>
-<span class="l">17: </span>
-<span class="l">18: </span>
-<span class="l">19: </span>
-<span class="l">20: </span>
-<span class="l">21: </span>
-<span class="l">22: </span>
+      <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+<span class="l">3: </span>
+<span class="l">4: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="prep">#r</span> <span class="s">&quot;node_modules/fable-core/Fable.Core.dll&quot;</span>
 <span class="prep">#load</span> <span class="s">&quot;node_modules/fable-arch/Fable.Arch.Html.fs&quot;</span>
 <span class="prep">#load</span> <span class="s">&quot;node_modules/fable-arch/Fable.Arch.App.fs&quot;</span>
 <span class="prep">#load</span> <span class="s">&quot;node_modules/fable-arch/Fable.Arch.Virtualdom.fs&quot;</span>
-<span class="c">//#if DEV</span>
-<span class="prep">#load</span> <span class="s">&quot;node_modules/fable-arch/Fable.Arch.DevTools.fs&quot;</span>
-<span class="c">//#endif</span>
-<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 1)" onmouseover="showTip(event, 'fs1', 1)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs2', 2)" onmouseover="showTip(event, 'fs2', 2)" class="i">Core</span>
-<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 3)" onmouseover="showTip(event, 'fs1', 3)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs3', 4)" onmouseover="showTip(event, 'fs3', 4)" class="i">Import</span>
-<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 5)" onmouseover="showTip(event, 'fs1', 5)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs3', 6)" onmouseover="showTip(event, 'fs3', 6)" class="i">Import</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs4', 7)" onmouseover="showTip(event, 'fs4', 7)" class="i">Browser</span>
-
-<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 8)" onmouseover="showTip(event, 'fs1', 8)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 9)" onmouseover="showTip(event, 'fs5', 9)" class="i">Arch</span>
-<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 10)" onmouseover="showTip(event, 'fs1', 10)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 11)" onmouseover="showTip(event, 'fs5', 11)" class="i">Arch</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs6', 12)" onmouseover="showTip(event, 'fs6', 12)" class="i">App</span>
-<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 13)" onmouseover="showTip(event, 'fs1', 13)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 14)" onmouseover="showTip(event, 'fs5', 14)" class="i">Arch</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 15)" onmouseover="showTip(event, 'fs7', 15)" class="i">Html</span>
-
-<span class="prep">#if</span> <span class="i">DEV</span>
-<span class="inactive">open</span><span class="inactive"> </span><span class="inactive">Fable.Arch.DevTools</span>
-<span class="prep">#endif</span>
-
-<span class="c">// model</span>
-<span class="k">type</span> <span onmouseout="hideTip(event, 'fs8', 16)" onmouseover="showTip(event, 'fs8', 16)" class="t">Counter</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs9', 17)" onmouseover="showTip(event, 'fs9', 17)" class="t">int</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs10', 18)" onmouseover="showTip(event, 'fs10', 18)" class="i">initCounter</span> <span class="o">=</span> <span class="n">0</span>
 </code></pre></td>
 </tr>
 </table>
-<p>The model for the first example is a simple integer that will act as hour counter.
-We also provide a default value for our counter.</p>
+<p>First we need to add the source of the devtools in order be able to use it.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l"> 1: </span>
 <span class="l"> 2: </span>
 <span class="l"> 3: </span>
@@ -227,8 +190,38 @@ We also provide a default value for our counter.</p>
 <span class="l">76: </span>
 <span class="l">77: </span>
 <span class="l">78: </span>
+<span class="l">79: </span>
+<span class="l">80: </span>
+<span class="l">81: </span>
+<span class="l">82: </span>
+<span class="l">83: </span>
+<span class="l">84: </span>
+<span class="l">85: </span>
+<span class="l">86: </span>
+<span class="l">87: </span>
+<span class="l">88: </span>
+<span class="l">89: </span>
+<span class="l">90: </span>
+<span class="l">91: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// Update</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="prep">#load</span> <span class="s">&quot;node_modules/fable-arch/Fable.Arch.DevTools.fs&quot;</span>
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 1)" onmouseover="showTip(event, 'fs1', 1)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs2', 2)" onmouseover="showTip(event, 'fs2', 2)" class="i">Core</span>
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 3)" onmouseover="showTip(event, 'fs1', 3)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs3', 4)" onmouseover="showTip(event, 'fs3', 4)" class="i">Import</span>
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 5)" onmouseover="showTip(event, 'fs1', 5)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs3', 6)" onmouseover="showTip(event, 'fs3', 6)" class="i">Import</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs4', 7)" onmouseover="showTip(event, 'fs4', 7)" class="i">Browser</span>
+
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 8)" onmouseover="showTip(event, 'fs1', 8)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 9)" onmouseover="showTip(event, 'fs5', 9)" class="i">Arch</span>
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 10)" onmouseover="showTip(event, 'fs1', 10)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 11)" onmouseover="showTip(event, 'fs5', 11)" class="i">Arch</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs6', 12)" onmouseover="showTip(event, 'fs6', 12)" class="i">App</span>
+<span class="k">open</span> <span onmouseout="hideTip(event, 'fs1', 13)" onmouseover="showTip(event, 'fs1', 13)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 14)" onmouseover="showTip(event, 'fs5', 14)" class="i">Arch</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs7', 15)" onmouseover="showTip(event, 'fs7', 15)" class="i">Html</span>
+
+<span class="prep">#if</span> <span class="i">DEV</span>
+<span class="inactive">open</span><span class="inactive"> </span><span class="inactive">Fable.Arch.DevTools</span>
+<span class="prep">#endif</span>
+
+<span class="c">// model</span>
+<span class="k">type</span> <span onmouseout="hideTip(event, 'fs8', 16)" onmouseover="showTip(event, 'fs8', 16)" class="t">Counter</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs9', 17)" onmouseover="showTip(event, 'fs9', 17)" class="t">int</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs10', 18)" onmouseover="showTip(event, 'fs10', 18)" class="i">initCounter</span> <span class="o">=</span> <span class="n">0</span>
+
+<span class="c">// Update</span>
 <span class="k">type</span> <span onmouseout="hideTip(event, 'fs11', 19)" onmouseover="showTip(event, 'fs11', 19)" class="t">CounterAction</span> <span class="o">=</span>
     | <span onmouseout="hideTip(event, 'fs12', 20)" onmouseover="showTip(event, 'fs12', 20)" class="p">Decrement</span> <span class="k">of</span> <span onmouseout="hideTip(event, 'fs9', 21)" onmouseover="showTip(event, 'fs9', 21)" class="t">int</span>
     | <span onmouseout="hideTip(event, 'fs13', 22)" onmouseover="showTip(event, 'fs13', 22)" class="p">Increment</span> <span class="k">of</span> <span onmouseout="hideTip(event, 'fs9', 23)" onmouseover="showTip(event, 'fs9', 23)" class="t">int</span>
@@ -300,11 +293,16 @@ We also provide a default value for our counter.</p>
     <span onmouseout="hideTip(event, 'fs50', 147)" onmouseover="showTip(event, 'fs50', 147)" class="i">window</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs51', 148)" onmouseover="showTip(event, 'fs51', 148)" class="f">setInterval</span>((<span class="k">fun</span> _ <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs37', 149)" onmouseover="showTip(event, 'fs37', 149)" class="p">Reset</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs49', 150)" onmouseover="showTip(event, 'fs49', 150)" class="f">h</span>), <span class="n">10000</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs52', 151)" onmouseover="showTip(event, 'fs52', 151)" class="f">ignore</span>
 
 <span class="k">let</span> <span onmouseout="hideTip(event, 'fs53', 152)" onmouseover="showTip(event, 'fs53', 152)" class="i">initModel</span> <span class="o">=</span> {<span onmouseout="hideTip(event, 'fs38', 153)" onmouseover="showTip(event, 'fs38', 153)" class="i">Top</span> <span class="o">=</span> <span class="n">0</span>; <span onmouseout="hideTip(event, 'fs39', 154)" onmouseover="showTip(event, 'fs39', 154)" class="i">Bottom</span> <span class="o">=</span> <span class="n">0</span>}
-<span onmouseout="hideTip(event, 'fs54', 155)" onmouseover="showTip(event, 'fs54', 155)" class="f">createSimpleApp</span> <span onmouseout="hideTip(event, 'fs53', 156)" onmouseover="showTip(event, 'fs53', 156)" class="i">initModel</span> <span onmouseout="hideTip(event, 'fs45', 157)" onmouseover="showTip(event, 'fs45', 157)" class="f">nestedView</span> <span onmouseout="hideTip(event, 'fs40', 158)" onmouseover="showTip(event, 'fs40', 158)" class="f">nestedUpdate</span> <span onmouseout="hideTip(event, 'fs55', 159)" onmouseover="showTip(event, 'fs55', 159)" class="t">Virtualdom</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs56', 160)" onmouseover="showTip(event, 'fs56', 160)" class="i">renderer</span>
+<span onmouseout="hideTip(event, 'fs54', 155)" onmouseover="showTip(event, 'fs54', 155)" class="f">createSimpleApp</span> <span onmouseout="hideTip(event, 'fs53', 156)" onmouseover="showTip(event, 'fs53', 156)" class="i">initModel</span> <span onmouseout="hideTip(event, 'fs45', 157)" onmouseover="showTip(event, 'fs45', 157)" class="f">nestedView</span> <span onmouseout="hideTip(event, 'fs40', 158)" onmouseover="showTip(event, 'fs40', 158)" class="f">nestedUpdate</span> <span onmouseout="hideTip(event, 'fs55', 159)" onmouseover="showTip(event, 'fs55', 159)" class="t">Virtualdom</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs56', 160)" onmouseover="showTip(event, 'fs56', 160)" class="f">createRender</span>
 <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs57', 161)" onmouseover="showTip(event, 'fs57', 161)" class="f">withStartNodeSelector</span> <span class="s">&quot;#nested-counter&quot;</span>
-<span class="c">//#if DEV</span>
-<span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs58', 162)" onmouseover="showTip(event, 'fs58', 162)" class="f">withPlugin</span> (<span onmouseout="hideTip(event, 'fs1', 163)" onmouseover="showTip(event, 'fs1', 163)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 164)" onmouseover="showTip(event, 'fs5', 164)" class="i">Arch</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs59', 165)" onmouseover="showTip(event, 'fs59', 165)" class="t">DevTools</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs60', 166)" onmouseover="showTip(event, 'fs60', 166)" class="f">createDevTools</span><span class="o">&lt;</span><span onmouseout="hideTip(event, 'fs36', 167)" onmouseover="showTip(event, 'fs36', 167)" class="t">NestedAction</span>, <span onmouseout="hideTip(event, 'fs33', 168)" onmouseover="showTip(event, 'fs33', 168)" class="t">NestedModel</span><span class="o">&gt;</span> <span class="s">&quot;something&quot;</span> <span onmouseout="hideTip(event, 'fs53', 169)" onmouseover="showTip(event, 'fs53', 169)" class="i">initModel</span>)
-<span class="c">//#endif</span>
+</code></pre></td>
+</tr>
+</table>
+<p>To enable the devtools all we need is this line.</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+<span class="l">2: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs58', 162)" onmouseover="showTip(event, 'fs58', 162)" class="f">withPlugin</span> (<span onmouseout="hideTip(event, 'fs1', 163)" onmouseover="showTip(event, 'fs1', 163)" class="i">Fable</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs5', 164)" onmouseover="showTip(event, 'fs5', 164)" class="i">Arch</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs59', 165)" onmouseover="showTip(event, 'fs59', 165)" class="t">DevTools</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs60', 166)" onmouseover="showTip(event, 'fs60', 166)" class="f">createDevTools</span><span class="o">&lt;</span><span onmouseout="hideTip(event, 'fs36', 167)" onmouseover="showTip(event, 'fs36', 167)" class="t">NestedAction</span>, <span onmouseout="hideTip(event, 'fs33', 168)" onmouseover="showTip(event, 'fs33', 168)" class="t">NestedModel</span><span class="o">&gt;</span> <span class="s">&quot;something&quot;</span> <span onmouseout="hideTip(event, 'fs53', 169)" onmouseover="showTip(event, 'fs53', 169)" class="i">initModel</span>)
 <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs61', 170)" onmouseover="showTip(event, 'fs61', 170)" class="f">start</span>
 </code></pre></td>
 </tr>
@@ -364,14 +362,14 @@ We also provide a default value for our counter.</p>
 <div class="tip" id="fs51">abstract member WindowTimers.setInterval : handler:obj * ?timeout:obj * [&lt;System.ParamArray&gt;] args:obj [] -&gt; float</div>
 <div class="tip" id="fs52">val ignore : value:&#39;T -&gt; unit<br /><br />Full name: Microsoft.FSharp.Core.Operators.ignore</div>
 <div class="tip" id="fs53">val initModel : NestedModel<br /><br />Full name: Plugin.initModel</div>
-<div class="tip" id="fs54">val createSimpleApp : model:&#39;a -&gt; view:(&#39;a -&gt; &#39;b) -&gt; update:(&#39;a -&gt; &#39;c -&gt; &#39;a) -&gt; (Renderer&lt;&#39;c,&#39;b,&#39;d&gt; -&gt; AppSpecification&lt;&#39;a,&#39;c,&#39;b,&#39;d&gt;)<br /><br />Full name: Fable.Arch.App.AppApi.createSimpleApp</div>
+<div class="tip" id="fs54">val createSimpleApp : model:&#39;a -&gt; view:(&#39;a -&gt; &#39;b) -&gt; update:(&#39;a -&gt; &#39;c -&gt; &#39;a) -&gt; ((Selector -&gt; Handler&lt;&#39;c&gt; -&gt; &#39;b -&gt; Handler&lt;&#39;c&gt; -&gt; &#39;b -&gt; unit) -&gt; AppSpecification&lt;&#39;a,&#39;c,&#39;b&gt;)<br /><br />Full name: Fable.Arch.App.AppApi.createSimpleApp</div>
 <div class="tip" id="fs55">module Virtualdom<br /><br />from Fable.Arch</div>
-<div class="tip" id="fs56">val renderer : Renderer&lt;&#39;a,DomNode&lt;&#39;a&gt;,Virtualdom.ViewState&lt;&#39;b&gt;&gt;<br /><br />Full name: Fable.Arch.Virtualdom.renderer</div>
-<div class="tip" id="fs57">val withStartNodeSelector : selector:Selector -&gt; app:AppSpecification&lt;&#39;a,&#39;b,&#39;c,&#39;d&gt; -&gt; AppSpecification&lt;&#39;a,&#39;b,&#39;c,&#39;d&gt;<br /><br />Full name: Fable.Arch.App.AppApi.withStartNodeSelector</div>
-<div class="tip" id="fs58">val withPlugin : plugin:Plugin&lt;&#39;a,&#39;b&gt; -&gt; (AppSpecification&lt;&#39;b,&#39;a,&#39;c,&#39;d&gt; -&gt; AppSpecification&lt;&#39;b,&#39;a,&#39;c,&#39;d&gt;)<br /><br />Full name: Fable.Arch.App.AppApi.withPlugin</div>
+<div class="tip" id="fs56">val createRender : selector:string -&gt; handler:(&#39;a -&gt; unit) -&gt; view:DomNode&lt;&#39;a&gt; -&gt; ((&#39;b -&gt; unit) -&gt; DomNode&lt;&#39;b&gt; -&gt; unit)<br /><br />Full name: Fable.Arch.Virtualdom.createRender</div>
+<div class="tip" id="fs57">val withStartNodeSelector : selector:Selector -&gt; app:AppSpecification&lt;&#39;a,&#39;b,&#39;c&gt; -&gt; AppSpecification&lt;&#39;a,&#39;b,&#39;c&gt;<br /><br />Full name: Fable.Arch.App.AppApi.withStartNodeSelector</div>
+<div class="tip" id="fs58">val withPlugin : plugin:Plugin&lt;&#39;a,&#39;b&gt; -&gt; (AppSpecification&lt;&#39;b,&#39;a,&#39;c&gt; -&gt; AppSpecification&lt;&#39;b,&#39;a,&#39;c&gt;)<br /><br />Full name: Fable.Arch.App.AppApi.withPlugin</div>
 <div class="tip" id="fs59">module DevTools<br /><br />from Fable.Arch</div>
 <div class="tip" id="fs60">val createDevTools : pluginId:obj -&gt; initModel:&#39;TModel -&gt; Plugin&lt;&#39;TMessage,&#39;TModel&gt;<br /><br />Full name: Fable.Arch.DevTools.createDevTools</div>
-<div class="tip" id="fs61">val start : appSpec:AppSpecification&lt;&#39;a,&#39;b,&#39;c,&#39;d&gt; -&gt; MailboxProcessor&lt;AppMessage&lt;&#39;b,&#39;a&gt;&gt;<br /><br />Full name: Fable.Arch.App.AppApi.start</div>
+<div class="tip" id="fs61">val start : appSpec:AppSpecification&lt;&#39;TModel,&#39;TMessage,&#39;TView&gt; -&gt; (AppMessage&lt;&#39;TMessage,&#39;TModel&gt; -&gt; unit)<br /><br />Full name: Fable.Arch.App.AppApi.start</div>
 
     </div>
     <div class="col-md-1 col-lg-2"></div>

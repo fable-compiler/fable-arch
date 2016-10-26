@@ -44,205 +44,166 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1), __webpack_require__(2), __webpack_require__(3), __webpack_require__(4)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore, _FableArch, _FableArch2, _FableArch3) {
-	  "use strict";
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1), __webpack_require__(2), __webpack_require__(4), __webpack_require__(3), __webpack_require__(5)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore, _FableArch, _FableArch2, _FableArch3, _FableArch4) {
+	    "use strict";
 	
-	  Object.defineProperty(exports, "__esModule", {
-	    value: true
-	  });
-	  exports.Actions = exports.Model = exports.Status = undefined;
-	  exports.fakeAjax = fakeAjax;
-	  exports.update = update;
-	  exports.view = view;
+	    Object.defineProperty(exports, "__esModule", {
+	        value: true
+	    });
+	    exports.Actions = exports.initValue = undefined;
+	    exports.toUrl = toUrl;
+	    exports.fromUrl = fromUrl;
+	    exports.urlParser = urlParser;
+	    exports.update = update;
+	    exports.urlUpdate = urlUpdate;
+	    exports.view = view;
 	
-	  function _classCallCheck(instance, Constructor) {
-	    if (!(instance instanceof Constructor)) {
-	      throw new TypeError("Cannot call a class as a function");
-	    }
-	  }
-	
-	  var _createClass = function () {
-	    function defineProperties(target, props) {
-	      for (var i = 0; i < props.length; i++) {
-	        var descriptor = props[i];
-	        descriptor.enumerable = descriptor.enumerable || false;
-	        descriptor.configurable = true;
-	        if ("value" in descriptor) descriptor.writable = true;
-	        Object.defineProperty(target, descriptor.key, descriptor);
-	      }
+	    function _classCallCheck(instance, Constructor) {
+	        if (!(instance instanceof Constructor)) {
+	            throw new TypeError("Cannot call a class as a function");
+	        }
 	    }
 	
-	    return function (Constructor, protoProps, staticProps) {
-	      if (protoProps) defineProperties(Constructor.prototype, protoProps);
-	      if (staticProps) defineProperties(Constructor, staticProps);
-	      return Constructor;
-	    };
-	  }();
+	    var _createClass = function () {
+	        function defineProperties(target, props) {
+	            for (var i = 0; i < props.length; i++) {
+	                var descriptor = props[i];
+	                descriptor.enumerable = descriptor.enumerable || false;
+	                descriptor.configurable = true;
+	                if ("value" in descriptor) descriptor.writable = true;
+	                Object.defineProperty(target, descriptor.key, descriptor);
+	            }
+	        }
 	
-	  function fakeAjax(cb, data) {
-	    window.setTimeout(function (_arg1) {
-	      return cb(data.toLocaleUpperCase());
-	    }, 1500);
-	  }
+	        return function (Constructor, protoProps, staticProps) {
+	            if (protoProps) defineProperties(Constructor.prototype, protoProps);
+	            if (staticProps) defineProperties(Constructor, staticProps);
+	            return Constructor;
+	        };
+	    }();
 	
-	  var Status = exports.Status = function () {
-	    function Status(caseName, fields) {
-	      _classCallCheck(this, Status);
-	
-	      this.Case = caseName;
-	      this.Fields = fields;
+	    function toUrl(count) {
+	        return _fableCore.String.fsFormat("#/%i")(function (x) {
+	            return x;
+	        })(count);
 	    }
 	
-	    _createClass(Status, [{
-	      key: "Equals",
-	      value: function Equals(other) {
-	        return _fableCore.Util.equalsUnions(this, other);
-	      }
-	    }, {
-	      key: "CompareTo",
-	      value: function CompareTo(other) {
-	        return _fableCore.Util.compareUnions(this, other);
-	      }
-	    }]);
-	
-	    return Status;
-	  }();
-	
-	  _fableCore.Util.setInterfaces(Status.prototype, ["FSharpUnion", "System.IEquatable", "System.IComparable"], "Echo.Status");
-	
-	  var Model = exports.Model = function () {
-	    function Model(inputValue, serverResponse, status) {
-	      _classCallCheck(this, Model);
-	
-	      this.InputValue = inputValue;
-	      this.ServerResponse = serverResponse;
-	      this.Status = status;
+	    function fromUrl(url) {
+	        return Number.parseInt(url.substr(2));
 	    }
 	
-	    _createClass(Model, [{
-	      key: "Equals",
-	      value: function Equals(other) {
-	        return _fableCore.Util.equalsRecords(this, other);
-	      }
-	    }, {
-	      key: "CompareTo",
-	      value: function CompareTo(other) {
-	        return _fableCore.Util.compareRecords(this, other);
-	      }
-	    }], [{
-	      key: "Init",
-	      get: function get() {
-	        return new Model("", "", new Status("None", []));
-	      }
-	    }]);
-	
-	    return Model;
-	  }();
-	
-	  _fableCore.Util.setInterfaces(Model.prototype, ["FSharpRecord", "System.IEquatable", "System.IComparable"], "Echo.Model");
-	
-	  var Actions = exports.Actions = function () {
-	    function Actions(caseName, fields) {
-	      _classCallCheck(this, Actions);
-	
-	      this.Case = caseName;
-	      this.Fields = fields;
+	    function urlParser(location) {
+	        return fromUrl(location.Hash);
 	    }
 	
-	    _createClass(Actions, [{
-	      key: "Equals",
-	      value: function Equals(other) {
-	        return _fableCore.Util.equalsUnions(this, other);
-	      }
-	    }, {
-	      key: "CompareTo",
-	      value: function CompareTo(other) {
-	        return _fableCore.Util.compareUnions(this, other);
-	      }
-	    }]);
+	    var initValue = exports.initValue = urlParser(_FableArch.Location.getLocation());
 	
-	    return Actions;
-	  }();
+	    var Actions = exports.Actions = function () {
+	        function Actions(caseName, fields) {
+	            _classCallCheck(this, Actions);
 	
-	  _fableCore.Util.setInterfaces(Actions.prototype, ["FSharpUnion", "System.IEquatable", "System.IComparable"], "Echo.Actions");
+	            this.Case = caseName;
+	            this.Fields = fields;
+	        }
 	
-	  function update(model, action) {
-	    var model_ = action.Case === "ChangeInput" ? new Model(action.Fields[0], model.ServerResponse, model.Status) : action.Case === "ServerResponse" ? function () {
-	      var Status_1 = new Status("Done", []);
-	      return new Model(model.InputValue, action.Fields[0], Status_1);
-	    }() : action.Case === "SetStatus" ? new Model(model.InputValue, model.ServerResponse, action.Fields[0]) : model;
+	        _createClass(Actions, [{
+	            key: "Equals",
+	            value: function Equals(other) {
+	                return _fableCore.Util.equalsUnions(this, other);
+	            }
+	        }, {
+	            key: "CompareTo",
+	            value: function CompareTo(other) {
+	                return _fableCore.Util.compareUnions(this, other);
+	            }
+	        }]);
 	
-	    var delayedCall = function delayedCall(h) {
-	      if (action.Case === "SendEcho") {
-	        fakeAjax(function (data) {
-	          h(new Actions("ServerResponse", [data]));
-	        }, model.InputValue);
-	        h(new Actions("SetStatus", [new Status("Pending", [])]));
-	      }
-	    };
+	        return Actions;
+	    }();
 	
-	    return [model_, _FableArch.AppApi.toActionList(delayedCall)];
-	  }
+	    _fableCore.Util.setInterfaces(Actions.prototype, ["FSharpUnion", "System.IEquatable", "System.IComparable"], "Hello.Actions");
 	
-	  function view(model) {
-	    var infoText = model.Status.Case === "Pending" ? new _FableArch2.Types.DomNode("Text", ["Waiting Server response"]) : model.Status.Case === "Done" ? new _FableArch2.Types.DomNode("Text", [_fableCore.String.fsFormat("The server response is: %s")(function (x) {
-	      return x;
-	    })(model.ServerResponse)]) : new _FableArch2.Types.DomNode("Text", [""]);
-	    return function () {
-	      var tagName = "div";
-	      return function (children) {
-	        return new _FableArch2.Types.DomNode("Element", [[tagName, new _fableCore.List()], children]);
-	      };
-	    }()(_fableCore.List.ofArray([function () {
-	      var tagName = "label";
-	      return function (children) {
-	        return new _FableArch2.Types.DomNode("Element", [[tagName, new _fableCore.List()], children]);
-	      };
-	    }()(_fableCore.List.ofArray([new _FableArch2.Types.DomNode("Text", ["Enter a sentence: "])])), new _FableArch2.Types.DomNode("VoidElement", [["br", new _fableCore.List()]]), function () {
-	      var tagName = "textarea";
-	      return function (children) {
-	        return new _FableArch2.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([new _FableArch2.Types.Attribute("EventHandler", [["oninput", function (e) {
-	          return function (arg0) {
-	            return new Actions("ChangeInput", [arg0]);
-	          }(e.target.value);
-	        }]]), new _FableArch2.Types.Attribute("Property", [["value", model.InputValue]])])], children]);
-	      };
-	    }()(new _fableCore.List()), new _FableArch2.Types.DomNode("VoidElement", [["br", new _fableCore.List()]]), function () {
-	      var tagName = "button";
-	      return function (children) {
-	        return new _FableArch2.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([function () {
-	          var h = function h(e) {
-	            e.stopPropagation();
-	            e.preventDefault();
-	            return function (_arg1) {
-	              return new Actions("SendEcho", []);
-	            }(e);
-	          };
+	    function update(model, msg) {
+	        return function (m) {
+	            return [m, _fableCore.List.ofArray([function (_arg1) {
+	                (0, _FableArch.pushState)(toUrl(m));
+	            }])];
+	        }(msg.Case === "Decrement" ? model - 1 : model + 1);
+	    }
 	
-	          return new _FableArch2.Types.Attribute("EventHandler", [["onclick", h]]);
-	        }()])], children]);
-	      };
-	    }()(_fableCore.List.ofArray([new _FableArch2.Types.DomNode("Text", ["Uppercase by server"])])), new _FableArch2.Types.DomNode("VoidElement", [["br", new _fableCore.List()]]), function () {
-	      var tagName = "span";
-	      return function (children) {
-	        return new _FableArch2.Types.DomNode("Element", [[tagName, new _fableCore.List()], children]);
-	      };
-	    }()(_fableCore.List.ofArray([infoText]))]));
-	  }
+	    function urlUpdate(model, cnt) {
+	        return [cnt, new _fableCore.List()];
+	    }
 	
-	  _FableArch.AppApi.start(_FableArch.AppApi.withStartNodeSelector("#echo", _FableArch.AppApi.createApp(Model.Init, function (model) {
-	    return view(model);
-	  }, function (model) {
-	    return function (action) {
-	      return update(model, action);
-	    };
-	  }, function (selector) {
-	    return function (handler) {
-	      return function (view_1) {
-	        return (0, _FableArch3.createRender)(selector, handler, view_1);
-	      };
-	    };
-	  })));
+	    function view(model) {
+	        return function () {
+	            var tagName = "div";
+	            return function (children) {
+	                return new _FableArch2.Types.DomNode("Element", [[tagName, new _fableCore.List()], children]);
+	            };
+	        }()(_fableCore.List.ofArray([function () {
+	            var tagName = "button";
+	            return function (children) {
+	                return new _FableArch2.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([function () {
+	                    var h = function h(e) {
+	                        e.stopPropagation();
+	                        e.preventDefault();
+	                        return function (_arg1) {
+	                            return new Actions("Decrement", []);
+	                        }(e);
+	                    };
+	
+	                    return new _FableArch2.Types.Attribute("EventHandler", [["onclick", h]]);
+	                }()])], children]);
+	            };
+	        }()(_fableCore.List.ofArray([new _FableArch2.Types.DomNode("Text", ["-"])])), function () {
+	            var tagName = "div";
+	            return function (children) {
+	                return new _FableArch2.Types.DomNode("Element", [[tagName, new _fableCore.List()], children]);
+	            };
+	        }()(_fableCore.List.ofArray([new _FableArch2.Types.DomNode("Text", [String(model)])])), function () {
+	            var tagName = "button";
+	            return function (children) {
+	                return new _FableArch2.Types.DomNode("Element", [[tagName, _fableCore.List.ofArray([function () {
+	                    var h = function h(e) {
+	                        e.stopPropagation();
+	                        e.preventDefault();
+	                        return function (_arg2) {
+	                            return new Actions("Increment", []);
+	                        }(e);
+	                    };
+	
+	                    return new _FableArch2.Types.Attribute("EventHandler", [["onclick", h]]);
+	                }()])], children]);
+	            };
+	        }()(_fableCore.List.ofArray([new _FableArch2.Types.DomNode("Text", ["+"])]))]));
+	    }
+	
+	    _FableArch3.AppApi.start(_FableArch3.AppApi.withStartNodeSelector("#hello", function () {
+	        var urlUpdate_1 = function urlUpdate_1(model) {
+	            return function (cnt) {
+	                return urlUpdate(model, cnt);
+	            };
+	        };
+	
+	        return function (app) {
+	            return (0, _FableArch.withNavigation)(function (location) {
+	                return urlParser(location);
+	            }, urlUpdate_1, app);
+	        };
+	    }()(_FableArch3.AppApi.createApp(initValue, function (model) {
+	        return view(model);
+	    }, function (model) {
+	        return function (msg) {
+	            return update(model, msg);
+	        };
+	    }, function (selector) {
+	        return function (handler) {
+	            return function (view_1) {
+	                return (0, _FableArch4.createRender)(selector, handler, view_1);
+	            };
+	        };
+	    }))));
 	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 
 
@@ -4840,6 +4801,262 @@
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1), __webpack_require__(3)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore, _FableArch) {
+	    "use strict";
+	
+	    Object.defineProperty(exports, "__esModule", {
+	        value: true
+	    });
+	    exports.NavigationAction = exports.Location = undefined;
+	    exports.mapDownNavigationAction = mapDownNavigationAction;
+	    exports.mapDownModelChanged = mapDownModelChanged;
+	    exports.pushState = pushState;
+	    exports.setState = setState;
+	    exports.go = go;
+	    exports.withNavigation = withNavigation;
+	
+	    function _classCallCheck(instance, Constructor) {
+	        if (!(instance instanceof Constructor)) {
+	            throw new TypeError("Cannot call a class as a function");
+	        }
+	    }
+	
+	    var _createClass = function () {
+	        function defineProperties(target, props) {
+	            for (var i = 0; i < props.length; i++) {
+	                var descriptor = props[i];
+	                descriptor.enumerable = descriptor.enumerable || false;
+	                descriptor.configurable = true;
+	                if ("value" in descriptor) descriptor.writable = true;
+	                Object.defineProperty(target, descriptor.key, descriptor);
+	            }
+	        }
+	
+	        return function (Constructor, protoProps, staticProps) {
+	            if (protoProps) defineProperties(Constructor.prototype, protoProps);
+	            if (staticProps) defineProperties(Constructor, staticProps);
+	            return Constructor;
+	        };
+	    }();
+	
+	    var Location = exports.Location = function () {
+	        function Location(href, host, hostname, protocol, origin, port, pathname, search, hash) {
+	            _classCallCheck(this, Location);
+	
+	            this.Href = href;
+	            this.Host = host;
+	            this.Hostname = hostname;
+	            this.Protocol = protocol;
+	            this.Origin = origin;
+	            this.Port = port;
+	            this.Pathname = pathname;
+	            this.Search = search;
+	            this.Hash = hash;
+	        }
+	
+	        _createClass(Location, [{
+	            key: "Equals",
+	            value: function Equals(other) {
+	                return _fableCore.Util.equalsRecords(this, other);
+	            }
+	        }, {
+	            key: "CompareTo",
+	            value: function CompareTo(other) {
+	                return _fableCore.Util.compareRecords(this, other);
+	            }
+	        }], [{
+	            key: "getLocation",
+	            value: function getLocation() {
+	                var location = document.location;
+	                return new Location(location.href, location.host, location.hostname, location.protocol, location.origin, location.port, location.pathname, location.search, location.hash);
+	            }
+	        }]);
+	
+	        return Location;
+	    }();
+	
+	    _fableCore.Util.setInterfaces(Location.prototype, ["FSharpRecord", "System.IEquatable", "System.IComparable"], "Fable.Arch.Navigation.Location");
+	
+	    var NavigationAction = exports.NavigationAction = function () {
+	        function NavigationAction(caseName, fields) {
+	            _classCallCheck(this, NavigationAction);
+	
+	            this.Case = caseName;
+	            this.Fields = fields;
+	        }
+	
+	        _createClass(NavigationAction, [{
+	            key: "Equals",
+	            value: function Equals(other) {
+	                return _fableCore.Util.equalsUnions(this, other);
+	            }
+	        }, {
+	            key: "CompareTo",
+	            value: function CompareTo(other) {
+	                return _fableCore.Util.compareUnions(this, other);
+	            }
+	        }]);
+	
+	        return NavigationAction;
+	    }();
+	
+	    _fableCore.Util.setInterfaces(NavigationAction.prototype, ["FSharpUnion", "System.IEquatable", "System.IComparable"], "Fable.Arch.Navigation.NavigationAction");
+	
+	    function mapDownNavigationAction(f, _arg1) {
+	        return _arg1.Case === "Message" ? f(_arg1.Fields[0]) : null;
+	    }
+	
+	    function mapDownModelChanged(mc) {
+	        return mapDownNavigationAction(function (m) {
+	            return new _FableArch.Types.ModelChanged(mc.PreviousState, m, mc.CurrentState);
+	        }, mc.Message);
+	    }
+	
+	    function pushState(url) {
+	        history.pushState(null, "", url);
+	    }
+	
+	    function setState(url) {
+	        history.replaceState(null, "", url);
+	    }
+	
+	    function go(n) {
+	        if (n !== 0) {
+	            history.go(n);
+	        }
+	    }
+	
+	    function withNavigation(parser, urlUpdate, app) {
+	        var update_ = function update_(model) {
+	            return function (_arg1) {
+	                return _arg1.Case === "Message" ? function (tupledArg) {
+	                    return [tupledArg[0], _fableCore.List.map(function () {
+	                        var mapping = function mapping(arg0) {
+	                            return new NavigationAction("Message", [arg0]);
+	                        };
+	
+	                        return function (action) {
+	                            return function (x) {
+	                                _FableArch.AppApi.mapAction(mapping, action, x);
+	                            };
+	                        };
+	                    }(), tupledArg[1])];
+	                }(app.Update(model)(_arg1.Fields[0])) : function (tupledArg) {
+	                    return [tupledArg[0], _fableCore.List.map(function () {
+	                        var mapping = function mapping(arg0) {
+	                            return new NavigationAction("Message", [arg0]);
+	                        };
+	
+	                        return function (action) {
+	                            return function (x) {
+	                                _FableArch.AppApi.mapAction(mapping, action, x);
+	                            };
+	                        };
+	                    }(), tupledArg[1])];
+	                }(urlUpdate(model)(parser(_arg1.Fields[0])));
+	            };
+	        };
+	
+	        var popStateProducer = function popStateProducer(h) {
+	            var popstateHandler = function popstateHandler(_arg2) {
+	                var location = Location.getLocation();
+	                h(new _FableArch.Types.AppMessage("Message", [new NavigationAction("Change", [location])]));
+	                return null;
+	            };
+	
+	            window.addEventListener('popstate', function (x) {
+	                return popstateHandler(x);
+	            });
+	        };
+	
+	        var producers = function () {
+	            var mappedProducers = _fableCore.List.map(function () {
+	                var map = function () {
+	                    var map = function map(arg0) {
+	                        return new NavigationAction("Message", [arg0]);
+	                    };
+	
+	                    return function (_arg1) {
+	                        return _FableArch.AppApi.mapAppMessage(map, _arg1);
+	                    };
+	                }();
+	
+	                return function (p) {
+	                    return _FableArch.AppApi.mapProducer(map, p);
+	                };
+	            }(), app.Producers);
+	
+	            return _fableCore.List.ofArray([popStateProducer], mappedProducers);
+	        }();
+	
+	        var subscribers = _fableCore.List.map(function () {
+	            var mapModelChanged = function mapModelChanged(mc) {
+	                return mapDownModelChanged(mc);
+	            };
+	
+	            var mapAction = function mapAction(f) {
+	                return function (_arg1) {
+	                    return mapDownNavigationAction(f, _arg1);
+	                };
+	            };
+	
+	            return function (sub) {
+	                return function (_arg1) {
+	                    _FableArch.AppApi.mapSubscriber(mapModelChanged, mapAction, sub, _arg1);
+	                };
+	            };
+	        }(), app.Subscribers);
+	
+	        var initMessage = function () {
+	            var mapping = function mapping(arg0) {
+	                return new NavigationAction("Message", [arg0]);
+	            };
+	
+	            return function (x) {
+	                _FableArch.AppApi.mapAction(mapping, app.InitMessage, x);
+	            };
+	        }();
+	
+	        var mapCreateRenderer = function mapCreateRenderer(createRenderer) {
+	            var mapRenderer = function mapRenderer(renderer) {
+	                var renderer_ = function renderer_(handler) {
+	                    return function (view) {
+	                        return renderer(function ($var13) {
+	                            return handler(function (arg0) {
+	                                return new NavigationAction("Message", [arg0]);
+	                            }($var13));
+	                        })(view);
+	                    };
+	                };
+	
+	                return renderer_;
+	            };
+	
+	            var createRenderer_ = function createRenderer_(sel) {
+	                return function (handler) {
+	                    return function (view) {
+	                        return mapRenderer(createRenderer(sel)(function ($var14) {
+	                            return handler(function (arg0) {
+	                                return new NavigationAction("Message", [arg0]);
+	                            }($var14));
+	                        })(view));
+	                    };
+	                };
+	            };
+	
+	            return createRenderer_;
+	        };
+	
+	        var createRenderer = mapCreateRenderer(app.CreateRenderer);
+	        return new _FableArch.Types.AppSpecification(app.InitState, app.View, update_, initMessage, createRenderer, app.NodeSelector, producers, subscribers);
+	    }
+	}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore) {
 	    "use strict";
 	
@@ -5292,7 +5509,7 @@
 
 
 /***/ },
-/* 3 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore) {
@@ -5401,10 +5618,10 @@
 
 
 /***/ },
-/* 4 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1), __webpack_require__(5)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore, _virtualDom) {
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(1), __webpack_require__(6)], __WEBPACK_AMD_DEFINE_RESULT__ = function (exports, _fableCore, _virtualDom) {
 	    "use strict";
 	
 	    Object.defineProperty(exports, "__esModule", {
@@ -5462,8 +5679,8 @@
 	                }() : _arg4.Case === "EventHandler" ? function () {
 	                    var f = _arg4.Fields[0][1];
 	                    var ev = _arg4.Fields[0][0];
-	                    return [ev, function ($var13) {
-	                        return handler(f($var13));
+	                    return [ev, function ($var15) {
+	                        return handler(f($var15));
 	                    }];
 	                }() : function () {
 	                    throw "Shouldn't happen";
@@ -5622,15 +5839,15 @@
 
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var diff = __webpack_require__(6)
-	var patch = __webpack_require__(19)
-	var h = __webpack_require__(28)
-	var create = __webpack_require__(39)
-	var VNode = __webpack_require__(30)
-	var VText = __webpack_require__(31)
+	var diff = __webpack_require__(7)
+	var patch = __webpack_require__(20)
+	var h = __webpack_require__(29)
+	var create = __webpack_require__(40)
+	var VNode = __webpack_require__(31)
+	var VText = __webpack_require__(32)
 	
 	module.exports = {
 	    diff: diff,
@@ -5643,28 +5860,28 @@
 
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var diff = __webpack_require__(7)
+	var diff = __webpack_require__(8)
 	
 	module.exports = diff
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isArray = __webpack_require__(8)
+	var isArray = __webpack_require__(9)
 	
-	var VPatch = __webpack_require__(9)
-	var isVNode = __webpack_require__(11)
-	var isVText = __webpack_require__(12)
-	var isWidget = __webpack_require__(13)
-	var isThunk = __webpack_require__(14)
-	var handleThunk = __webpack_require__(15)
+	var VPatch = __webpack_require__(10)
+	var isVNode = __webpack_require__(12)
+	var isVText = __webpack_require__(13)
+	var isWidget = __webpack_require__(14)
+	var isThunk = __webpack_require__(15)
+	var handleThunk = __webpack_require__(16)
 	
-	var diffProps = __webpack_require__(16)
+	var diffProps = __webpack_require__(17)
 	
 	module.exports = diff
 	
@@ -6085,7 +6302,7 @@
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports) {
 
 	var nativeIsArray = Array.isArray
@@ -6099,10 +6316,10 @@
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(10)
+	var version = __webpack_require__(11)
 	
 	VirtualPatch.NONE = 0
 	VirtualPatch.VTEXT = 1
@@ -6127,17 +6344,17 @@
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports) {
 
 	module.exports = "2"
 
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(10)
+	var version = __webpack_require__(11)
 	
 	module.exports = isVirtualNode
 	
@@ -6147,10 +6364,10 @@
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(10)
+	var version = __webpack_require__(11)
 	
 	module.exports = isVirtualText
 	
@@ -6160,7 +6377,7 @@
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports) {
 
 	module.exports = isWidget
@@ -6171,7 +6388,7 @@
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports) {
 
 	module.exports = isThunk
@@ -6182,13 +6399,13 @@
 
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isVNode = __webpack_require__(11)
-	var isVText = __webpack_require__(12)
-	var isWidget = __webpack_require__(13)
-	var isThunk = __webpack_require__(14)
+	var isVNode = __webpack_require__(12)
+	var isVText = __webpack_require__(13)
+	var isWidget = __webpack_require__(14)
+	var isThunk = __webpack_require__(15)
 	
 	module.exports = handleThunk
 	
@@ -6228,11 +6445,11 @@
 
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(17)
-	var isHook = __webpack_require__(18)
+	var isObject = __webpack_require__(18)
+	var isHook = __webpack_require__(19)
 	
 	module.exports = diffProps
 	
@@ -6292,7 +6509,7 @@
 
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -6303,7 +6520,7 @@
 
 
 /***/ },
-/* 18 */
+/* 19 */
 /***/ function(module, exports) {
 
 	module.exports = isHook
@@ -6316,24 +6533,24 @@
 
 
 /***/ },
-/* 19 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var patch = __webpack_require__(20)
+	var patch = __webpack_require__(21)
 	
 	module.exports = patch
 
 
 /***/ },
-/* 20 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var document = __webpack_require__(21)
-	var isArray = __webpack_require__(8)
+	var document = __webpack_require__(22)
+	var isArray = __webpack_require__(9)
 	
-	var render = __webpack_require__(23)
-	var domIndex = __webpack_require__(25)
-	var patchOp = __webpack_require__(26)
+	var render = __webpack_require__(24)
+	var domIndex = __webpack_require__(26)
+	var patchOp = __webpack_require__(27)
 	module.exports = patch
 	
 	function patch(rootNode, patches, renderOptions) {
@@ -6411,12 +6628,12 @@
 
 
 /***/ },
-/* 21 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {var topLevel = typeof global !== 'undefined' ? global :
 	    typeof window !== 'undefined' ? window : {}
-	var minDoc = __webpack_require__(22);
+	var minDoc = __webpack_require__(23);
 	
 	if (typeof document !== 'undefined') {
 	    module.exports = document;
@@ -6433,23 +6650,23 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 22 */
+/* 23 */
 /***/ function(module, exports) {
 
 	/* (ignored) */
 
 /***/ },
-/* 23 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var document = __webpack_require__(21)
+	var document = __webpack_require__(22)
 	
-	var applyProperties = __webpack_require__(24)
+	var applyProperties = __webpack_require__(25)
 	
-	var isVNode = __webpack_require__(11)
-	var isVText = __webpack_require__(12)
-	var isWidget = __webpack_require__(13)
-	var handleThunk = __webpack_require__(15)
+	var isVNode = __webpack_require__(12)
+	var isVText = __webpack_require__(13)
+	var isWidget = __webpack_require__(14)
+	var handleThunk = __webpack_require__(16)
 	
 	module.exports = createElement
 	
@@ -6491,11 +6708,11 @@
 
 
 /***/ },
-/* 24 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isObject = __webpack_require__(17)
-	var isHook = __webpack_require__(18)
+	var isObject = __webpack_require__(18)
+	var isHook = __webpack_require__(19)
 	
 	module.exports = applyProperties
 	
@@ -6594,7 +6811,7 @@
 
 
 /***/ },
-/* 25 */
+/* 26 */
 /***/ function(module, exports) {
 
 	// Maps a virtual DOM tree onto a real DOM tree in an efficient manner.
@@ -6685,15 +6902,15 @@
 
 
 /***/ },
-/* 26 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var applyProperties = __webpack_require__(24)
+	var applyProperties = __webpack_require__(25)
 	
-	var isWidget = __webpack_require__(13)
-	var VPatch = __webpack_require__(9)
+	var isWidget = __webpack_require__(14)
+	var VPatch = __webpack_require__(10)
 	
-	var updateWidget = __webpack_require__(27)
+	var updateWidget = __webpack_require__(28)
 	
 	module.exports = applyPatch
 	
@@ -6842,10 +7059,10 @@
 
 
 /***/ },
-/* 27 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var isWidget = __webpack_require__(13)
+	var isWidget = __webpack_require__(14)
 	
 	module.exports = updateWidget
 	
@@ -6863,33 +7080,33 @@
 
 
 /***/ },
-/* 28 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var h = __webpack_require__(29)
+	var h = __webpack_require__(30)
 	
 	module.exports = h
 
 
 /***/ },
-/* 29 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var isArray = __webpack_require__(8);
+	var isArray = __webpack_require__(9);
 	
-	var VNode = __webpack_require__(30);
-	var VText = __webpack_require__(31);
-	var isVNode = __webpack_require__(11);
-	var isVText = __webpack_require__(12);
-	var isWidget = __webpack_require__(13);
-	var isHook = __webpack_require__(18);
-	var isVThunk = __webpack_require__(14);
+	var VNode = __webpack_require__(31);
+	var VText = __webpack_require__(32);
+	var isVNode = __webpack_require__(12);
+	var isVText = __webpack_require__(13);
+	var isWidget = __webpack_require__(14);
+	var isHook = __webpack_require__(19);
+	var isVThunk = __webpack_require__(15);
 	
-	var parseTag = __webpack_require__(32);
-	var softSetHook = __webpack_require__(34);
-	var evHook = __webpack_require__(35);
+	var parseTag = __webpack_require__(33);
+	var softSetHook = __webpack_require__(35);
+	var evHook = __webpack_require__(36);
 	
 	module.exports = h;
 	
@@ -7015,14 +7232,14 @@
 
 
 /***/ },
-/* 30 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(10)
-	var isVNode = __webpack_require__(11)
-	var isWidget = __webpack_require__(13)
-	var isThunk = __webpack_require__(14)
-	var isVHook = __webpack_require__(18)
+	var version = __webpack_require__(11)
+	var isVNode = __webpack_require__(12)
+	var isWidget = __webpack_require__(14)
+	var isThunk = __webpack_require__(15)
+	var isVHook = __webpack_require__(19)
 	
 	module.exports = VirtualNode
 	
@@ -7093,10 +7310,10 @@
 
 
 /***/ },
-/* 31 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var version = __webpack_require__(10)
+	var version = __webpack_require__(11)
 	
 	module.exports = VirtualText
 	
@@ -7109,12 +7326,12 @@
 
 
 /***/ },
-/* 32 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var split = __webpack_require__(33);
+	var split = __webpack_require__(34);
 	
 	var classIdSplit = /([\.#]?[a-zA-Z0-9\u007F-\uFFFF_:-]+)/;
 	var notClassId = /^\.|#/;
@@ -7169,7 +7386,7 @@
 
 
 /***/ },
-/* 33 */
+/* 34 */
 /***/ function(module, exports) {
 
 	/*!
@@ -7281,7 +7498,7 @@
 
 
 /***/ },
-/* 34 */
+/* 35 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -7304,12 +7521,12 @@
 
 
 /***/ },
-/* 35 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var EvStore = __webpack_require__(36);
+	var EvStore = __webpack_require__(37);
 	
 	module.exports = EvHook;
 	
@@ -7337,12 +7554,12 @@
 
 
 /***/ },
-/* 36 */
+/* 37 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var OneVersionConstraint = __webpack_require__(37);
+	var OneVersionConstraint = __webpack_require__(38);
 	
 	var MY_VERSION = '7';
 	OneVersionConstraint('ev-store', MY_VERSION);
@@ -7363,12 +7580,12 @@
 
 
 /***/ },
-/* 37 */
+/* 38 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var Individual = __webpack_require__(38);
+	var Individual = __webpack_require__(39);
 	
 	module.exports = OneVersion;
 	
@@ -7391,7 +7608,7 @@
 
 
 /***/ },
-/* 38 */
+/* 39 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
@@ -7417,10 +7634,10 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 39 */
+/* 40 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var createElement = __webpack_require__(23)
+	var createElement = __webpack_require__(24)
 	
 	module.exports = createElement
 
