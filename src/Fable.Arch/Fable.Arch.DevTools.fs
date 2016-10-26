@@ -129,6 +129,9 @@ let cssString = """
         height: 100%;
     }
 
+    ._fable_dev_tools .action-list .row {
+        margin: 0px;
+    }
     ._fable_dev_tools .action-list .row.excluded .content {
         display: none;
     }
