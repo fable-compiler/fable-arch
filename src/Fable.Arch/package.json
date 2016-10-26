@@ -1,6 +1,6 @@
 {
     "name": "fable-arch",
-    "version": "0.9.9",
+    "version": "0.9.10",
     "description": "Fable Arch is a generic version of the elm architecture implemented with Fable in F#.",
     "repository": {
         "type": "git",
@@ -15,7 +15,8 @@
         "F#"
     ],
     "devDependencies": {
-        "fable-core": "^0.6.3"
+        "fable-core": "^0.6.3",
+        "fable-import-react": "^0.5.2"
     },
     "homepage": "https://github.com/fable-compiler/Fable#readme"
 }

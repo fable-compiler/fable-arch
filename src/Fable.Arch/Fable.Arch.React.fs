@@ -1,219 +1,44 @@
-module Fable.Arch.App
+module Fable.Arch.React
 
 open Fable.Core
 open Fable.Core.JsInterop
 open System.Diagnostics
+open Fable.Import.React
 
-open Html
+type MkView<'model> = ('model->unit) -> ('model->ReactElement<obj>)
+type Props<'model> = {
+    main:MkView<'model>
+}
 
-[<AutoOpen>]
-module Types =
-    type Handler<'TMessage> = 'TMessage -> unit
+module Components =
+    let mutable internal mounted = false
 
-    type ModelChanged<'TMessage, 'TModel> = 
-        {
-            PreviousState: 'TModel
-            Message: 'TMessage
-            CurrentState: 'TModel
-        }
+    type App<'model>(props:Props<'model>) as this =
+        inherit Component<obj,'model>()
+        do
+            mounted <- false
 
-    type AppEvent<'TMessage, 'TModel> =
-        | ModelChanged of ModelChanged<'TMessage, 'TModel>
-        | ActionReceived of 'TMessage
-        | Replayed of (System.Guid * 'TModel) list
-    
-    type AppMessage<'TMessage, 'TModel> =
-        | Message of 'TMessage
-        | Replay of 'TModel*((System.Guid*'TMessage) list)
+        let safeState state =
+            match mounted with 
+            | false -> this.state <- state
+            | _ -> this.setState state
+        let view = props.main safeState
+        member this.componentDidMount() =
+            mounted <- true
 
-    type Action<'TMessage> = Handler<'TMessage> -> unit
+        member this.render () =
+            view this.state 
 
-    type Subscriber<'TMessage, 'TModel> = AppEvent<'TMessage, 'TModel> -> unit
-    type Producer<'TMessage, 'TModel> = Action<AppMessage<'TMessage, 'TModel>>
-    type Plugin<'TMessage, 'TModel> =
-        {
-            Producer: Producer<'TMessage, 'TModel>
-            Subscriber: Subscriber<'TMessage, 'TModel>
-        }
+let createRenderer viewFn initModel sel h v = 
+    let mutable setState = None
+    let main s = 
+        setState <- Some s
+        s initModel
+        fun model -> viewFn model h
 
-    type Selector = string
+    let targetNode = Fable.Import.Browser.document.body.querySelector(sel)
+    let comp = Fable.Helpers.React.com<Components.App<_>,_,_> {main = main} []
+    Fable.Import.React_Extensions.ReactDom.render(comp,targetNode) |> ignore
 
-    type AppSpecification<'TModel, 'TMessage, 'TView> = 
-        {
-            InitState: 'TModel
-            View: 'TModel -> 'TView
-            Update: 'TModel -> 'TMessage -> ('TModel * Action<'TMessage> list)
-            InitMessage: Action<'TMessage>
-            CreateRenderer: Selector -> Handler<'TMessage> -> 'TView -> (Handler<'TMessage> -> 'TView -> unit)
-            NodeSelector: Selector
-            Producers: Producer<'TMessage, 'TModel> list
-            Subscribers: Subscriber<'TMessage, 'TModel> list
-        }
-
-    type App<'TModel, 'TMessage, 'TView> =
-        {
-            Model: 'TModel
-            Actions: (unit -> unit) list
-            Render: Handler<'TMessage> -> 'TView -> unit
-            Subscribers: Subscriber<'TMessage, 'TModel> list
-        }
-
-    let application<'TMessage, 'TModel, 'TView> handleMessage handleReplay configureProducers createInitApp =
-        let mutable state = None
-
-        let notifySubs msg = 
-            match state with
-            | Some s -> 
-                s.Subscribers |> List.iter (fun sub -> sub msg)
-            | None -> ()
-
-        let rec handleEvent (evt:AppMessage<'TMessage, 'TModel>) =
-            let (state', actions)  : App<'TModel, 'TMessage, 'TView>*(unit -> unit) list = 
-                match evt with
-                | Message message ->
-                    handleMessage handleEvent notifySubs message (state |> Option.get)
-                | Replay (model, messages) ->
-                    handleReplay handleEvent notifySubs (model, messages) (state |> Option.get)
-            state <- Some state'
-            actions |> List.iter (fun x -> x())
-
-        state <- createInitApp (Message >> handleEvent) |> Some
-
-        configureProducers handleEvent
-        handleEvent
-
-    let render post viewFn app =
-        let view = viewFn app.Model
-        app.Render (Message >> post) view
-        app
-
-    let createActions post = List.map (fun a -> fun () -> a (Message >> post))
-    
-    let handleMessage update viewFn post notifySubs message app =
-        notifySubs (ActionReceived message)
-        let (model, actions) = update app.Model message
-
-        let modelChanged = 
-            ModelChanged {
-                CurrentState = model
-                PreviousState = app.Model
-                Message = message
-            }
-        
-        let actions = createActions post actions
-        let app' = 
-            {app with Model = model}
-            |> render post viewFn
-
-        app', (fun () -> (notifySubs modelChanged))::actions
-
-    let calculateModelChanges initState update actions = 
-        let execUpdate r a =
-            let m = 
-                match r with
-                | [] -> initState
-                | x::_ -> x |> snd
-            let msg = a |> snd
-            let (m', _) = update m (a |> snd)
-            let id:System.Guid = a |> fst
-            id,m'
-
-        actions
-        |> List.fold (fun s a -> (execUpdate s a)::s) []
-
-    let handleReplay viewFn updateFn post notifySubs (fromModel, actions) app = 
-        let result = calculateModelChanges fromModel updateFn actions
-        let model = 
-            match result with 
-            | m::_ -> m |> snd
-            | [] -> fromModel
-        let app' = 
-            {app with Model = model}
-            |> render post viewFn
-        
-        app', [fun () -> (Replayed result) |> notifySubs]
-
-[<AutoOpen>]
-module AppApi = 
-    // Helper functions to map from one action type to another
-    let mapAction<'T1,'T2> (mapping:'T1 -> 'T2) (action:Action<'T1>) : Action<'T2> = 
-        fun x -> action (mapping >> x)  
-
-    let mapAppMessage map = function
-        | AppMessage.Message msg -> AppMessage.Message (map msg)
-        | Replay (x,messageList) -> Replay (x,messageList |> List.map (fun (id, m) -> id, map m))
-
-    let mapProducer map p = mapAction map p
-
-    let mapSubscriber mapModelChanged mapAction sub = function
-        | ModelChanged mc ->
-            mc |> mapModelChanged |> Option.map ModelChanged |> Option.iter sub
-        | ActionReceived m -> mapAction id m |> Option.map ActionReceived |> Option.iter sub
-        | Replayed lst -> sub (Replayed lst)
-
-    let mapActions m = List.map (mapAction m)
-    let toActionList a = [a]
-
-    // Starting point for creating an application
-    let createApp state view update createRenderer =
-        {
-            InitState = state
-            View = view
-            Update = update
-            InitMessage = (fun _ -> ())
-            CreateRenderer = createRenderer
-            NodeSelector = "body"
-            Producers = []
-            Subscribers = []
-        }
-
-    // Starting point for an application with a simpler update function
-    let createSimpleApp model view update =
-        createApp model view (fun x y -> (update x y), [])
-
-    // Fluent api functions to add optional configurations to the application
-    let withStartNodeSelector selector app = { app with NodeSelector = selector }
-    let withInitMessage msg app = { app with InitMessage = msg }
-
-    let private withInstrumentationProducer p app = 
-        {app with Producers = p::app.Producers}
-    let withProducer (producer:('a->unit)->unit) app =
-        let lift h = Message >> h 
-        let producer' = lift >> producer
-        withInstrumentationProducer producer' app
-
-    let withInstrumentationSubscriber subscriber app =
-        {app with AppSpecification.Subscribers = subscriber::app.Subscribers}
-    let withSubscriber (subscriber:ModelChanged<'a,'b> -> unit) app = 
-        let subscriber' = function 
-            | ModelChanged m -> m |> subscriber
-            | _ -> ()
-        withInstrumentationSubscriber subscriber' app
-        
-    let withPlugin plugin =
-        (withInstrumentationSubscriber plugin.Subscriber)
-        >> (withInstrumentationProducer plugin.Producer)
-
-    let configureProducers producers post =
-        producers |> List.iter (fun p -> p post) 
-
-    // Start the application
-    let start (appSpec:AppSpecification<'TModel, 'TMessage, 'TView>) =
-        let viewFn : ('TModel -> 'TView) = appSpec.View
-        let updateFn = appSpec.Update
-
-        let createInitApp post = 
-            let view : 'TView = viewFn appSpec.InitState
-            appSpec.InitMessage post
-            let render = appSpec.CreateRenderer appSpec.NodeSelector post view
-
-            {
-                Model = appSpec.InitState
-                Render = render
-                Subscribers = appSpec.Subscribers
-                Actions = []
-            } : App<'TModel, 'TMessage, 'TView>
-        let handleMessage' = handleMessage updateFn viewFn
-        let handleReplay' = handleReplay viewFn updateFn
-        let configureProducers' = configureProducers appSpec.Producers
-        application handleMessage' handleReplay' configureProducers' createInitApp
+    fun hand vm ->
+    (setState |> Option.get) vm

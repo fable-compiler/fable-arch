@@ -40,11 +40,14 @@
     <Reference Include="./node_modules/fable-core/Fable.Core.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="./node_modules/fable-import-react/Fable.Import.React.fs" />
+    <Compile Include="./node_modules/fable-import-react/Fable.Helpers.React.fs" />
     <Compile Include="Fable.Arch.Html.fs" />
     <Compile Include="Fable.Arch.App.fs" />
     <Compile Include="Fable.Arch.Virtualdom.fs" />
     <Compile Include="Fable.Arch.DevTools.fs" />
     <Compile Include="Fable.Arch.RouteParser.fs" />
+    <Compile Include="Fable.Arch.React.fs" />
     <Content Include="paket.references" />
     <Compile Include="RouteParserTesting.fsx" />
     <Compile Include="Fable.Arch.Navigation.fs" />
