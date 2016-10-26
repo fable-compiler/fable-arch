@@ -51,7 +51,7 @@ let view model =
 // update function doesn't generate any actions. See 
 // some of the other more advanced examples for how to
 // use createApp
-createSimpleApp "" view update Virtualdom.renderer
+createSimpleApp "" view update Virtualdom.createRender
 |> withStartNodeSelector "#hello"
 |> withSubscriber (fun x -> Fable.Import.Browser.console.log("Event received: ", x))
 |> start

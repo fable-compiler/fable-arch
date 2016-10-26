@@ -152,7 +152,7 @@ let view (model:Sudoku) =
         ]
 
 open Fable.Import.Browser
-createApp initModel view update Virtualdom.renderer
+createApp initModel view update Virtualdom.createRender
 |> withStartNodeSelector "#todoapp"
 |> withSubscriber (fun x -> window.console.log("Something happened: ", x))
 |> start

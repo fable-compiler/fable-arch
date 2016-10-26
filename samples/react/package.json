@@ -15,7 +15,7 @@
     "devDependencies": {
         "fable-import-react": "^0.5.1",
         "fable-compiler": "^0.6.3",
-        "fable-arch": "^0.9.9",
+        "fable-arch": "^0.9.10",
         "source-map-loader": "^0.1.5",
         "webpack": "^1.13.1"
     },

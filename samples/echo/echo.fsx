@@ -123,6 +123,6 @@ let view model =
     ]
 
 /// Create our application
-createApp Model.Init view update Virtualdom.renderer
+createApp Model.Init view update Virtualdom.createRender
 |> withStartNodeSelector "#echo"
 |> start

@@ -235,7 +235,7 @@ open Storage
 let initList = fetch<Item>() |> List.ofArray
 let initModel = {Filter = All; Items = initList; Input = ""}
 
-createApp initModel view update Virtualdom.renderer
+createApp initModel view update Virtualdom.createRender
 |> (withSubscriber (fun m -> save (m.CurrentState.Items |> Array.ofList)))
 |> withStartNodeSelector "#todoapp"
 |> start

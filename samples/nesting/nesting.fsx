@@ -97,6 +97,6 @@ let nestedView model =
 let resetEveryTenth h =
     window.setInterval((fun _ -> Reset |> h), 10000) |> ignore
 
-createSimpleApp {Top = 0; Bottom = 0} nestedView nestedUpdate Virtualdom.renderer
+createSimpleApp {Top = 0; Bottom = 0} nestedView nestedUpdate Virtualdom.createRender
 |> withStartNodeSelector "#nested-counter"
 |> start

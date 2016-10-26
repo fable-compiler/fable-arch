@@ -189,7 +189,7 @@ We add a `routeProducer`, which is what listens to the location
 changes. We also add a `routeSubscriber`, which listens to events
 from the app and update the location accordingly.
 *)
-createSimpleApp {Top = initCounter; Bottom = initCounter} nestedView nestedUpdate Virtualdom.renderer
+createSimpleApp {Top = initCounter; Bottom = initCounter} nestedView nestedUpdate Virtualdom.createRender
 |> withStartNodeSelector "#nested-counter"
 |> withProducer (routeProducer locationHandler router)
 |> withSubscriber (routeSubscriber locationHandler routerF)
