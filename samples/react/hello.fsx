@@ -1,10 +1,14 @@
 (**
- - title: Hello world - getting with simple app
- - tagline: Hello world implemented with fable-arch
+ - title: Hello react - a simple counter using react
+ - tagline: Hello world implemented with fable-arch and react as render. The devtools are also enabled.
  - app-style: width:800px; margin:20px auto 50px auto;
- - intro: This is a simple "hello world" application.
+ - intro: This is a simple "hello world" type application.
 *)
 
+(**
+To be able to use the devtools we also need to add virtualdom,
+you should be able to disable them with a compiler directive.
+*)
 #r "node_modules/fable-core/Fable.Core.dll"
 #load "node_modules/fable-arch/Fable.Arch.Html.fs"
 #load "node_modules/fable-arch/Fable.Arch.App.fs"
@@ -76,5 +80,8 @@ let createReactApp initModel view update =
 
 createReactApp initModel view update
 |> withStartNodeSelector placeholderId
+(**
+To enable the devtools all we need is this line
+*)
 |> withPlugin (Fable.Arch.DevTools.createDevTools<Msg, Model> "something" initModel)
 |> start

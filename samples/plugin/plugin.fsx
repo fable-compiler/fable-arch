@@ -1,6 +1,6 @@
 (**
- - title: Plugin
- - tagline: Nesting application implemented with fable-arch and a plugin attached
+ - title: Devtools
+ - tagline: Devtools demo
  - app-style: width:800px; margin:20px auto 50px auto;
  - intro: This is a simple counter but with a devtools plugin attached to the application.
 *)
@@ -8,9 +8,10 @@
 #load "node_modules/fable-arch/Fable.Arch.Html.fs"
 #load "node_modules/fable-arch/Fable.Arch.App.fs"
 #load "node_modules/fable-arch/Fable.Arch.Virtualdom.fs"
-//#if DEV
+(**
+First we need to add the source of the devtools in order be able to use it.
+*)
 #load "node_modules/fable-arch/Fable.Arch.DevTools.fs"
-//#endif
 open Fable.Core
 open Fable.Import
 open Fable.Import.Browser
@@ -26,11 +27,6 @@ open Fable.Arch.DevTools
 // model
 type Counter = int
 let initCounter = 0
-
-(**
-The model for the first example is a simple integer that will act as hour counter.
-We also provide a default value for our counter.
-*)
 
 // Update
 type CounterAction =
@@ -106,7 +102,8 @@ let resetEveryTenth h =
 let initModel = {Top = 0; Bottom = 0}
 createSimpleApp initModel nestedView nestedUpdate Virtualdom.createRender
 |> withStartNodeSelector "#nested-counter"
-//#if DEV
+(**
+To enable the devtools all we need is this line.
+*)
 |> withPlugin (Fable.Arch.DevTools.createDevTools<NestedAction, NestedModel> "something" initModel)
-//#endif
 |> start
