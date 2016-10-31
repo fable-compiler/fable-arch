@@ -22,26 +22,19 @@ let createElement (e:obj): Fable.Import.Browser.Node = failwith "JS only"
 
 let createTree<'T> (handler:'T -> unit) tag (attributes:Attribute<'T> list) children =
     let toAttrs (attrs:Attribute<'T> list) =
-        let elAttributes = 
+        let (elAttributes, props) = 
             attrs
-            |> List.map (function
-                | Attribute (k,v) -> (k ==> v) |> Some
-                | _ -> None)
-            |> List.choose id
-            |> (function | [] -> None | v -> Some ("attributes" ==> (createObj(v))))
-        let props =
-            attrs
-            |> List.filter (function | Attribute _ -> false | _ -> true)
-            |> List.map (function
-                | Attribute _ -> failwith "Shouldn't happen"
-                | Style style -> "style" ==> createObj(unbox style)
-                | Property (k,v) -> k ==> v
-                | EventHandler(ev,f) -> ev ==> ((f >> handler) :> obj)
-            )
+            |> List.fold (fun (elAttrs, props) a ->
+                match a with
+                | Attribute (k,v) -> ((k ==> v)::elAttrs,props)
+                | Style style -> (elAttrs, ("style" ==> createObj(unbox style))::props)
+                | Property (k,v) -> (elAttrs, (k ==> v)::props)
+                | EventHandler(ev,f) -> (elAttrs, (ev ==> ((f >> handler) :> obj))::props)
+            ) ([],[])
 
         match elAttributes with
-        | None -> props
-        | Some x -> x::props
+        | [] -> props
+        | x -> ("attributes" ==> (createObj(x)))::props
         |> createObj
     let elem = h(tag, toAttrs attributes, List.toArray children)
     elem
