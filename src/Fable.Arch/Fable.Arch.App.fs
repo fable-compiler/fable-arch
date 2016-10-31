@@ -58,7 +58,7 @@ module Types =
             Subscribers: Subscriber<'TMessage, 'TModel> list
         }
 
-    let application<'TMessage, 'TModel, 'TView> handleMessage handleReplay configureProducers createInitApp =
+    let application<'TMessage, 'TModel, 'TView> initMessage handleMessage handleReplay configureProducers createInitApp =
         let mutable state = None
 
         let notifySubs msg = 
@@ -77,7 +77,9 @@ module Types =
             state <- Some state'
             actions |> List.iter (fun x -> x())
 
-        state <- createInitApp (Message >> handleEvent) |> Some
+        let post = (Message >> handleEvent)
+        state <- createInitApp post |> Some
+        initMessage post
 
         configureProducers handleEvent
         handleEvent
@@ -204,9 +206,7 @@ module AppApi =
 
         let createInitApp post = 
             let view : 'TView = viewFn appSpec.InitState
-            appSpec.InitMessage post
             let render = appSpec.CreateRenderer appSpec.NodeSelector post view
-
             {
                 Model = appSpec.InitState
                 Render = render
@@ -216,4 +216,4 @@ module AppApi =
         let handleMessage' = handleMessage updateFn viewFn
         let handleReplay' = handleReplay viewFn updateFn
         let configureProducers' = configureProducers appSpec.Producers
-        application handleMessage' handleReplay' configureProducers' createInitApp
+        application appSpec.InitMessage handleMessage' handleReplay' configureProducers' createInitApp
