@@ -20,6 +20,12 @@ let patch (node:obj) (patches:obj): Fable.Import.Browser.Node = failwith "JS onl
 [<Import("create","virtual-dom")>]
 let createElement (e:obj): Fable.Import.Browser.Node = failwith "JS only"
 
+[<Import("VNode","virtual-dom")>]
+type VNode(tag: string, attrs: obj, childre: obj []) = class end
+
+[<Import("VText","virtual-dom")>]
+type VText(text: string) = class end
+
 let createTree<'T> (handler:'T -> unit) tag (attributes:Attribute<'T> list) children =
     let toAttrs (attrs:Attribute<'T> list) =
         let (elAttributes, props) = 
@@ -36,8 +42,8 @@ let createTree<'T> (handler:'T -> unit) tag (attributes:Attribute<'T> list) chil
         | [] -> props
         | x -> ("attributes" ==> (createObj(x)))::props
         |> createObj
-    let elem = h(tag, toAttrs attributes, List.toArray children)
-    elem
+    let n2 = new VNode(tag, toAttrs attributes, List.toArray children)
+    box n2
 
 type RenderState = 
     | NoRequest
@@ -57,8 +63,8 @@ let rec renderSomething handler node =
     | Element((tag,attrs), nodes)
     | Svg((tag,attrs), nodes) -> createTree handler tag attrs (nodes |> List.map (renderSomething handler))
     | VoidElement (tag, attrs) -> createTree handler tag attrs []
-    | Text str -> box(string str)
-    | WhiteSpace str -> box(string str)
+    | Text str -> new VText(string str) |> box
+    | WhiteSpace str -> new VText(string str) |> box
 
 let render handler view viewState =
     let tree = renderSomething handler view
