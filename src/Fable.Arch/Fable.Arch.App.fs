@@ -4,8 +4,6 @@ open Fable.Core
 open Fable.Core.JsInterop
 open System.Diagnostics
 
-open Html
-
 [<AutoOpen>]
 module Types =
     type Handler<'TMessage> = 'TMessage -> unit

@@ -45,6 +45,7 @@
     <Compile Include="Fable.Arch.Html.fs" />
     <Compile Include="Fable.Arch.App.fs" />
     <Compile Include="Fable.Arch.Virtualdom.fs" />
+    <Compile Include="Fable.Arch.Virtualdom.Html.fs" />
     <Compile Include="Fable.Arch.DevTools.fs" />
     <Compile Include="Fable.Arch.RouteParser.fs" />
     <Compile Include="Fable.Arch.React.fs" />

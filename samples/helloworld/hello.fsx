@@ -6,16 +6,17 @@
 *)
 
 #r "node_modules/fable-core/Fable.Core.dll"
-#load "node_modules/fable-arch/Fable.Arch.Html.fs"
 #load "node_modules/fable-arch/Fable.Arch.App.fs"
+#load "node_modules/fable-arch/Fable.Arch.Html.fs"
 #load "node_modules/fable-arch/Fable.Arch.Virtualdom.fs"
+#load "node_modules/fable-arch/Fable.Arch.Virtualdom.Html.fs"
 
 open Fable.Core
 open Fable.Core.JsInterop
 
 open Fable.Arch
 open Fable.Arch.App
-open Fable.Arch.Html
+open Fable.Arch.Virtualdom.Html
 
 // Model
 type Model = string
@@ -52,6 +53,6 @@ let view model =
 // some of the other more advanced examples for how to
 // use createApp. In addition to the application functions
 // we also need to specify which renderer to use.
-createSimpleApp "" view update Virtualdom.createRender
+createSimpleApp "" view update Virtualdom.Rendering.createRender2
 |> withStartNodeSelector "#hello"
 |> start

@@ -404,7 +404,7 @@ let createDevTools<'TMessage, 'TModel> pluginId initModel=
                 LastCommited = None
                 PushToApp = (fun m -> linkAgent.Post (Push (AppMessage.Replay m)))
             }
-        createApp initModel devToolsView devToolsUpdate Virtualdom.createRender
+        createApp initModel devToolsView devToolsUpdate Fable.Arch.Virtualdom.Rendering.createRender
         |> withStartNodeSelector "#___devtools"
         |> start 
     
