@@ -9,14 +9,9 @@
 To be able to use the devtools we also need to add virtualdom,
 you should be able to disable them with a compiler directive.
 *)
-#r "node_modules/fable-core/Fable.Core.dll"
-#load "node_modules/fable-arch/Fable.Arch.Html.fs"
-#load "node_modules/fable-arch/Fable.Arch.App.fs"
-#load "node_modules/fable-import-react/Fable.Import.React.fs"
-#load "node_modules/fable-import-react/Fable.Helpers.React.fs"
-#load "node_modules/fable-arch/Fable.Arch.Virtualdom.fs"
-#load "node_modules/fable-arch/Fable.Arch.DevTools.fs"
-#load "node_modules/fable-arch/Fable.Arch.React.fs"
+#r "../../node_modules/fable-core/Fable.Core.dll"
+#r "../../node_modules/fable-react/Fable.React.dll"
+#r "../../npm/Fable.Arch.dll"
 
 open Fable.Core
 open Fable.Core.JsInterop
@@ -62,7 +57,7 @@ open Fable.Helpers.React.Props
 
 let view {count = count} dispatch =
   let onClick msg =
-    OnClick <| fun _ -> msg |> dispatch 
+    OnClick <| fun _ -> msg |> dispatch
 
   R.div []
     [ R.button [ onClick Decrement ] [ unbox "-" ]
@@ -73,7 +68,7 @@ let view {count = count} dispatch =
 let placeholderId = "#hello"
 
 let initModel = {count = 0}
-let createReactApp initModel view update = 
+let createReactApp initModel view update =
   let reactView = id
   let renderer = createRenderer view initModel
   createSimpleApp initModel reactView update renderer

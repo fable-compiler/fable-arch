@@ -29,14 +29,14 @@ module Types =
     | WhiteSpace of string
     | Svg of Element<'TMessage> * DomNode<'TMessage> list
 
-let mapEventHandler<'T1,'T2> (mapping:('T1 -> 'T2)) (e,f) = EventHandler(e, f >> mapping) 
+let mapEventHandler<'T1,'T2> (mapping:('T1 -> 'T2)) (e,f) = EventHandler(e, f >> mapping)
 
 let mapAttributes<'T1,'T2> (mapping:('T1 -> 'T2)) (attribute:Attribute<'T1>) =
     match attribute with
     | EventHandler(eb) -> mapEventHandler mapping eb
     | Style s -> Style s
     | Property kv -> Property kv
-    | Attribute kv -> Attribute kv 
+    | Attribute kv -> Attribute kv
 
 let mapElem<'T1,'T2> (mapping:('T1 -> 'T2)) (node:Element<'T1>) =
     let (tag, attrs) = node
@@ -46,159 +46,159 @@ let mapVoidElem<'T1,'T2> (mapping:('T1 -> 'T2)) (node:Element<'T1>) =
     let (tag, attrs) = node
     (tag, attrs |> List.map (mapAttributes mapping))
 
-let rec map<'T1,'T2> (mapping:('T1 -> 'T2)) (node:DomNode<'T1>) = 
+let rec map<'T1,'T2> (mapping:('T1 -> 'T2)) (node:DomNode<'T1>) =
     match node with
     | Element(e,ns) -> Element(mapElem mapping e, ns |> List.map (map mapping))
     | VoidElement(ve) -> VoidElement(mapVoidElem mapping ve)
-    | Text(s) -> Text s 
-    | WhiteSpace(ws) -> WhiteSpace ws   
+    | Text(s) -> Text s
+    | WhiteSpace(ws) -> WhiteSpace ws
     | Svg(e,ns) -> Element(mapElem mapping e, ns |> List.map (map mapping))
 
 [<AutoOpen>]
 module Tags =
-    let inline elem tagName attrs children = Element((tagName, attrs), children)
-    let inline voidElem tagName attrs = VoidElement(tagName, attrs)
+    let elem tagName attrs children = Element((tagName, attrs), children)
+    let voidElem tagName attrs = VoidElement(tagName, attrs)
 
-    let inline whiteSpace x = WhiteSpace x
-    let inline text x = Text x
+    let whiteSpace x = WhiteSpace x
+    let text x = Text x
 
     // Elements - list of elements here: https://developer.mozilla.org/en-US/docs/Web/HTML/Element
     // Void elements
-    let inline br x = voidElem "br" x
-    let inline area x = voidElem "area" x
-    let inline baseHtml x = voidElem "base" x
-    let inline col x = voidElem "col" x
-    let inline embed x = voidElem "embed" x
-    let inline hr x = voidElem "hr" x
-    let inline img x = voidElem "img" x
-    let inline input x = voidElem "input" x
-    let inline link x = voidElem "link" x
-    let inline meta x = voidElem "meta" x
-    let inline param x = voidElem "param" x
-    let inline source x = voidElem "source" x
-    let inline track x = voidElem "track" x
-    let inline wbr x = voidElem "wbr" x
+    let br x = voidElem "br" x
+    let area x = voidElem "area" x
+    let baseHtml x = voidElem "base" x
+    let col x = voidElem "col" x
+    let embed x = voidElem "embed" x
+    let hr x = voidElem "hr" x
+    let img x = voidElem "img" x
+    let input x = voidElem "input" x
+    let link x = voidElem "link" x
+    let meta x = voidElem "meta" x
+    let param x = voidElem "param" x
+    let source x = voidElem "source" x
+    let track x = voidElem "track" x
+    let wbr x = voidElem "wbr" x
 
     // Metadata
-    let inline head x = elem "head" x
-    let inline style x = elem "style" x
-    let inline title x = elem "title" x
+    let head x = elem "head" x
+    let style x = elem "style" x
+    let title x = elem "title" x
 
     // Content sectioning
-    let inline address x = elem "address" x
-    let inline article x = elem "article" x
-    let inline aside x = elem "aside" x
-    let inline footer x = elem "footer" x
-    let inline header x = elem "header" x
-    let inline h1 x = elem "h1" x
-    let inline h2 x = elem "h2" x
-    let inline h3 x = elem "h3" x
-    let inline h4 x = elem "h4" x
-    let inline h5 x = elem "h5" x
-    let inline h6 x = elem "h6" x
-    let inline hgroup x = elem "hgroup" x
-    let inline nav x = elem "nav" x
+    let address x = elem "address" x
+    let article x = elem "article" x
+    let aside x = elem "aside" x
+    let footer x = elem "footer" x
+    let header x = elem "header" x
+    let h1 x = elem "h1" x
+    let h2 x = elem "h2" x
+    let h3 x = elem "h3" x
+    let h4 x = elem "h4" x
+    let h5 x = elem "h5" x
+    let h6 x = elem "h6" x
+    let hgroup x = elem "hgroup" x
+    let nav x = elem "nav" x
 
     // Text content
-    let inline dd x = elem "dd" x
-    let inline div x = elem "div" x
-    let inline dl x = elem "dl" x
-    let inline dt x = elem "dt" x
-    let inline figcaption x = elem "figcaption" x
-    let inline figure x = elem "figure" x
-    let inline li x = elem "li" x
-    let inline main x = elem "main" x
-    let inline ol x = elem "ol" x
-    let inline p x = elem "p" x
-    let inline pre x = elem "pre" x
-    let inline section x = elem "section" x
-    let inline ul x = elem "ul" x
+    let dd x = elem "dd" x
+    let div x = elem "div" x
+    let dl x = elem "dl" x
+    let dt x = elem "dt" x
+    let figcaption x = elem "figcaption" x
+    let figure x = elem "figure" x
+    let li x = elem "li" x
+    let main x = elem "main" x
+    let ol x = elem "ol" x
+    let p x = elem "p" x
+    let pre x = elem "pre" x
+    let section x = elem "section" x
+    let ul x = elem "ul" x
 
-    // Inline text semantics
-    let inline a x = elem "a" x
-    let inline abbr x = elem "abbr" x
-    let inline b x = elem "b" x
-    let inline bdi x = elem "bdi" x
-    let inline bdo x = elem "bdo" x
-    let inline cite x = elem "cite" x
-    let inline code x = elem "code" x
-    let inline data x = elem "data" x
-    let inline dfn x = elem "dfn" x
-    let inline em x = elem "em" x
-    let inline i x = elem "i" x
-    let inline kbd x = elem "kbd" x
-    let inline mark x = elem "mark" x
-    let inline q x = elem "q" x
-    let inline rp x = elem "rp" x
-    let inline rt x = elem "rt" x
-    let inline rtc x = elem "rtc" x
-    let inline ruby x = elem "ruby" x
-    let inline s x = elem "s" x
-    let inline samp x = elem "samp" x
-    let inline small x = elem "small" x
-    let inline span x = elem "span" x
-    let inline strong x = elem "strong" x
-    let inline sub x = elem "sub" x
-    let inline sup x = elem "sup" x
-    let inline time x = elem "time" x
-    let inline u x = elem "u" x
-    let inline var x = elem "var" x
+    // Text semantics
+    let a x = elem "a" x
+    let abbr x = elem "abbr" x
+    let b x = elem "b" x
+    let bdi x = elem "bdi" x
+    let bdo x = elem "bdo" x
+    let cite x = elem "cite" x
+    let code x = elem "code" x
+    let data x = elem "data" x
+    let dfn x = elem "dfn" x
+    let em x = elem "em" x
+    let i x = elem "i" x
+    let kbd x = elem "kbd" x
+    let mark x = elem "mark" x
+    let q x = elem "q" x
+    let rp x = elem "rp" x
+    let rt x = elem "rt" x
+    let rtc x = elem "rtc" x
+    let ruby x = elem "ruby" x
+    let s x = elem "s" x
+    let samp x = elem "samp" x
+    let small x = elem "small" x
+    let span x = elem "span" x
+    let strong x = elem "strong" x
+    let sub x = elem "sub" x
+    let sup x = elem "sup" x
+    let time x = elem "time" x
+    let u x = elem "u" x
+    let var x = elem "var" x
 
     // Image and multimedia
-    let inline audio x = elem "audio" x
-    let inline map x = elem "map" x
-    let inline video x = elem "video" x
+    let audio x = elem "audio" x
+    let map x = elem "map" x
+    let video x = elem "video" x
 
     // Embedded content
-    let inline objectHtml x = elem "object" x
+    let objectHtml x = elem "object" x
 
     // Demarcasting edits
-    let inline del x = elem "del" x
-    let inline ins x = elem "ins" x
+    let del x = elem "del" x
+    let ins x = elem "ins" x
 
     // Table content
-    let inline caption x = elem "caption" x
-    let inline colgroup x = elem "colgroup" x
-    let inline table x = elem "table" x
-    let inline tbody x = elem "tbody" x
-    let inline td x = elem "td" x
-    let inline tfoot x = elem "tfoot" x
-    let inline th x = elem "th" x
-    let inline thead x = elem "thead" x
-    let inline tr x = elem "tr" x
+    let caption x = elem "caption" x
+    let colgroup x = elem "colgroup" x
+    let table x = elem "table" x
+    let tbody x = elem "tbody" x
+    let td x = elem "td" x
+    let tfoot x = elem "tfoot" x
+    let th x = elem "th" x
+    let thead x = elem "thead" x
+    let tr x = elem "tr" x
 
     // Forms
-    let inline button x = elem "button" x
-    let inline datalist x = elem "datalist" x
-    let inline fieldset x = elem "fieldset" x
-    let inline form x = elem "form" x
-    let inline label x = elem "label" x
-    let inline legend x = elem "legend" x
-    let inline meter x = elem "meter" x
-    let inline optgroup x = elem "optgroup" x
-    let inline option x = elem "option" x
-    let inline output x = elem "output" x
-    let inline progress x = elem "progress" x
-    let inline select x = elem "select" x
-    let inline textarea x = elem "textarea" x
+    let button x = elem "button" x
+    let datalist x = elem "datalist" x
+    let fieldset x = elem "fieldset" x
+    let form x = elem "form" x
+    let label x = elem "label" x
+    let legend x = elem "legend" x
+    let meter x = elem "meter" x
+    let optgroup x = elem "optgroup" x
+    let option x = elem "option" x
+    let output x = elem "output" x
+    let progress x = elem "progress" x
+    let select x = elem "select" x
+    let textarea x = elem "textarea" x
 
     // Interactive elements
-    let inline details x = elem "details" x
-    let inline dialog x = elem "dialog" x
-    let inline menu x = elem "menu" x
-    let inline menuitem x = elem "menuitem" x
-    let inline summary x = elem "summary" x
+    let details x = elem "details" x
+    let dialog x = elem "dialog" x
+    let menu x = elem "menu" x
+    let menuitem x = elem "menuitem" x
+    let summary x = elem "summary" x
 
 [<AutoOpen>]
 module Attributes =
-    let inline attribute key value = Attribute.Attribute (key,value)
-    let inline property key value = Attribute.Property (key,value)
+    let attribute key value = Attribute.Attribute (key,value)
+    let property key value = Attribute.Property (key,value)
 
     /// class attribute helper
-    let inline classy value = attribute "class" value
+    let classy value = attribute "class" value
 
     /// Helper to build space separated class
-    let inline classList (list: (string*bool) seq) =
+    let classList (list: (string*bool) seq) =
         list
             |> Seq.filter (fun (c,cond) -> cond)
             |> Seq.map (fun (c, cond) -> c)
@@ -214,120 +214,120 @@ module Attributes =
             |> sprintf "%s %s" b
             |> classy
 
-    let inline boolAttribute name (value: bool) =
+    let boolAttribute name (value: bool) =
         attribute name (string value)
 
 [<AutoOpen>]
 module Events =
     open Fable.Core.JsInterop
-    let inline onMouseEvent eventType f = 
+    let onMouseEvent eventType f =
         let h e =
             e?stopPropagation() |> ignore
             e?preventDefault() |> ignore
             f e
         EventHandler (eventType, h)
 
-    let inline onMouseClick x = onMouseEvent "onclick" x
-    let inline onContextMenu x = onMouseEvent "oncontextmenu" x
-    let inline onDblClick x = onMouseEvent "ondblclick" x
-    let inline onMouseDown x = onMouseEvent "onmousedown" x
-    let inline onMouseEnter x = onMouseEvent "onmouseenter" x
-    let inline onMouseLeave x = onMouseEvent "onmouseleave" x
-    let inline onMouseMove x = onMouseEvent "onmousemove" x
-    let inline onMouseOut x = onMouseEvent "onmouseout" x
-    let inline onMouseOver x = onMouseEvent "onmouseover" x
-    let inline onMouseUp x = onMouseEvent "onmouseup" x
-    let inline onShow x = onMouseEvent "onshow" x
-    let inline onKeyboardEvent eventType f = EventHandler (eventType, f)
-    let inline onKeydown x = onKeyboardEvent "onkeydown" x
-    let inline onKeypress x = onKeyboardEvent "onkeypress" x
-    let inline onKeyup x = onKeyboardEvent "onkeyup" x
+    let onMouseClick x = onMouseEvent "onclick" x
+    let onContextMenu x = onMouseEvent "oncontextmenu" x
+    let onDblClick x = onMouseEvent "ondblclick" x
+    let onMouseDown x = onMouseEvent "onmousedown" x
+    let onMouseEnter x = onMouseEvent "onmouseenter" x
+    let onMouseLeave x = onMouseEvent "onmouseleave" x
+    let onMouseMove x = onMouseEvent "onmousemove" x
+    let onMouseOut x = onMouseEvent "onmouseout" x
+    let onMouseOver x = onMouseEvent "onmouseover" x
+    let onMouseUp x = onMouseEvent "onmouseup" x
+    let onShow x = onMouseEvent "onshow" x
+    let onKeyboardEvent eventType f = EventHandler (eventType, f)
+    let onKeydown x = onKeyboardEvent "onkeydown" x
+    let onKeypress x = onKeyboardEvent "onkeypress" x
+    let onKeyup x = onKeyboardEvent "onkeyup" x
 
-    let inline onEvent eventType f = EventHandler (eventType, f)
-    let inline onAbort x = onEvent "onabort" x
-    let inline onAfterPrint x = onEvent "onafterprint" x
-    let inline onAudioEnd x = onEvent "onaudioend" x
-    let inline onAudioStart x = onEvent "onaudiostart" x
-    let inline onBeforePrint x = onEvent "onbeforeprint" x
-    let inline onCached x = onEvent "oncached" x
-    let inline onCanPlay x = onEvent "oncanplay" x
-    let inline onCanPlayThrough x = onEvent "oncanplaythrough" x
-    let inline onChange x = onEvent "onchange" x
-    let inline onChargingChange x = onEvent "onchargingchange" x
-    let inline onChargingTimeChange x = onEvent "onchargingtimechange" x
-    let inline onChecking x = onEvent "onchecking" x
-    let inline onClose x = onEvent "onclose" x
-    let inline onDischargingTimeChange x = onEvent "ondischargingtimechange" x
-    let inline onDOMContentLoaded x = onEvent "onDOMContentLoaded" x
-    let inline onDownloading x = onEvent "ondownloading" x
-    let inline onDurationchange x = onEvent "ondurationchange" x
-    let inline onEmptied x = onEvent "onemptied" x
-    let inline onEnd x = onEvent "onend" x
-    let inline onEnded x = onEvent "onended" x
-    let inline onError x = onEvent "onerror" x
-    let inline onCullScreenChange x = onEvent "onfullscreenchange" x
-    let inline onCullScreenError x = onEvent "onfullscreenerror" x
-    let inline onInput x = onEvent "oninput" x
-    let inline onInvalid x = onEvent "oninvalid" x
-    let inline onLanguageChange x = onEvent "onlanguagechange" x
-    let inline onLevelChange x = onEvent "onlevelchange" x
-    let inline onLoadedData x = onEvent "onloadeddata" x
-    let inline onLoadedMetaData x = onEvent "onloadedmetadata" x
-    let inline onNoUpdate x = onEvent "onnoupdate" x
-    let inline onObsolete x = onEvent "onobsolete" x
-    let inline onOffline x = onEvent "onoffline" x
-    let inline onOnline x = onEvent "ononline" x
-    let inline onOpen x = onEvent "onopen" x
-    let inline onOrientationChange x = onEvent "onorientationchange" x
-    let inline onPause x = onEvent "onpause" x
-    let inline onPointerlockchange x = onEvent "onpointerlockchange" x
-    let inline onPointerlockerror x = onEvent "onpointerlockerror" x
-    let inline onPlay x = onEvent "onplay" x
-    let inline onPlaying x = onEvent "onplaying" x
-    let inline onRateChange x = onEvent "onratechange" x
-    let inline onReadyStateChange x = onEvent "onreadystatechange" x
-    let inline onReset x = onEvent "onreset" x
-    let inline onSeeked x = onEvent "onseeked" x
-    let inline onSeeking x = onEvent "onseeking" x
-    let inline onSelectStart x = onEvent "onselectstart" x
-    let inline onSelectionChange x = onEvent "onselectionchange" x
-    let inline onSoundEnd x = onEvent "onsoundend" x
-    let inline onSoundStart x = onEvent "onsoundstart" x
-    let inline onSpeechEnd x = onEvent "onspeechend" x
-    let inline onSpeechStart x = onEvent "onspeechstart" x
-    let inline onStalled x = onEvent "onstalled" x
-    let inline onStart x = onEvent "onstart" x
-    let inline onSubmit x = onEvent "onsubmit" x
-    let inline onSuccess x = onEvent "onsuccess" x
-    let inline onSuspend x = onEvent "onsuspend" x
-    let inline onTimeUpdate x = onEvent "ontimeupdate" x
-    let inline onUpdateReady x = onEvent "onupdateready" x
-    let inline onVoicesChanged x = onEvent "onvoiceschanged" x
-    let inline onVisibilityChange x = onEvent "onvisibilitychange" x
-    let inline onVolumeChange x = onEvent "onvolumechange" x
-    let inline onVrdisplayConnected x = onEvent "onvrdisplayconnected" x
-    let inline onVrdisplayDisconnected x = onEvent "onvrdisplaydisconnected" x
-    let inline onVrdisplayPresentChange x = onEvent "onvrdisplaypresentchange" x
-    let inline onWaiting x = onEvent "onwaiting" x
+    let onEvent eventType f = EventHandler (eventType, f)
+    let onAbort x = onEvent "onabort" x
+    let onAfterPrint x = onEvent "onafterprint" x
+    let onAudioEnd x = onEvent "onaudioend" x
+    let onAudioStart x = onEvent "onaudiostart" x
+    let onBeforePrint x = onEvent "onbeforeprint" x
+    let onCached x = onEvent "oncached" x
+    let onCanPlay x = onEvent "oncanplay" x
+    let onCanPlayThrough x = onEvent "oncanplaythrough" x
+    let onChange x = onEvent "onchange" x
+    let onChargingChange x = onEvent "onchargingchange" x
+    let onChargingTimeChange x = onEvent "onchargingtimechange" x
+    let onChecking x = onEvent "onchecking" x
+    let onClose x = onEvent "onclose" x
+    let onDischargingTimeChange x = onEvent "ondischargingtimechange" x
+    let onDOMContentLoaded x = onEvent "onDOMContentLoaded" x
+    let onDownloading x = onEvent "ondownloading" x
+    let onDurationchange x = onEvent "ondurationchange" x
+    let onEmptied x = onEvent "onemptied" x
+    let onEnd x = onEvent "onend" x
+    let onEnded x = onEvent "onended" x
+    let onError x = onEvent "onerror" x
+    let onCullScreenChange x = onEvent "onfullscreenchange" x
+    let onCullScreenError x = onEvent "onfullscreenerror" x
+    let onInput x = onEvent "oninput" x
+    let onInvalid x = onEvent "oninvalid" x
+    let onLanguageChange x = onEvent "onlanguagechange" x
+    let onLevelChange x = onEvent "onlevelchange" x
+    let onLoadedData x = onEvent "onloadeddata" x
+    let onLoadedMetaData x = onEvent "onloadedmetadata" x
+    let onNoUpdate x = onEvent "onnoupdate" x
+    let onObsolete x = onEvent "onobsolete" x
+    let onOffline x = onEvent "onoffline" x
+    let onOnline x = onEvent "ononline" x
+    let onOpen x = onEvent "onopen" x
+    let onOrientationChange x = onEvent "onorientationchange" x
+    let onPause x = onEvent "onpause" x
+    let onPointerlockchange x = onEvent "onpointerlockchange" x
+    let onPointerlockerror x = onEvent "onpointerlockerror" x
+    let onPlay x = onEvent "onplay" x
+    let onPlaying x = onEvent "onplaying" x
+    let onRateChange x = onEvent "onratechange" x
+    let onReadyStateChange x = onEvent "onreadystatechange" x
+    let onReset x = onEvent "onreset" x
+    let onSeeked x = onEvent "onseeked" x
+    let onSeeking x = onEvent "onseeking" x
+    let onSelectStart x = onEvent "onselectstart" x
+    let onSelectionChange x = onEvent "onselectionchange" x
+    let onSoundEnd x = onEvent "onsoundend" x
+    let onSoundStart x = onEvent "onsoundstart" x
+    let onSpeechEnd x = onEvent "onspeechend" x
+    let onSpeechStart x = onEvent "onspeechstart" x
+    let onStalled x = onEvent "onstalled" x
+    let onStart x = onEvent "onstart" x
+    let onSubmit x = onEvent "onsubmit" x
+    let onSuccess x = onEvent "onsuccess" x
+    let onSuspend x = onEvent "onsuspend" x
+    let onTimeUpdate x = onEvent "ontimeupdate" x
+    let onUpdateReady x = onEvent "onupdateready" x
+    let onVoicesChanged x = onEvent "onvoiceschanged" x
+    let onVisibilityChange x = onEvent "onvisibilitychange" x
+    let onVolumeChange x = onEvent "onvolumechange" x
+    let onVrdisplayConnected x = onEvent "onvrdisplayconnected" x
+    let onVrdisplayDisconnected x = onEvent "onvrdisplaydisconnected" x
+    let onVrdisplayPresentChange x = onEvent "onvrdisplaypresentchange" x
+    let onWaiting x = onEvent "onwaiting" x
 
-    let inline onBlur x = onEvent "onblur" x
-    let inline onFocus x = onEvent "onfocus" x
+    let onBlur x = onEvent "onblur" x
+    let onFocus x = onEvent "onfocus" x
 
 [<AutoOpen>]
-module Svg = 
+module Svg =
     let svgNS = Attribute.Property("namespace","http://www.w3.org/2000/svg")
-    let inline svgElem tagName attrs children = Element((tagName, svgNS::attrs), children)
+    let svgElem tagName attrs children = Element((tagName, svgNS::attrs), children)
 
-    let inline svg x = svgElem "svg" x
-    let inline circle x = svgElem "circle" x 
-    let inline rect x = svgElem "rect" x 
+    let svg x = svgElem "svg" x
+    let circle x = svgElem "circle" x
+    let rect x = svgElem "rect" x
 
-    let inline width x = attribute "width" x
-    let inline height x = attribute "height" x
-    let inline viewBox x = attribute "viewBox" x
-    let inline cx x = attribute "cx" x
-    let inline cy x = attribute "cy" x
-    let inline r x = attribute "r" x
-    let inline stroke x = attribute "stroke" x
-    let inline strokeWidth x = attribute "stroke-width" x
-    let inline fill x = attribute "fill" x
+    let width x = attribute "width" x
+    let height x = attribute "height" x
+    let viewBox x = attribute "viewBox" x
+    let cx x = attribute "cx" x
+    let cy x = attribute "cy" x
+    let r x = attribute "r" x
+    let stroke x = attribute "stroke" x
+    let strokeWidth x = attribute "stroke-width" x
+    let fill x = attribute "fill" x
