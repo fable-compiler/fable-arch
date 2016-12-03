@@ -1,7 +1,7 @@
 var path = require("path");
 var fs = require("fs-extra");
-// var fable = require("fable-compiler");
-var fable = require("../Fable/build/fable");
+var fable = require("fable-compiler");
+// var fable = require("../Fable/build/fable");
 
 var targets = {
     all() {

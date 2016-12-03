@@ -38,17 +38,13 @@ module Types =
 
     type Selector = string
 
-    type RenderFn<'TModel, 'TMessage, 'TView> =
-        | Vdom of (Handler<'TMessage> -> 'TView -> unit)
-        | React of (Handler<'TMessage> -> 'TModel -> unit)
-
     type AppSpecification<'TModel, 'TMessage, 'TView> =
         {
             InitState: 'TModel
             View: 'TModel -> 'TView
             Update: 'TModel -> 'TMessage -> ('TModel * Action<'TMessage> list)
             InitMessage: Action<'TMessage>
-            CreateRenderer: Selector -> Handler<'TMessage> -> 'TView -> RenderFn<'TModel, 'TMessage, 'TView>
+            CreateRenderer: Selector -> Handler<'TMessage> -> 'TView -> (Handler<'TMessage> -> 'TView -> unit)
             NodeSelector: Selector
             Producers: Producer<'TMessage, 'TModel> list
             Subscribers: Subscriber<'TMessage, 'TModel> list
@@ -58,7 +54,7 @@ module Types =
         {
             Model: 'TModel
             Actions: (unit -> unit) list
-            Render: RenderFn<'TModel, 'TMessage, 'TView>
+            Render: Handler<'TMessage> -> 'TView -> unit
             Subscribers: Subscriber<'TMessage, 'TModel> list
         }
 
@@ -89,12 +85,8 @@ module Types =
         handleEvent
 
     let render post viewFn app =
-        match app.Render with
-        | Vdom render ->
-            let view = viewFn app.Model
-            render (Message >> post) view
-        | React render ->
-            render (Message >> post) app.Model
+        let view = viewFn app.Model
+        app.Render (Message >> post) view
         app
 
     let createActions post = List.map (fun a -> fun () -> a (Message >> post))
@@ -171,19 +163,7 @@ module AppApi =
             View = view
             Update = update
             InitMessage = (fun _ -> ())
-            CreateRenderer = fun sel h v -> createRenderer sel h v |> Vdom
-            NodeSelector = "body"
-            Producers = []
-            Subscribers = []
-        }
-
-    let createReactApp state update createRenderer =
-        {
-            InitState = state
-            View = Unchecked.defaultof<_>
-            Update = fun x y -> (update x y), []
-            InitMessage = (fun _ -> ())
-            CreateRenderer = fun sel h v -> createRenderer sel h v |> React
+            CreateRenderer = createRenderer
             NodeSelector = "body"
             Producers = []
             Subscribers = []
@@ -225,10 +205,7 @@ module AppApi =
         let updateFn = appSpec.Update
 
         let createInitApp post =
-            let view : 'TView =
-                if box viewFn <> null
-                then viewFn appSpec.InitState
-                else Unchecked.defaultof<'TView>
+            let view : 'TView = viewFn appSpec.InitState
             let render = appSpec.CreateRenderer appSpec.NodeSelector post view
             {
                 Model = appSpec.InitState

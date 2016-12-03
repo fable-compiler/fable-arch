@@ -51,7 +51,7 @@
     <Compile Include="Fable.Arch.React.fs" />
     <Content Include="paket.references" />
     <!--<Compile Include="RouteParserTesting.fsx" />-->
-    <!--<Compile Include="Fable.Arch.Navigation.fs" />-->
+    <Compile Include="Fable.Arch.Navigation.fs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <Choose>

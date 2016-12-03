@@ -29,7 +29,7 @@ open Fable.Import.React
 
 // MODEL
 
-type [<Pojo>] Model = {count:int}
+type Model = {count:int}
 
 
 type Msg =
@@ -55,7 +55,7 @@ module R = Fable.Helpers.React
 open Fable.Core.JsInterop
 open Fable.Helpers.React.Props
 
-let view dispatch {count = count} =
+let view {count = count} dispatch =
   let onClick msg =
     OnClick <| fun _ -> msg |> dispatch
 
@@ -69,20 +69,12 @@ let placeholderId = "#hello"
 
 let initModel = {count = 0}
 
-let createReactApp initState update createRenderer =
-    {
-        InitState = initState
-        View = Unchecked.defaultof<_>
-        Update = fun x y -> (update x y), []
-        InitMessage = (fun _ -> ())
-        CreateRenderer = fun sel h v -> createRenderer sel |> React
-        NodeSelector = "body"
-        Producers = []
-        Subscribers = []
-    }
+let createReactApp initModel view update =
+  let reactView = id
+  let renderer = createRenderer view initModel
+  createSimpleApp initModel reactView update renderer
 
-createRenderer view initModel
-|> createReactApp initModel update
+createReactApp initModel view update
 |> withStartNodeSelector placeholderId
 (**
 To enable the devtools all we need is this line
