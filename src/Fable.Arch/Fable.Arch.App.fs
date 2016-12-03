@@ -10,7 +10,7 @@ open Html
 module Types =
     type Handler<'TMessage> = 'TMessage -> unit
 
-    type ModelChanged<'TMessage, 'TModel> = 
+    type ModelChanged<'TMessage, 'TModel> =
         {
             PreviousState: 'TModel
             Message: 'TMessage
@@ -21,7 +21,7 @@ module Types =
         | ModelChanged of ModelChanged<'TMessage, 'TModel>
         | ActionReceived of 'TMessage
         | Replayed of (System.Guid * 'TModel) list
-    
+
     type AppMessage<'TMessage, 'TModel> =
         | Message of 'TMessage
         | Replay of 'TModel*((System.Guid*'TMessage) list)
@@ -38,13 +38,17 @@ module Types =
 
     type Selector = string
 
-    type AppSpecification<'TModel, 'TMessage, 'TView> = 
+    type RenderFn<'TModel, 'TMessage, 'TView> =
+        | Vdom of (Handler<'TMessage> -> 'TView -> unit)
+        | React of (Handler<'TMessage> -> 'TModel -> unit)
+
+    type AppSpecification<'TModel, 'TMessage, 'TView> =
         {
             InitState: 'TModel
             View: 'TModel -> 'TView
             Update: 'TModel -> 'TMessage -> ('TModel * Action<'TMessage> list)
             InitMessage: Action<'TMessage>
-            CreateRenderer: Selector -> Handler<'TMessage> -> 'TView -> (Handler<'TMessage> -> 'TView -> unit)
+            CreateRenderer: Selector -> Handler<'TMessage> -> 'TView -> RenderFn<'TModel, 'TMessage, 'TView>
             NodeSelector: Selector
             Producers: Producer<'TMessage, 'TModel> list
             Subscribers: Subscriber<'TMessage, 'TModel> list
@@ -54,21 +58,21 @@ module Types =
         {
             Model: 'TModel
             Actions: (unit -> unit) list
-            Render: Handler<'TMessage> -> 'TView -> unit
+            Render: RenderFn<'TModel, 'TMessage, 'TView>
             Subscribers: Subscriber<'TMessage, 'TModel> list
         }
 
     let application<'TMessage, 'TModel, 'TView> initMessage handleMessage handleReplay configureProducers createInitApp =
         let mutable state = None
 
-        let notifySubs msg = 
+        let notifySubs msg =
             match state with
-            | Some s -> 
+            | Some s ->
                 s.Subscribers |> List.iter (fun sub -> sub msg)
             | None -> ()
 
         let rec handleEvent (evt:AppMessage<'TMessage, 'TModel>) =
-            let (state', actions)  : App<'TModel, 'TMessage, 'TView>*(unit -> unit) list = 
+            let (state', actions)  : App<'TModel, 'TMessage, 'TView>*(unit -> unit) list =
                 match evt with
                 | Message message ->
                     handleMessage handleEvent notifySubs message (state |> Option.get)
@@ -85,33 +89,37 @@ module Types =
         handleEvent
 
     let render post viewFn app =
-        let view = viewFn app.Model
-        app.Render (Message >> post) view
+        match app.Render with
+        | Vdom render ->
+            let view = viewFn app.Model
+            render (Message >> post) view
+        | React render ->
+            render (Message >> post) app.Model
         app
 
     let createActions post = List.map (fun a -> fun () -> a (Message >> post))
-    
+
     let handleMessage update viewFn post notifySubs message app =
         notifySubs (ActionReceived message)
         let (model, actions) = update app.Model message
 
-        let modelChanged = 
+        let modelChanged =
             ModelChanged {
                 CurrentState = model
                 PreviousState = app.Model
                 Message = message
             }
-        
+
         let actions = createActions post actions
-        let app' = 
+        let app' =
             {app with Model = model}
             |> render post viewFn
 
         app', (fun () -> (notifySubs modelChanged))::actions
 
-    let calculateModelChanges initState update actions = 
+    let calculateModelChanges initState update actions =
         let execUpdate r a =
-            let m = 
+            let m =
                 match r with
                 | [] -> initState
                 | x::_ -> x |> snd
@@ -123,23 +131,23 @@ module Types =
         actions
         |> List.fold (fun s a -> (execUpdate s a)::s) []
 
-    let handleReplay viewFn updateFn post notifySubs (fromModel, actions) app = 
+    let handleReplay viewFn updateFn post notifySubs (fromModel, actions) app =
         let result = calculateModelChanges fromModel updateFn actions
-        let model = 
-            match result with 
+        let model =
+            match result with
             | m::_ -> m |> snd
             | [] -> fromModel
-        let app' = 
+        let app' =
             {app with Model = model}
             |> render post viewFn
-        
+
         app', [fun () -> (Replayed result) |> notifySubs]
 
 [<AutoOpen>]
-module AppApi = 
+module AppApi =
     // Helper functions to map from one action type to another
-    let mapAction<'T1,'T2> (mapping:'T1 -> 'T2) (action:Action<'T1>) : Action<'T2> = 
-        fun x -> action (mapping >> x)  
+    let mapAction<'T1,'T2> (mapping:'T1 -> 'T2) (action:Action<'T1>) : Action<'T2> =
+        fun x -> action (mapping >> x)
 
     let mapAppMessage map = function
         | AppMessage.Message msg -> AppMessage.Message (map msg)
@@ -163,7 +171,19 @@ module AppApi =
             View = view
             Update = update
             InitMessage = (fun _ -> ())
-            CreateRenderer = createRenderer
+            CreateRenderer = fun sel h v -> createRenderer sel h v |> Vdom
+            NodeSelector = "body"
+            Producers = []
+            Subscribers = []
+        }
+
+    let createReactApp state update createRenderer =
+        {
+            InitState = state
+            View = Unchecked.defaultof<_>
+            Update = fun x y -> (update x y), []
+            InitMessage = (fun _ -> ())
+            CreateRenderer = fun sel h v -> createRenderer sel h v |> React
             NodeSelector = "body"
             Producers = []
             Subscribers = []
@@ -177,35 +197,38 @@ module AppApi =
     let withStartNodeSelector selector app = { app with NodeSelector = selector }
     let withInitMessage msg app = { app with InitMessage = msg }
 
-    let private withInstrumentationProducer p app = 
+    let private withInstrumentationProducer p app =
         {app with Producers = p::app.Producers}
     let withProducer (producer:('a->unit)->unit) app =
-        let lift h = Message >> h 
+        let lift h = Message >> h
         let producer' = lift >> producer
         withInstrumentationProducer producer' app
 
     let withInstrumentationSubscriber subscriber app =
         {app with AppSpecification.Subscribers = subscriber::app.Subscribers}
-    let withSubscriber (subscriber:ModelChanged<'a,'b> -> unit) app = 
-        let subscriber' = function 
+    let withSubscriber (subscriber:ModelChanged<'a,'b> -> unit) app =
+        let subscriber' = function
             | ModelChanged m -> m |> subscriber
             | _ -> ()
         withInstrumentationSubscriber subscriber' app
-        
+
     let withPlugin plugin =
         (withInstrumentationSubscriber plugin.Subscriber)
         >> (withInstrumentationProducer plugin.Producer)
 
     let configureProducers producers post =
-        producers |> List.iter (fun p -> p post) 
+        producers |> List.iter (fun p -> p post)
 
     // Start the application
     let start (appSpec:AppSpecification<'TModel, 'TMessage, 'TView>) =
         let viewFn : ('TModel -> 'TView) = appSpec.View
         let updateFn = appSpec.Update
 
-        let createInitApp post = 
-            let view : 'TView = viewFn appSpec.InitState
+        let createInitApp post =
+            let view : 'TView =
+                if box viewFn <> null
+                then viewFn appSpec.InitState
+                else Unchecked.defaultof<'TView>
             let render = appSpec.CreateRenderer appSpec.NodeSelector post view
             {
                 Model = appSpec.InitState
