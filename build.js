@@ -8,7 +8,7 @@ var targets = {
         return fable.promisify(fs.remove, "npm")
             .then(_ => fable.promisify(fs.remove, "build"))
             .then(_ => fable.compile({projFile: "src/Fable.Arch"}))
-            // .then(_ => fable.compile({projFile: "src/Fable.Arch", target: "umd"}))
+            .then(_ => fable.compile({projFile: "src/Fable.Arch", target: "umd"}))
             .then(_ => fable.promisify(fs.copy, "package.json", "npm/package.json"))
             .then(_ => fable.promisify(fs.copy, "README.md", "npm/README.md"))
             .then(_ => fable.promisify(fs.readFile, "RELEASE_NOTES.md"))
