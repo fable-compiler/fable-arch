@@ -8,7 +8,7 @@ According to webpack website:
 >
 > It’s like LiveReload for every module.
 
-In this documentation we are going to see how HMR can be used with Fable-VirtualDom to dynamically update the application and maintain the state between realods.
+In this documentation we are going to see how HMR can be used with Fable-VirtualDom to dynamically update the application and maintain the state between reloads.
 
 
 ## How to use in development mode ?
