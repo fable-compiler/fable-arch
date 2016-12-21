@@ -8,8 +8,11 @@ open Html
 
 [<AutoOpen>]
 module Types =
+
+    /// An handler is a function used to send a message in the application.
     type Handler<'TMessage> = 'TMessage -> unit
 
+    /// Representation of a change in the model
     type ModelChanged<'TMessage, 'TModel> =
         {
             PreviousState: 'TModel
@@ -38,6 +41,16 @@ module Types =
 
     type Selector = string
 
+    /// AppSpecification is a type used as an interface for the renderer
+    ///
+    /// - InitState: Initiale state of the model used by the application.
+    /// - View: Function used to generate the Virtual DOM supported by the renderer.
+    /// - Update: Function used to support the message in the application.
+    /// - InitMessage: A function to execute when the app is ready.
+    /// - CreateRenderer: This function is responsible to convert the Virtual DOM into real DOM.
+    /// - NodeSelector: Selector used to attach the application in the DOM
+    /// - Producers: This is a list of function which are able to push message inside the application
+    /// - Subscribers: This is a list of function to notify when a message is handle by the application
     type AppSpecification<'TModel, 'TMessage, 'TView> =
         {
             InitState: 'TModel
@@ -59,29 +72,43 @@ module Types =
         }
 
     let application<'TMessage, 'TModel, 'TView> initMessage handleMessage handleReplay configureProducers createInitApp =
+        /// State of the application
+        /// we are using closure to store the Application state in memory
         let mutable state = None
 
+        /// Helper function used to notify subscribers
         let notifySubs msg =
+            /// Only notify the subscribers if the application is running
             match state with
             | Some s ->
                 s.Subscribers |> List.iter (fun sub -> sub msg)
             | None -> ()
 
+        /// Function responsible of running the application 
         let rec handleEvent (evt:AppMessage<'TMessage, 'TModel>) =
             let (state', actions)  : App<'TModel, 'TMessage, 'TView>*(unit -> unit) list =
+                // Pattern matching overt the type of the AppMessage
                 match evt with
                 | Message message ->
+                    // This is a standard message
                     handleMessage handleEvent notifySubs message (state |> Option.get)
                 | Replay (model, messages) ->
+                    // We are asking to replay a state
                     handleReplay handleEvent notifySubs (model, messages) (state |> Option.get)
+            // Update the 
             state <- Some state'
             actions |> List.iter (fun x -> x())
 
         let post = (Message >> handleEvent)
+        /// Initialise the application
         state <- createInitApp post |> Some
+        /// Send the init message into the application
         initMessage post
 
+        /// Configure the producers give them an Handler
+        /// This is the Handler they will use to push message in the application
         configureProducers handleEvent
+        // Start the application
         handleEvent
 
     let render post viewFn app =
@@ -91,7 +118,15 @@ module Types =
 
     let createActions post = List.map (fun a -> fun () -> a (Message >> post))
 
-    let handleMessage update viewFn post notifySubs message app =
+    /// Function used to handle a message inside the application
+    ///
+    /// - update: Function used to support the message in the application.
+    /// - viewFn: Function taking the model in input and generating a Virtual DOM
+    /// - post: Function used to send back Message into the application
+    /// - notifySubs: Function used to notify the subscribers
+    /// - message: Current Message being processed
+    /// - app: Current state of the Application being processed
+    let handleMessage (update: 'TModel -> 'TMessage -> 'TModel * Action<'TMessage> list) (viewFn: 'TModel -> 'TView) (post: AppMessage<'TMessage, 'TModel> -> unit) (notifySubs: AppEvent<'TMessage, 'TModel> -> unit) (message: 'TMessage) (app: App<'TModel, 'TMessage, 'TView>) =
         notifySubs (ActionReceived message)
         let (model, actions) = update app.Model message
 
