@@ -2,7 +2,7 @@
 
 # Hot Module Replacement
 
-According to webpack website:
+According to the [Webpack website](https://webpack.js.org/concepts/hot-module-replacement/):
 
 > “Hot Module Replacement” (HMR) is a feature to inject updated modules into the active runtime.
 >
@@ -13,14 +13,14 @@ In this documentation we are going to see how HMR can be used with Fable-Virtual
 
 ## How to use in development mode ?
 
-First we need to install the npm dependencies and dev dependencies with: `npm install`
+First we need to install the NPM dependencies and dev dependencies with: `npm install`
 
-Second we run `npm run dev` which have two effect:
+Secondly, we run `npm run dev` which does two things:
 
-1. Start fable compiler in watching mode
-2. Start webpack development server for serving the files and activating the HMR
+1. Start fable compiler in watch mode
+2. Start a Webpack development server for serving the files and activating the HMR
 
-Now you can access the website by navigating at [http://localhost:8080](http://localhost:8080)
+You can now access the website by navigating to [http://localhost:8080](http://localhost:8080)
 
 
 ## Architecture
@@ -35,8 +35,8 @@ require( '../styles/app.styl' );
 var Entry = require( '../../out/Entry' );
 ```
 
-The application start point is `Entry` module (js file).
-Fable is generating one *.js* file by *.fsx*.
+The application start point is the `Entry` module (js file).
+Fable generates one *.js* file for each *.fsx* file.
 
 The `Entry.fsx` file is used to set up the HMR and start the VirtualDom application.
 
@@ -63,7 +63,7 @@ if isNotNull Module.hot then
 App.Main.start contentNode ()
 ```
 
-The file `Main.fsx` is a Fable-VirtualDom application with some configuration to support the HMR. 
+The `Main.fsx` file is a Fable-VirtualDom application with some configuration to support the HMR. 
 
 ```fsharp
 type Model =
@@ -100,7 +100,7 @@ type Model =
     model', action'
 ```
 
-We used the `window?storage` to store the state of our application on each update and load the app from here if there is information in it at loading time.
+We use the `window?storage` to store the state of our application on each update and load the app from here if there is information in it at loading time.
 
 ## Known limitations
 
@@ -116,6 +116,6 @@ You just need to clone the repo and follow the [How to use in development mode ?
 
 ## Bonus
 
-The embedded webpack is also configure to generate production ready files. 
+The embedded Webpack configuration can also generate production ready files. 
 
-You just run the command `npm run build` and got the folder `public/` generated with all the files need for your client side.
+Just run the command `npm run build` and go to the folder `public/`, which will contain the generated files needed for your client side application.
