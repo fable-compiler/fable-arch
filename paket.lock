@@ -1,13 +1,13 @@
 NUGET
   remote: https://www.nuget.org/api/v2
-    FAKE (4.37.2)
+    FAKE (4.48)
     FSharp.Core (4.0.0.1)
 
 GROUP Docs
 NUGET
   remote: https://www.nuget.org/api/v2
-    DotLiquid (2.0.26)
-    FAKE (4.37.2)
+    DotLiquid (2.0.64)
+    FAKE (4.48)
     FSharp.Compiler.Service (2.0.0.6)
     FSharp.Core (4.0.0.1)
     FSharp.Formatting (2.14.4)
