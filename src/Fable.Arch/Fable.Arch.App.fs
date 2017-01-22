@@ -234,8 +234,11 @@ module AppApi =
     let configureProducers producers post =
         producers |> List.iter (fun p -> p post)
 
-    // Start the application
-    let start (appSpec:AppSpecification<'TModel, 'TMessage, 'TView>) =
+    /// Start the application and return a function `AppMessage<'TMessage, 'TModel> -> unit`,
+    /// that will act as a way to send messages into the app. This is used for non-mainstream
+    /// scenarios where the complete app is controlled by an external entity, such as DevTools.
+    /// For normal applications, use the `start` function instead.
+    let startAndExposeMessageSink (appSpec:AppSpecification<'TModel, 'TMessage, 'TView>) =
         let viewFn : ('TModel -> 'TView) = appSpec.View
         let updateFn = appSpec.Update
 
@@ -252,3 +255,7 @@ module AppApi =
         let handleReplay' = handleReplay viewFn updateFn
         let configureProducers' = configureProducers appSpec.Producers
         application appSpec.InitMessage handleMessage' handleReplay' configureProducers' createInitApp
+
+    /// Start the application
+    let start (appSpec:AppSpecification<'TModel, 'TMessage, 'TView>) = 
+        startAndExposeMessageSink appSpec |> ignore

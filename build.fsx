@@ -49,7 +49,7 @@ Target "Npm" (fun _ ->
     Npm (fun p ->
             { p with
                 Command = Install Standard
-                WorkingDirectory = "./src/Fable.Arch/"
+                WorkingDirectory = "."
             })
 )
 
