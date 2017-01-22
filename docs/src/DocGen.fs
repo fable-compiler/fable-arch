@@ -16,8 +16,8 @@ module DocGen =
   let baseUrl = ""
   let rawUrl = ""
   #else
-  let baseUrl = "https://mangelmaxime.github.io/fable-arch"
-  let rawUrl = "https://raw.githubusercontent.com/MangelMaxime/fable-arch/gh-pages/"
+  let baseUrl = "https://fable-compiler.github.io/fable-arch"
+  let rawUrl = "https://raw.githubusercontent.com/fable-compiler/fable-arch/gh-pages/"
   #endif
 
   let createSampleURL file =
