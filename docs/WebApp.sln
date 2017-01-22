@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "project", "project", "{BF60BC93-E09B-4E5F-9D85-95A519479D54}"
+	ProjectSection(SolutionItems) = preProject
+		build.js = build.js
+		index.html = index.html
+		package.json = package.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "public", "public", "{BDC2CBB4-EF50-4A9A-A738-0B2A82A621A3}"
+	ProjectSection(SolutionItems) = preProject
+		public\css\style.css = public\css\style.css
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scss", "scss", "{DF9E3093-65E8-4EB5-8870-21D1F3B554B8}"
+	ProjectSection(SolutionItems) = preProject
+		scss\main.sass = scss\main.sass
+	EndProjectSection
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "WebApp", "src\WebApp.fsproj", "{861B39F3-785E-45AB-90B4-3CC720C1EC0B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{861B39F3-785E-45AB-90B4-3CC720C1EC0B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{861B39F3-785E-45AB-90B4-3CC720C1EC0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{861B39F3-785E-45AB-90B4-3CC720C1EC0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{861B39F3-785E-45AB-90B4-3CC720C1EC0B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -260,7 +260,7 @@ build/
 .paket/paket.exe
 
 
-public/
+docs/public/js/
 
 # Generated documentation folder
 docs/output/
