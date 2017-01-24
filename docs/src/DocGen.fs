@@ -13,18 +13,16 @@ module DocGen =
   let docFilesDirectory = "doc_files"
 
   #if DEV
-  let baseUrl = ""
   let rawUrl = ""
   #else
-  let baseUrl = "https://fable-compiler.github.io/fable-arch"
   let rawUrl = "https://raw.githubusercontent.com/fable-compiler/fable-arch/gh-pages/"
   #endif
-
+  
   let createSampleURL file =
     sprintf "%s/%s/%s" rawUrl sampleSourceDirectory file
 
   let createDocFilesDirectoryURL fileName =
-    sprintf "%s/%s/%s.md" baseUrl docFilesDirectory fileName
+    sprintf "%s/%s/%s.md" rawUrl docFilesDirectory fileName
 
   let createDocURL fileName =
     sprintf "#/docs?fileName=%s" fileName
