@@ -86,8 +86,8 @@ module Dispatcher =
                   ]
                 tileVertical
                   [ { Title = "Subscriber"
-                      SubTitle = "A subscriber is a function attach to an application. This subscriber will be notify every time an event/message
-                                  is being handle by the application."
+                      SubTitle = "A subscriber is a function attached to an application. The subscriber will be notified every time an event/message
+                                  is handled by the application."
                       FileName = "subscriber"
                     }
                   ]
