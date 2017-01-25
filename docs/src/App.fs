@@ -235,7 +235,6 @@ module Main =
   |> withProducer tickProducer
   |> withSubscriber (routeSubscriber locationHandler routerF)
   |> start
-  |> ignore
 
   // Init location
   // If hash is empty go to root
