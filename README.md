@@ -6,7 +6,7 @@ Fable bindings for virtual-dom
 
 ```sh
 $ npm install --save virtual-dom fable-core
-$ npm install --save-dev fable-import-virtualdom
+$ npm install --save-dev fable-arch
 ```
 
 ## Usage
@@ -17,18 +17,40 @@ $ npm install --save-dev fable-import-virtualdom
   <ItemGroup>
     <Reference Include="node_modules/fable-core/Fable.Core.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="node_modules/fable-import-virtualdom/Fable.Helpers.Virtualdom.fs" />
-  </ItemGroup>
+  <Reference Include="Fable.Arch">
+    <HintPath>node_modules\fable-arch\Fable.Arch.dll</HintPath>
+  </Reference>
 ```
 
 ### In an F# script (.fsx)
 
 ```fsharp
 #r "node_modules/fable-core/Fable.Core.dll"
-#load "node_modules/fable-import-virtualdom/Fable.Helpers.Virtualdom.fs"
+#r "node_modules\fable-arch\Fable.Arch.dll"
 
 open Fable.Core
 open Fable.Import
-open Fable.Helpers.VirtualDom
+open Fable.Arch
+open Fable.Arch.App
+open Fable.Arch.App.AppApi
+open Fable.Arch.Html
+```
+
+### Rollup
+
+If you are using Rollup has the bundler you need to tell it how to bundle virtual-dom.
+
+Example:
+
+```json
+  "rollup": {
+    "dest": "public/bundle.js",
+    "plugins": {
+      "commonjs": {
+        "namedExports": {
+          "virtual-dom": [ "h", "create", "diff", "patch" ]
+        }
+      }
+    }
+  }
 ```
