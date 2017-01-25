@@ -406,7 +406,7 @@ let createDevTools<'TMessage, 'TModel> pluginId initModel=
             }
         createApp initModel devToolsView devToolsUpdate Virtualdom.createRender
         |> withStartNodeSelector "#___devtools"
-        |> start 
+        |> startAndExposeMessageSink 
     
     {
         Producer = (fun h -> linkAgent.Post(SetHandler h)) 

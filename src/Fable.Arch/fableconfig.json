@@ -1,0 +1,14 @@
+{
+    "projFile": "./Fable.Arch.fsproj",
+    "sourceMaps": true,
+    "outDir": "../../npm",
+    "module": "es2015",
+    "dll": true,
+    "targets": {
+        "umd": {
+            "outDir": "../../npm/umd",
+            "module": "umd",
+            "dll": false
+        }
+    }
+}
