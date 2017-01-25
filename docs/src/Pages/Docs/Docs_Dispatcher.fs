@@ -79,7 +79,7 @@ module Dispatcher =
               [ tileVertical
                   [ { Title = "Hot Module Replacement (HMR)"
                       SubTitle = "Hot Module Reloading, or Replacement, is a feature where you inject update modules in a running application.
-                                  This opens up the possibility to time travel in the application without loosing context.
+                                  This opens up the possibility to time travel in the application without losing context.
                                   It also makes it easier to try out changes in the functionality while retaining the state of the application."
                       FileName = "hmr"
                     }
