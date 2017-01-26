@@ -79,15 +79,15 @@ module Dispatcher =
               [ tileVertical
                   [ { Title = "Hot Module Replacement (HMR)"
                       SubTitle = "Hot Module Reloading, or Replacement, is a feature where you inject update modules in a running application.
-                                  This opens up the possibility to time travel in the application without loosing context.
+                                  This opens up the possibility to time travel in the application without losing context.
                                   It also makes it easier to try out changes in the functionality while retaining the state of the application."
                       FileName = "hmr"
                     }
                   ]
                 tileVertical
                   [ { Title = "Subscriber"
-                      SubTitle = "A subscriber is a function attach to an application. This subscriber will be notify every time an event/message
-                                  is being handle by the application."
+                      SubTitle = "A subscriber is a function attached to an application. The subscriber will be notified every time an event/message
+                                  is handled by the application."
                       FileName = "subscriber"
                     }
                   ]
