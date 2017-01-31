@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "node build.js",
+    "build-dev": "node build.js dev",
     "dev": "concurrently \"npm run serve\" \"npm run watch\"",
     "serve": "http-server . -c-1 -s",
     "setup": "node setup.js",

@@ -189,6 +189,7 @@ module Main =
       runM (NavigateTo (Sample SampleApi.Counter)) (pStaticStr "/sample/counter" |> (drop >> _end))
       runM (NavigateTo (Sample SampleApi.HelloWorld)) (pStaticStr "/sample/hello-world" |> (drop >> _end))
       runM (NavigateTo (Sample SampleApi.NestedCounter)) (pStaticStr "/sample/nested-counter" |> (drop >> _end))
+      runM (NavigateTo (Sample SampleApi.Calculator)) (pStaticStr "/sample/calculator" |> (drop >> _end))
       runM (NavigateTo About) (pStaticStr "/about" |> (drop >> _end))
     ]
 
