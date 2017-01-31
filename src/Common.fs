@@ -25,6 +25,7 @@ module Common =
       | Counter
       | HelloWorld
       | NestedCounter
+      | Calculator
 
   type Route
     = Index
@@ -45,6 +46,7 @@ module Common =
         | SampleApi.Counter -> Some "/sample/counter"
         | SampleApi.HelloWorld -> Some "/sample/hello-world"
         | SampleApi.NestedCounter -> Some "/sample/nested-counter"
+        | SampleApi.Calculator -> Some "/sample/calculator"
       | About -> Some "/about"
 
   let voidLinkAction<'T> : Attribute<'T> = property "href" "javascript:void(0)"

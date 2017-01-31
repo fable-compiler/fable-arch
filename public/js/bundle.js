@@ -2154,7 +2154,15 @@ function mapEventHandler(mapping, e, f) {
     }]]);
 }
 function mapAttributes(mapping, attribute) {
-    return attribute.Case === "Style" ? new Types.Attribute("Style", [attribute.Fields[0]]) : attribute.Case === "Property" ? new Types.Attribute("Property", [attribute.Fields[0]]) : attribute.Case === "Attribute" ? new Types.Attribute("Attribute", [attribute.Fields[0]]) : mapEventHandler(mapping, attribute.Fields[0][0], attribute.Fields[0][1]);
+    if (attribute.Case === "Style") {
+        return new Types.Attribute("Style", [attribute.Fields[0]]);
+    } else if (attribute.Case === "Property") {
+        return new Types.Attribute("Property", [attribute.Fields[0]]);
+    } else if (attribute.Case === "Attribute") {
+        return new Types.Attribute("Attribute", [attribute.Fields[0]]);
+    } else {
+        return mapEventHandler(mapping, attribute.Fields[0][0], attribute.Fields[0][1]);
+    }
 }
 function mapElem(mapping, node_0, node_1) {
     var node = [node_0, node_1];
@@ -2169,11 +2177,21 @@ function mapVoidElem(mapping, node_0, node_1) {
     }, node[1])];
 }
 function map$$1(mapping, node) {
-    return node.Case === "VoidElement" ? new Types.DomNode("VoidElement", [mapVoidElem(mapping, node.Fields[0][0], node.Fields[0][1])]) : node.Case === "Text" ? new Types.DomNode("Text", [node.Fields[0]]) : node.Case === "WhiteSpace" ? new Types.DomNode("WhiteSpace", [node.Fields[0]]) : node.Case === "Svg" ? new Types.DomNode("Element", [mapElem(mapping, node.Fields[0][0], node.Fields[0][1]), map$1(function (node_1) {
-        return map$$1(mapping, node_1);
-    }, node.Fields[1])]) : new Types.DomNode("Element", [mapElem(mapping, node.Fields[0][0], node.Fields[0][1]), map$1(function (node_1) {
-        return map$$1(mapping, node_1);
-    }, node.Fields[1])]);
+    if (node.Case === "VoidElement") {
+        return new Types.DomNode("VoidElement", [mapVoidElem(mapping, node.Fields[0][0], node.Fields[0][1])]);
+    } else if (node.Case === "Text") {
+        return new Types.DomNode("Text", [node.Fields[0]]);
+    } else if (node.Case === "WhiteSpace") {
+        return new Types.DomNode("WhiteSpace", [node.Fields[0]]);
+    } else if (node.Case === "Svg") {
+        return new Types.DomNode("Element", [mapElem(mapping, node.Fields[0][0], node.Fields[0][1]), map$1(function (node_1) {
+            return map$$1(mapping, node_1);
+        }, node.Fields[1])]);
+    } else {
+        return new Types.DomNode("Element", [mapElem(mapping, node.Fields[0][0], node.Fields[0][1]), map$1(function (node_1) {
+            return map$$1(mapping, node_1);
+        }, node.Fields[1])]);
+    }
 }
 var Tags = function (__exports) {
     var elem = __exports.elem = function (tagName, attrs, children) {
@@ -3427,6 +3445,7 @@ var SampleApi = function (__exports) {
           type: "WebApp.Common.SampleApi.Route",
           interfaces: ["FSharpUnion", "System.IEquatable", "System.IComparable"],
           cases: {
+            Calculator: [],
             Clock: [],
             Counter: [],
             HelloWorld: [],
@@ -3505,6 +3524,8 @@ function resolveRoutesToUrl(r) {
       return "/sample/hello-world";
     } else if (r.Fields[0].Case === "NestedCounter") {
       return "/sample/nested-counter";
+    } else if (r.Fields[0].Case === "Calculator") {
+      return "/sample/calculator";
     } else {
       return "/sample/clock";
     }
@@ -5315,7 +5336,7 @@ var Types$1 = function (__exports) {
             var patternInput = evt.Case === "Replay" ? handleReplay(handleEvent)(notifySubs)([evt.Fields[0], evt.Fields[1]])(state) : handleMessage(handleEvent)(notifySubs)(evt.Fields[0])(state);
             state = patternInput[0];
             iterate(function (x) {
-                x();
+                x(null);
             }, patternInput[1]);
         };
 
@@ -5411,9 +5432,13 @@ var AppApi = function (__exports) {
     };
 
     var mapAppMessage = __exports.mapAppMessage = function (map$$1, _arg1) {
-        return _arg1.Case === "Replay" ? new Types$1.AppMessage("Replay", [_arg1.Fields[0], map$1(function (tupledArg) {
-            return [tupledArg[0], map$$1(tupledArg[1])];
-        }, _arg1.Fields[1])]) : new Types$1.AppMessage("Message", [map$$1(_arg1.Fields[0])]);
+        if (_arg1.Case === "Replay") {
+            return new Types$1.AppMessage("Replay", [_arg1.Fields[0], map$1(function (tupledArg) {
+                return [tupledArg[0], map$$1(tupledArg[1])];
+            }, _arg1.Fields[1])]);
+        } else {
+            return new Types$1.AppMessage("Message", [map$$1(_arg1.Fields[0])]);
+        }
     };
 
     var mapProducer = __exports.mapProducer = function (map$$1, p) {
@@ -5425,54 +5450,24 @@ var AppApi = function (__exports) {
     var mapSubscriber = __exports.mapSubscriber = function (mapModelChanged, mapAction_1, sub, _arg1) {
         if (_arg1.Case === "ActionReceived") {
             (function (option) {
-                iterate(sub, function () {
-                    var $var6 = option;
-
-                    if ($var6 != null) {
-                        return [$var6];
-                    } else {
-                        return [];
-                    }
-                }());
-            })(function () {
-                var $var7 = mapAction_1(function (x) {
-                    return x;
-                })(_arg1.Fields[0]);
-
-                if ($var7 != null) {
-                    return function (arg0) {
-                        return new Types$1.AppEvent("ActionReceived", [arg0]);
-                    }($var7);
-                } else {
-                    return $var7;
-                }
-            }());
+                iterate(sub, defaultArg(option, [], function (x) {
+                    return [x];
+                }));
+            })(defaultArg(mapAction_1(function (x) {
+                return x;
+            })(_arg1.Fields[0]), null, function (arg0) {
+                return new Types$1.AppEvent("ActionReceived", [arg0]);
+            }));
+        } else if (_arg1.Case === "Replayed") {
+            sub(new Types$1.AppEvent("Replayed", [_arg1.Fields[0]]));
         } else {
-            if (_arg1.Case === "Replayed") {
-                sub(new Types$1.AppEvent("Replayed", [_arg1.Fields[0]]));
-            } else {
-                (function (option) {
-                    iterate(sub, function () {
-                        var $var8 = option;
-
-                        if ($var8 != null) {
-                            return [$var8];
-                        } else {
-                            return [];
-                        }
-                    }());
-                })(function () {
-                    var $var9 = mapModelChanged(_arg1.Fields[0]);
-
-                    if ($var9 != null) {
-                        return function (arg0) {
-                            return new Types$1.AppEvent("ModelChanged", [arg0]);
-                        }($var9);
-                    } else {
-                        return $var9;
-                    }
-                }());
-            }
+            (function (option) {
+                iterate(sub, defaultArg(option, [], function (x) {
+                    return [x];
+                }));
+            })(defaultArg(mapModelChanged(_arg1.Fields[0]), null, function (arg0) {
+                return new Types$1.AppEvent("ModelChanged", [arg0]);
+            }));
         }
     };
 
@@ -5523,15 +5518,15 @@ var AppApi = function (__exports) {
 
     var withProducer = __exports.withProducer = function (producer, app) {
         var lift = function lift(h) {
-            return function ($var10) {
+            return function ($var6) {
                 return h(function (arg0) {
                     return new Types$1.AppMessage("Message", [arg0]);
-                }($var10));
+                }($var6));
             };
         };
 
-        var producer_ = function producer_($var11) {
-            return producer(lift($var11));
+        var producer_ = function producer_($var7) {
+            return producer(lift($var7));
         };
 
         return withInstrumentationProducer(producer_, app);
@@ -5553,8 +5548,8 @@ var AppApi = function (__exports) {
     };
 
     var withPlugin = __exports.withPlugin = function (plugin) {
-        return function ($var12) {
-            return withInstrumentationProducer(plugin.Producer, withInstrumentationSubscriber(plugin.Subscriber, $var12));
+        return function ($var8) {
+            return withInstrumentationProducer(plugin.Producer, withInstrumentationSubscriber(plugin.Subscriber, $var8));
         };
     };
 
@@ -5564,7 +5559,7 @@ var AppApi = function (__exports) {
         }, producers);
     };
 
-    var start = __exports.start = function (appSpec) {
+    var startAndExposeMessageSink = __exports.startAndExposeMessageSink = function (appSpec) {
         var createInitApp = function createInitApp(post) {
             var view = appSpec.View(appSpec.InitState);
             var render = appSpec.CreateRenderer(appSpec.NodeSelector)(post)(view);
@@ -5596,6 +5591,10 @@ var AppApi = function (__exports) {
         };
 
         return Types$1.application(appSpec.InitMessage, handleMessage_, handleReplay_, configureProducers_, createInitApp);
+    };
+
+    var start = __exports.start = function (appSpec) {
+        startAndExposeMessageSink(appSpec);
     };
 
     return __exports;
@@ -7013,7 +7012,472 @@ function view$8(model) {
   return VDom.Html.sampleView("Nested counter sample", sampleDemo$2(model), docs$2.Html);
 }
 
+var _stringWs = '\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002\u2003' +
+  '\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF';
+
+var $export$5 = _export;
+var defined$3 = _defined;
+var fails   = _fails;
+var spaces  = _stringWs;
+var space   = '[' + spaces + ']';
+var non     = '\u200b\u0085';
+var ltrim   = RegExp('^' + space + space + '*');
+var rtrim   = RegExp(space + space + '*$');
+
+var exporter = function(KEY, exec, ALIAS){
+  var exp   = {};
+  var FORCE = fails(function(){
+    return !!spaces[KEY]() || non[KEY]() != non;
+  });
+  var fn = exp[KEY] = FORCE ? exec(trim$1) : spaces[KEY];
+  if(ALIAS)exp[ALIAS] = fn;
+  $export$5($export$5.P + $export$5.F * FORCE, 'String', exp);
+};
+
+// 1 -> String#trimLeft
+// 2 -> String#trimRight
+// 3 -> String#trim
+var trim$1 = exporter.trim = function(string, TYPE){
+  string = String(defined$3(string));
+  if(TYPE & 1)string = string.replace(ltrim, '');
+  if(TYPE & 2)string = string.replace(rtrim, '');
+  return string;
+};
+
+var _stringTrim = exporter;
+
+var $parseInt$1 = _global.parseInt;
+var $trim     = _stringTrim.trim;
+var ws        = _stringWs;
+var hex       = /^[\-+]?0[xX]/;
+
+var _parseInt$3 = $parseInt$1(ws + '08') !== 8 || $parseInt$1(ws + '0x16') !== 22 ? function parseInt(str, radix){
+  var string = $trim(String(str), 3);
+  return $parseInt$1(string, (radix >>> 0) || (hex.test(string) ? 16 : 10));
+} : $parseInt$1;
+
+var $export$4   = _export;
+var $parseInt = _parseInt$3;
+// 20.1.2.13 Number.parseInt(string, radix)
+$export$4($export$4.S + $export$4.F * (Number.parseInt != $parseInt), 'Number', {parseInt: $parseInt});
+
+var _parseInt$1 = parseInt;
+
+var _parseInt = createCommonjsModule(function (module) {
+module.exports = { "default": _parseInt$1, __esModule: true };
+});
+
+var _Number$parseInt = unwrapExports(_parseInt);
+
+var Input = function () {
+  function Input(caseName, fields) {
+    _classCallCheck(this, Input);
+
+    this.Case = caseName;
+    this.Fields = fields;
+  }
+
+  _createClass(Input, [{
+    key: _Symbol.reflection,
+    value: function () {
+      return {
+        type: "WebApp.Pages.Sample.Calculator.Input",
+        interfaces: ["FSharpUnion", "System.IEquatable", "System.IComparable"],
+        cases: {
+          Clear: [],
+          Const: ["number"],
+          Div: [],
+          Equals: [],
+          Minus: [],
+          Plus: [],
+          Times: []
+        }
+      };
+    }
+  }, {
+    key: "Equals",
+    value: function (other) {
+      return equalsUnions(this, other);
+    }
+  }, {
+    key: "CompareTo",
+    value: function (other) {
+      return compareUnions(this, other);
+    }
+  }]);
+
+  return Input;
+}();
+setType("WebApp.Pages.Sample.Calculator.Input", Input);
+var Model$9 = function () {
+  function Model(caseName, fields) {
+    _classCallCheck(this, Model);
+
+    this.Case = caseName;
+    this.Fields = fields;
+  }
+
+  _createClass(Model, [{
+    key: _Symbol.reflection,
+    value: function () {
+      return {
+        type: "WebApp.Pages.Sample.Calculator.Model",
+        interfaces: ["FSharpUnion", "System.IEquatable", "System.IComparable"],
+        cases: {
+          InputStack: [makeGeneric(List$1, {
+            T: Input
+          })]
+        }
+      };
+    }
+  }, {
+    key: "Equals",
+    value: function (other) {
+      return equalsUnions(this, other);
+    }
+  }, {
+    key: "CompareTo",
+    value: function (other) {
+      return compareUnions(this, other);
+    }
+  }]);
+
+  return Model;
+}();
+setType("WebApp.Pages.Sample.Calculator.Model", Model$9);
 var Actions$9 = function () {
+  function Actions(caseName, fields) {
+    _classCallCheck(this, Actions);
+
+    this.Case = caseName;
+    this.Fields = fields;
+  }
+
+  _createClass(Actions, [{
+    key: _Symbol.reflection,
+    value: function () {
+      return {
+        type: "WebApp.Pages.Sample.Calculator.Actions",
+        interfaces: ["FSharpUnion", "System.IEquatable", "System.IComparable"],
+        cases: {
+          PushInput: [Input]
+        }
+      };
+    }
+  }, {
+    key: "Equals",
+    value: function (other) {
+      return equalsUnions(this, other);
+    }
+  }, {
+    key: "CompareTo",
+    value: function (other) {
+      return compareUnions(this, other);
+    }
+  }]);
+
+  return Actions;
+}();
+setType("WebApp.Pages.Sample.Calculator.Actions", Actions$9);
+
+function _Operation___(_arg1) {
+  if (_arg1.Case === "Plus") {
+    return new Input("Plus", []);
+  } else if (_arg1.Case === "Minus") {
+    return new Input("Minus", []);
+  } else if (_arg1.Case === "Times") {
+    return new Input("Times", []);
+  } else if (_arg1.Case === "Div") {
+    return new Input("Div", []);
+  }
+}
+
+function concatInts(x, y) {
+  return _Number$parseInt(fsFormat("%d%d")(function (x) {
+    return x;
+  })(x)(y));
+}
+function opString(_arg1) {
+  if (_arg1.Case === "Plus") {
+    return "+";
+  } else if (_arg1.Case === "Minus") {
+    return "-";
+  } else if (_arg1.Case === "Times") {
+    return "*";
+  } else if (_arg1.Case === "Div") {
+    return "/";
+  } else if (_arg1.Case === "Equals") {
+    return "=";
+  } else if (_arg1.Case === "Clear") {
+    return "CE";
+  } else {
+    return "";
+  }
+}
+function inputString(_arg1) {
+  var activePatternResult1050 = _Operation___(_arg1);
+
+  if (activePatternResult1050 != null) {
+    var op = activePatternResult1050;
+    return opString(op);
+  } else if (_arg1.Case === "Const") {
+    return String(_arg1.Fields[0]);
+  } else {
+    return "";
+  }
+}
+function modelString(_arg1) {
+  return join("", function (list) {
+    return map$1(function (_arg1_1) {
+      return inputString(_arg1_1);
+    }, list);
+  }(_arg1.Fields[0]));
+}
+function solve(_arg1) {
+  var _target1 = function _target1() {
+    throw new Error("C:\\Users\\mmangel\\Workspaces\\Perso\\fable-arch\\docs\\src\\Pages/Sample/Sample_Calculator.fs", 67, 13);
+  };
+
+  if (_arg1.Fields[0].tail != null) {
+    if (_arg1.Fields[0].head.Case === "Const") {
+      if (_arg1.Fields[0].tail.tail != null) {
+        var activePatternResult1053 = _Operation___(_arg1.Fields[0].tail.head);
+
+        if (activePatternResult1053 != null) {
+          if (_arg1.Fields[0].tail.tail.tail != null) {
+            if (_arg1.Fields[0].tail.tail.head.Case === "Const") {
+              if (_arg1.Fields[0].tail.tail.tail.tail == null) {
+                var op = activePatternResult1053;
+                var x = _arg1.Fields[0].head.Fields[0];
+                var y = _arg1.Fields[0].tail.tail.head.Fields[0];
+
+                if (op.Case === "Plus") {
+                  return x + y;
+                } else if (op.Case === "Minus") {
+                  return x - y;
+                } else if (op.Case === "Times") {
+                  return x * y;
+                } else if (op.Case === "Div") {
+                  return ~~(x / y);
+                } else {
+                  throw new Error("Will not happen");
+                }
+              } else {
+                return _target1();
+              }
+            } else {
+              return _target1();
+            }
+          } else {
+            return _target1();
+          }
+        } else {
+          return _target1();
+        }
+      } else {
+        return _target1();
+      }
+    } else {
+      return _target1();
+    }
+  } else {
+    return _target1();
+  }
+}
+function update$9(_arg2, _arg1) {
+  if (_arg1.Fields[0].Equals(new Input("Clear", []))) {
+    return [new Model$9("InputStack", [new List$1()]), new List$1()];
+  } else {
+    var _target3 = function _target3() {
+      var _target1 = function _target1() {
+        return [new Model$9("InputStack", [_arg2.Fields[0]]), new List$1()];
+      };
+
+      if (_arg2.Fields[0].tail != null) {
+        if (_arg2.Fields[0].head.Case === "Const") {
+          if (_arg2.Fields[0].tail.tail != null) {
+            var activePatternResult1059 = _Operation___(_arg2.Fields[0].tail.head);
+
+            if (activePatternResult1059 != null) {
+              if (_arg2.Fields[0].tail.tail.tail != null) {
+                if (_arg2.Fields[0].tail.tail.head.Case === "Const") {
+                  if (_arg2.Fields[0].tail.tail.tail.tail == null) {
+                    var op = activePatternResult1059;
+                    var x = _arg2.Fields[0].head.Fields[0];
+                    var y = _arg2.Fields[0].tail.tail.head.Fields[0];
+
+                    if (_arg1.Fields[0].Case === "Const") {
+                      var y_ = _arg1.Fields[0].Fields[0];
+                      return [new Model$9("InputStack", [ofArray([new Input("Const", [x]), op, new Input("Const", [concatInts(y, y_)])])]), new List$1()];
+                    } else if (_arg1.Fields[0].Case === "Equals") {
+                      return [new Model$9("InputStack", [ofArray([new Input("Const", [solve(new Model$9("InputStack", [_arg2.Fields[0]]))])])]), new List$1()];
+                    } else {
+                      var activePatternResult1058 = _Operation___(_arg1.Fields[0]);
+
+                      if (activePatternResult1058 != null) {
+                        var op_1 = activePatternResult1058;
+                        var result = solve(new Model$9("InputStack", [_arg2.Fields[0]]));
+                        return [new Model$9("InputStack", [ofArray([new Input("Const", [result]), op_1])]), new List$1()];
+                      } else {
+                        return [new Model$9("InputStack", [_arg2.Fields[0]]), new List$1()];
+                      }
+                    }
+                  } else {
+                    return _target1();
+                  }
+                } else {
+                  return _target1();
+                }
+              } else {
+                return _target1();
+              }
+            } else {
+              return _target1();
+            }
+          } else {
+            return _target1();
+          }
+        } else {
+          return _target1();
+        }
+      } else {
+        return _target1();
+      }
+    };
+
+    if (_arg2.Fields[0].tail != null) {
+      if (_arg2.Fields[0].head.Case === "Const") {
+        if (_arg2.Fields[0].tail.tail != null) {
+          var activePatternResult1060 = _Operation___(_arg2.Fields[0].tail.head);
+
+          if (activePatternResult1060 != null) {
+            if (_arg2.Fields[0].tail.tail.tail == null) {
+              var op = activePatternResult1060;
+              var x = _arg2.Fields[0].head.Fields[0];
+
+              if (_arg1.Fields[0].Case === "Const") {
+                var y = _arg1.Fields[0].Fields[0];
+                return [new Model$9("InputStack", [ofArray([new Input("Const", [x]), op, new Input("Const", [y])])]), new List$1()];
+              } else {
+                var activePatternResult1057 = _Operation___(_arg1.Fields[0]);
+
+                if (activePatternResult1057 != null) {
+                  var otherOp = activePatternResult1057;
+                  return [new Model$9("InputStack", [ofArray([new Input("Const", [x]), otherOp])]), new List$1()];
+                } else {
+                  return [new Model$9("InputStack", [_arg2.Fields[0]]), new List$1()];
+                }
+              }
+            } else {
+              return _target3();
+            }
+          } else {
+            return _target3();
+          }
+        } else {
+          var _x = _arg2.Fields[0].head.Fields[0];
+
+          if (_arg1.Fields[0].Case === "Const") {
+            var _y = _arg1.Fields[0].Fields[0];
+            return [new Model$9("InputStack", [ofArray([new Input("Const", [concatInts(_x, _y)])])]), new List$1()];
+          } else {
+            var activePatternResult1056 = _Operation___(_arg1.Fields[0]);
+
+            if (activePatternResult1056 != null) {
+              var _op = activePatternResult1056;
+              return [new Model$9("InputStack", [ofArray([new Input("Const", [_x]), _op])]), new List$1()];
+            } else {
+              return [new Model$9("InputStack", [_arg2.Fields[0]]), new List$1()];
+            }
+          }
+        }
+      } else {
+        return _target3();
+      }
+    } else {
+      var activePatternResult1055 = _Operation___(_arg1.Fields[0]);
+
+      if (activePatternResult1055 != null) {
+        var _op2 = activePatternResult1055;
+        return [new Model$9("InputStack", [new List$1()]), new List$1()];
+      } else if (_arg1.Fields[0].Case === "Equals") {
+        return [new Model$9("InputStack", [new List$1()]), new List$1()];
+      } else {
+        return [new Model$9("InputStack", [ofArray([_arg1.Fields[0]])]), new List$1()];
+      }
+    }
+  }
+}
+function digitStyle() {
+  return new Types.Attribute("Style", [ofArray([["height", "50px"], ["width", "55px"], ["font-size", "20px"], ["cursor", "pointer"], ["padding", "15px"], ["padding-top", "5px"], ["margin", "5px"], ["text-align", "center"], ["line-height", "40px"], ["background-color", "lightgreen"], ["box-shadow", "0 0 3px black"]])]);
+}
+function opButtonStyle() {
+  return new Types.Attribute("Style", [ofArray([["height", "50px"], ["width", "55px"], ["font-size", "20px"], ["padding", "15px"], ["padding-top", "5px"], ["text-align", "center"], ["line-height", "40px"], ["cursor", "pointer"], ["margin", "5px"], ["background-color", "lightblue"], ["box-shadow", "0 0 3px black"]])]);
+}
+function demoView(model) {
+  var digit = function digit(n) {
+    return Tags.div(ofArray([digitStyle(), Events.onMouseClick(function (_arg1) {
+      return new Actions$9("PushInput", [new Input("Const", [n])]);
+    })]))(ofArray([Tags.text(String(n))]));
+  };
+
+  var opBtn = function opBtn(input) {
+    var content = function () {
+      var activePatternResult1068 = _Operation___(input);
+
+      if (activePatternResult1068 != null) {
+        var op = activePatternResult1068;
+        return opString(op);
+      } else if (input.Case === "Equals") {
+        return "=";
+      } else if (input.Case === "Clear") {
+        return "CE";
+      } else {
+        return "";
+      }
+    }();
+
+    return Tags.div(ofArray([opButtonStyle(), Events.onMouseClick(function (_arg2) {
+      return new Actions$9("PushInput", [input]);
+    })]))(ofArray([Tags.text(content)]));
+  };
+
+  var row = function row(xs) {
+    return Tags.tr(new List$1())(toList(delay(function () {
+      return map$2(function (x) {
+        return Tags.td(new List$1())(ofArray([x]));
+      }, xs);
+    })));
+  };
+
+  return Tags.div(ofArray([new Types.Attribute("Style", [ofArray([["width", "320px"], ["border", "2px black solid"], ["border-radius", "15px"], ["padding", "10px"]])])]))(ofArray([Tags.h1(ofArray([new Types.Attribute("Style", [ofArray([["font-size", "24px"], ["padding-left", "20px"], ["height", "30px"]])])]))(ofArray([Tags.text(modelString(model))])), Tags.br(new List$1()), Tags.table(new List$1())(ofArray([function () {
+    var clo0 = row;
+    return function (arg00) {
+      return clo0(arg00);
+    };
+  }()(ofArray([digit(1), digit(2), digit(3), opBtn(new Input("Plus", []))])), function () {
+    var clo0 = row;
+    return function (arg00) {
+      return clo0(arg00);
+    };
+  }()(ofArray([digit(4), digit(5), digit(6), opBtn(new Input("Minus", []))])), function () {
+    var clo0 = row;
+    return function (arg00) {
+      return clo0(arg00);
+    };
+  }()(ofArray([digit(7), digit(8), digit(9), opBtn(new Input("Times", []))])), function () {
+    var clo0 = row;
+    return function (arg00) {
+      return clo0(arg00);
+    };
+  }()(ofArray([opBtn(new Input("Clear", [])), digit(0), opBtn(new Input("Equals", [])), opBtn(new Input("Div", []))]))]))]));
+}
+var docs$3 = new Documentation("Sample_Calculator.fs");
+function view$9(model) {
+  return VDom.Html.sampleView("Calculator", demoView(model), docs$3.Html);
+}
+
+var Actions$10 = function () {
   function Actions(caseName, fields) {
     _classCallCheck(this, Actions);
 
@@ -7046,30 +7510,31 @@ var Actions$9 = function () {
 
   return Actions;
 }();
-setType("WebApp.Pages.Sample.HelloWorld.Actions", Actions$9);
-function update$9(model, action) {
+setType("WebApp.Pages.Sample.HelloWorld.Actions", Actions$10);
+function update$10(model, action) {
   return [action.Fields[0], new List$1()];
 }
 function sampleDemo$3(model) {
   return Tags.div(new List$1())(ofArray([Tags.label(ofArray([Attributes.classy("label")]))(ofArray([Tags.text("Enter your name:")])), Tags.p(ofArray([Attributes.classy("control")]))(ofArray([Tags.input(ofArray([Attributes.classy("input"), Attributes.property("type", "text"), Attributes.property("placeholder", "Ex: Joe Doe"), Attributes.property("value", model), VDom.Html.onInput(function (arg0) {
-    return new Actions$9("ChangeInput", [arg0]);
+    return new Actions$10("ChangeInput", [arg0]);
   })]))])), Tags.span(new List$1())(ofArray([Tags.text(fsFormat("Hello %s")(function (x) {
     return x;
   })(model))]))]));
 }
-var docs$3 = new Documentation("Sample_HelloWorld.fs");
-function view$9(model) {
-  return VDom.Html.sampleView("Hello world sample", sampleDemo$3(model), docs$3.Html);
+var docs$4 = new Documentation("Sample_HelloWorld.fs");
+function view$10(model) {
+  return VDom.Html.sampleView("Hello world sample", sampleDemo$3(model), docs$4.Html);
 }
 
 var Model$5 = function () {
-  function Model$$1(clock, counter, helloWorld, nestedCounter) {
+  function Model$$1(clock, counter, helloWorld, nestedCounter, calculator) {
     _classCallCheck(this, Model$$1);
 
     this.Clock = clock;
     this.Counter = counter;
     this.HelloWorld = helloWorld;
     this.NestedCounter = nestedCounter;
+    this.Calculator = calculator;
   }
 
   _createClass(Model$$1, [{
@@ -7082,7 +7547,8 @@ var Model$5 = function () {
           Clock: Option(Model$6),
           Counter: Option(Model$7),
           HelloWorld: Option("string"),
-          NestedCounter: Option(Model$8)
+          NestedCounter: Option(Model$8),
+          Calculator: Option(Model$9)
         }
       };
     }
@@ -7098,8 +7564,8 @@ var Model$5 = function () {
     }
   }], [{
     key: "Generate",
-    value: function (index, counter, helloWorld, nestedCounter) {
-      return new Model$$1(index, counter, helloWorld, nestedCounter);
+    value: function (index, counter, helloWorld, nestedCounter, calc) {
+      return new Model$$1(index, counter, helloWorld, nestedCounter, calc);
     }
   }, {
     key: "Initial",
@@ -7110,6 +7576,8 @@ var Model$5 = function () {
         return Model$$1.Generate(null, null, "");
       } else if (currentPage.Case === "NestedCounter") {
         return Model$$1.Generate(null, null, null, Model$8.Initial);
+      } else if (currentPage.Case === "Calculator") {
+        return Model$$1.Generate(null, null, null, null, new Model$9("InputStack", [new List$1()]));
       } else {
         return Model$$1.Generate(Model$6.Initial);
       }
@@ -7174,9 +7642,10 @@ var Actions$5 = function () {
         type: "WebApp.Pages.Sample.Dispatcher.Actions",
         interfaces: ["FSharpUnion", "System.IEquatable", "System.IComparable"],
         cases: {
+          CalcActions: [Actions$9],
           ClockActions: [Actions$6],
           CounterActions: [Actions$7],
-          HelloWorldActions: [Actions$9],
+          HelloWorldActions: [Actions$10],
           NavigateTo: [SampleApi.Route],
           NestedCounterActions: [Actions$8]
         }
@@ -7207,7 +7676,7 @@ function update$5(model, action) {
       return {
         v: [function () {
           var Counter = patternInput[0];
-          return new Model$5(model.Clock, Counter, model.HelloWorld, model.NestedCounter);
+          return new Model$5(model.Clock, Counter, model.HelloWorld, model.NestedCounter, model.Calculator);
         }(), action_]
       };
     }();
@@ -7215,14 +7684,14 @@ function update$5(model, action) {
     if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
   } else if (action.Case === "HelloWorldActions") {
     var _ret2 = function () {
-      var patternInput = update$9(model.HelloWorld, action.Fields[0]);
+      var patternInput = update$10(model.HelloWorld, action.Fields[0]);
       var action_ = AppApi.mapActions(function (arg0) {
         return new Actions$5("HelloWorldActions", [arg0]);
       })(patternInput[1]);
       return {
         v: [function () {
           var HelloWorld = patternInput[0];
-          return new Model$5(model.Clock, model.Counter, HelloWorld, model.NestedCounter);
+          return new Model$5(model.Clock, model.Counter, HelloWorld, model.NestedCounter, model.Calculator);
         }(), action_]
       };
     }();
@@ -7237,12 +7706,27 @@ function update$5(model, action) {
       return {
         v: [function () {
           var NestedCounter = patternInput[0];
-          return new Model$5(model.Clock, model.Counter, model.HelloWorld, NestedCounter);
+          return new Model$5(model.Clock, model.Counter, model.HelloWorld, NestedCounter, model.Calculator);
         }(), action_]
       };
     }();
 
     if ((typeof _ret3 === "undefined" ? "undefined" : _typeof(_ret3)) === "object") return _ret3.v;
+  } else if (action.Case === "CalcActions") {
+    var _ret4 = function () {
+      var patternInput = update$9(model.Calculator, action.Fields[0]);
+      var action_ = AppApi.mapActions(function (arg0) {
+        return new Actions$5("CalcActions", [arg0]);
+      })(patternInput[1]);
+      return {
+        v: [function () {
+          var Calculator = patternInput[0];
+          return new Model$5(model.Clock, model.Counter, model.HelloWorld, model.NestedCounter, Calculator);
+        }(), action_]
+      };
+    }();
+
+    if ((typeof _ret4 === "undefined" ? "undefined" : _typeof(_ret4)) === "object") return _ret4.v;
   } else if (action.Case === "NavigateTo") {
     var message = ofArray([function (h) {
       var url = resolveRoutesToUrl(new Route("Sample", [action.Fields[0]]));
@@ -7259,7 +7743,7 @@ function update$5(model, action) {
     var action_ = AppApi.mapActions(function (arg0) {
       return new Actions$5("ClockActions", [arg0]);
     })(patternInput[1]);
-    return [new Model$5(patternInput[0], model.Counter, model.HelloWorld, model.NestedCounter), action_];
+    return [new Model$5(patternInput[0], model.Counter, model.HelloWorld, model.NestedCounter, model.Calculator), action_];
   }
 }
 function navItem$1(item, currentPage) {
@@ -7277,12 +7761,14 @@ function view$5(model, subRoute) {
     return new Actions$5("CounterActions", [arg0]);
   }, view$7(model.Counter)) : subRoute.Case === "HelloWorld" ? map$$1(function (arg0) {
     return new Actions$5("HelloWorldActions", [arg0]);
-  }, view$9(model.HelloWorld)) : subRoute.Case === "NestedCounter" ? map$$1(function (arg0) {
+  }, view$10(model.HelloWorld)) : subRoute.Case === "NestedCounter" ? map$$1(function (arg0) {
     return new Actions$5("NestedCounterActions", [arg0]);
-  }, view$8(model.NestedCounter)) : map$$1(function (arg0) {
+  }, view$8(model.NestedCounter)) : subRoute.Case === "Calculator" ? map$$1(function (arg0) {
+    return new Actions$5("CalcActions", [arg0]);
+  }, view$9(model.Calculator)) : map$$1(function (arg0) {
     return new Actions$5("ClockActions", [arg0]);
   }, view$6(model.Clock));
-  return Tags.div(new List$1())(ofArray([Tags.nav(ofArray([Attributes.classy("nav has-shadow")]))(ofArray([Tags.div(ofArray([Attributes.classy("container")]))(ofArray([navbar(ofArray([NavbarLink.Create("Hello world", new SampleApi.Route("HelloWorld", [])), NavbarLink.Create("Counter", new SampleApi.Route("Counter", [])), NavbarLink.Create("Nested counter", new SampleApi.Route("NestedCounter", [])), NavbarLink.Create("Clock", new SampleApi.Route("Clock", []))]), subRoute)]))])), Tags.div(ofArray([Attributes.classy("container")]))(ofArray([htmlContent]))]));
+  return Tags.div(new List$1())(ofArray([Tags.nav(ofArray([Attributes.classy("nav has-shadow")]))(ofArray([Tags.div(ofArray([Attributes.classy("container")]))(ofArray([navbar(ofArray([NavbarLink.Create("Hello world", new SampleApi.Route("HelloWorld", [])), NavbarLink.Create("Counter", new SampleApi.Route("Counter", [])), NavbarLink.Create("Nested counter", new SampleApi.Route("NestedCounter", [])), NavbarLink.Create("Clock", new SampleApi.Route("Clock", [])), NavbarLink.Create("Calculator", new SampleApi.Route("Calculator", []))]), subRoute)]))])), Tags.div(ofArray([Attributes.classy("container")]))(ofArray([htmlContent]))]));
 }
 
 // call something on iterator step with safe closing on error
@@ -7338,7 +7824,7 @@ var _iterDetect = function(exec, skipClosing){
 };
 
 var ctx$1            = _ctx;
-var $export$4        = _export;
+var $export$6        = _export;
 var toObject$1       = _toObject;
 var call           = _iterCall;
 var isArrayIter    = _isArrayIter;
@@ -7346,7 +7832,7 @@ var toLength$1       = _toLength;
 var createProperty = _createProperty;
 var getIterFn      = core_getIteratorMethod;
 
-$export$4($export$4.S + $export$4.F * !_iterDetect(function(iter){ Array.from(iter); }), 'Array', {
+$export$6($export$6.S + $export$6.F * !_iterDetect(function(iter){ Array.from(iter); }), 'Array', {
   // 22.1.2.1 Array.from(arrayLike, mapfn = undefined, thisArg = undefined)
   from: function from(arrayLike/*, mapfn = undefined, thisArg = undefined*/){
     var O       = toObject$1(arrayLike)
@@ -8010,13 +8496,13 @@ var Optics = function (__exports) {
   return __exports;
 }({});
 
-var markdownText = "\r\n# About\n\nThis website is written with:\n\n- [Fable](http://fable.io/) a transpiler F# to Javascript\n- [Fable-arch](https://github.com/fable-compiler/fable-arch) a set of tools for building modern web applications inspired by the [elm architecture](http://guide.elm-lang.org/architecture/index.html).\n- [Bulma](http://bulma.io/) a modern CSS framework based on Flexbox\n- [Marked](https://github.com/chjj/marked) a markdown parser and compiler. Built for speed\n- [PrismJS](http://prismjs.com/) a lightweight, extensible syntax highlighter\n    ";
-function view$10() {
+var markdownText = "\r\n# About\r\n\r\nThis website is written with:\r\n\r\n- [Fable](http://fable.io/) a transpiler F# to Javascript\r\n- [Fable-arch](https://github.com/fable-compiler/fable-arch) a set of tools for building modern web applications inspired by the [elm architecture](http://guide.elm-lang.org/architecture/index.html).\r\n- [Bulma](http://bulma.io/) a modern CSS framework based on Flexbox\r\n- [Marked](https://github.com/chjj/marked) a markdown parser and compiler. Built for speed\r\n- [PrismJS](http://prismjs.com/) a lightweight, extensible syntax highlighter\r\n    ";
+function view$11() {
   return Tags.div(ofArray([Attributes.classy("section")]))(ofArray([Tags.div(ofArray([Attributes.classy("container")]))(ofArray([Tags.div(ofArray([Attributes.classy("content"), Attributes.property("innerHTML", marked.parse(markdownText))]))(new List$1())]))]));
 }
 
-var markdownText$1 = "\r\n# Fable-arch samples\r\n\r\nFable-arch is a set of tools for building modern web applications inspired by the [elm architecture](http://guide.elm-lang.org/architecture/index.html).\r\n\r\nFable-arch use [Fable](http://fable.io/) which allow you to write your code using F# and compile in JavaScript.\r\n\r\nIt is implemented around a set of abstractions which makes it possible to implement custom renderers if there is a need.\r\nFable-arch comes with a HTML Dsl and a renderer built on top of [virtual-dom](https://github.com/Matt-Esch/virtual-dom) and all\r\nthe samples here are using those two tools.\r\nHopefully the samples here show you how to get started and gives you some inspiration about how to build your application using Fable-arch.\r\n\r\nYou can also contribute more examples by sending us a pull request.\n    ";
-function view$11() {
+var markdownText$1 = "\r\n# Fable-arch samples\r\n\r\nFable-arch is a set of tools for building modern web applications inspired by the [elm architecture](http://guide.elm-lang.org/architecture/index.html).\r\n\r\nFable-arch use [Fable](http://fable.io/) which allow you to write your code using F# and compile in JavaScript.\r\n\r\nIt is implemented around a set of abstractions which makes it possible to implement custom renderers if there is a need.\r\nFable-arch comes with a HTML Dsl and a renderer built on top of [virtual-dom](https://github.com/Matt-Esch/virtual-dom) and all\r\nthe samples here are using those two tools.\r\nHopefully the samples here show you how to get started and gives you some inspiration about how to build your application using Fable-arch.\r\n\r\nYou can also contribute more examples by sending us a pull request.\r\n    ";
+function view$12() {
   return Tags.div(ofArray([Attributes.classy("section")]))(ofArray([Tags.div(ofArray([Attributes.classy("container")]))(ofArray([Tags.div(ofArray([Attributes.classy("content"), Attributes.property("innerHTML", marked.parse(markdownText$1))]))(new List$1())]))]));
 }
 
@@ -8107,7 +8593,9 @@ var Parsing = function (__exports) {
 
     var satisfy = __exports.satisfy = function (predicate, label) {
         var innerFn = function innerFn(input) {
-            return isNullOrEmpty(input) ? new Result("Failure", [[label, "No more input"]]) : function () {
+            if (isNullOrEmpty(input)) {
+                return new Result("Failure", [[label, "No more input"]]);
+            } else {
                 var first = input[0];
 
                 if (predicate(first)) {
@@ -8119,7 +8607,7 @@ var Parsing = function (__exports) {
                     })(first);
                     return new Result("Failure", [[label, err]]);
                 }
-            }();
+            }
         };
 
         return new Parser(innerFn, label);
@@ -8219,10 +8707,10 @@ var Parsing = function (__exports) {
     };
 
     var mapP = __exports.mapP = function (f) {
-        var f_1 = function f_1($var15) {
+        var f_1 = function f_1($var10) {
             return function (x) {
                 return returnP(x);
-            }(f($var15));
+            }(f($var10));
         };
 
         return function (p) {
@@ -8314,8 +8802,8 @@ var Parsing = function (__exports) {
     };
 
     var choice = __exports.choice = function (listOfParsers) {
-        return reduce(function ($var16, $var17) {
-            return op_LessBarGreater()($var16)($var17);
+        return reduce(function ($var11, $var12) {
+            return op_LessBarGreater()($var11)($var12);
         }, listOfParsers);
     };
 
@@ -8332,7 +8820,11 @@ var Parsing = function (__exports) {
 
     var zeroOrOne = __exports.zeroOrOne = function (parser) {
         var innerFn = function innerFn(input) {
-            return input === "" ? new Result("Success", [["", ""]]) : run(parser, input);
+            if (input === "") {
+                return new Result("Success", [["", ""]]);
+            } else {
+                return run(parser, input);
+            }
         };
 
         return new Parser(innerFn, "zeroOrOne");
@@ -8357,7 +8849,9 @@ var Parsing = function (__exports) {
             var innerParse = function innerParse(count_) {
                 return function (input_) {
                     return function (acc) {
-                        return count_ === 0 ? new Result("Success", [[reverse$$1(acc), input_]]) : function () {
+                        if (count_ === 0) {
+                            return new Result("Success", [[reverse$$1(acc), input_]]);
+                        } else {
                             var matchValue = run(parser, input_);
 
                             if (matchValue.Case === "Success") {
@@ -8372,7 +8866,7 @@ var Parsing = function (__exports) {
                                 })(_label)(count$$1);
                                 return new Result("Failure", [[label_1, error]]);
                             }
-                        }();
+                        }
                     };
                 };
             };
@@ -8445,7 +8939,7 @@ var Parsing = function (__exports) {
         var some = op_BarGreaterGreater(p, function (arg0) {
             return arg0;
         });
-        var none = returnP();
+        var none = returnP(null);
         return op_LessQmarkGreater()(op_LessBarGreater()(some)(none))(label);
     };
 
@@ -11063,33 +11557,43 @@ function _classCallCheck$6(instance, Constructor) { if (!(instance instanceof Co
 function createTree(handler, tag, attributes, children) {
     var toAttrs = function toAttrs(attrs) {
         var elAttributes = function (_arg2) {
-            return _arg2.tail == null ? null : ["attributes", createObj(_arg2)];
+            if (_arg2.tail == null) {
+                return null;
+            } else {
+                return ["attributes", createObj(_arg2)];
+            }
         }(choose$$1(function (x) {
             return x;
         }, map$1(function (_arg1) {
-            return _arg1.Case === "Attribute" ? function () {
+            if (_arg1.Case === "Attribute") {
                 var v = _arg1.Fields[0][1];
                 var k = _arg1.Fields[0][0];
                 return [k, v];
-            }() : null;
+            }
         }, attrs)));
 
         var props = map$1(function (_arg4) {
-            return _arg4.Case === "Style" ? ["style", createObj(_arg4.Fields[0])] : _arg4.Case === "Property" ? function () {
+            if (_arg4.Case === "Style") {
+                return ["style", createObj(_arg4.Fields[0])];
+            } else if (_arg4.Case === "Property") {
                 var v = _arg4.Fields[0][1];
                 var k = _arg4.Fields[0][0];
                 return [k, v];
-            }() : _arg4.Case === "EventHandler" ? function () {
+            } else if (_arg4.Case === "EventHandler") {
                 var f = _arg4.Fields[0][1];
                 var ev = _arg4.Fields[0][0];
-                return [ev, function ($var13) {
-                    return handler(f($var13));
+                return [ev, function ($var9) {
+                    return handler(f($var9));
                 }];
-            }() : function () {
+            } else {
                 throw new Error("Shouldn't happen");
-            }();
+            }
         }, filter$$1(function (_arg3) {
-            return _arg3.Case === "Attribute" ? false : true;
+            if (_arg3.Case === "Attribute") {
+                return false;
+            } else {
+                return true;
+            }
         }, attrs));
         return createObj(elAttributes != null ? new List$1(elAttributes, props) : props);
     };
@@ -11176,22 +11680,16 @@ function renderSomething(handler, node) {
 
     if (node.Case === "Svg") {
         return _target0(node.Fields[0][1], node.Fields[1], node.Fields[0][0]);
+    } else if (node.Case === "VoidElement") {
+        var tag = node.Fields[0][0];
+        var attrs = node.Fields[0][1];
+        return createTree(handler, tag, attrs, new List$1());
+    } else if (node.Case === "Text") {
+        return node.Fields[0];
+    } else if (node.Case === "WhiteSpace") {
+        return node.Fields[0];
     } else {
-        if (node.Case === "VoidElement") {
-            var tag = node.Fields[0][0];
-            var attrs = node.Fields[0][1];
-            return createTree(handler, tag, attrs, new List$1());
-        } else {
-            if (node.Case === "Text") {
-                return node.Fields[0];
-            } else {
-                if (node.Case === "WhiteSpace") {
-                    return node.Fields[0];
-                } else {
-                    return _target0(node.Fields[0][1], node.Fields[1], node.Fields[0][0]);
-                }
-            }
-        }
+        return _target0(node.Fields[0][1], node.Fields[1], node.Fields[0][0]);
     }
 }
 function render(handler, view, viewState) {
@@ -11207,7 +11705,7 @@ function createRender(selector, handler, view) {
 
     var raf = function raf(cb) {
         return window.requestAnimationFrame(function (fb) {
-            cb();
+            cb(null);
         });
     };
 
@@ -11224,20 +11722,18 @@ function createRender(selector, handler, view) {
                         var RenderState_1 = new RenderState("NoRequest", []);
                         viewState = new ViewState(viewState.CurrentTree, viewState.NextTree, viewState.Node, RenderState_1);
                     }
+                } else if (matchValue.Case === "NoRequest") {
+                    throw new Error("Shouldn't happen");
                 } else {
-                    if (matchValue.Case === "NoRequest") {
-                        throw new Error("Shouldn't happen");
-                    } else {
-                        raf(callBack);
-                        {
-                            var _RenderState_ = new RenderState("ExtraRequest", []);
+                    raf(callBack);
+                    {
+                        var _RenderState_ = new RenderState("ExtraRequest", []);
 
-                            viewState = new ViewState(viewState.CurrentTree, viewState.NextTree, viewState.Node, _RenderState_);
-                        }
-                        var patches = index_3(viewState.CurrentTree, viewState.NextTree);
-                        index_4(viewState.Node, patches);
-                        viewState = new ViewState(viewState.NextTree, viewState.NextTree, viewState.Node, viewState.RenderState);
+                        viewState = new ViewState(viewState.CurrentTree, viewState.NextTree, viewState.Node, _RenderState_);
                     }
+                    var patches = index_3(viewState.CurrentTree, viewState.NextTree);
+                    index_4(viewState.Node, patches);
+                    viewState = new ViewState(viewState.NextTree, viewState.NextTree, viewState.Node, viewState.RenderState);
                 }
             };
 
@@ -11674,7 +12170,7 @@ function view$$1(model) {
     return new Actions$$1("DocsDispatcherAction", [arg0]);
   }, view$3(model.SubModels.Docs, model.CurrentPage.Fields[0])) : model.CurrentPage.Case === "Sample" ? map$$1(function (arg0) {
     return new Actions$$1("SampleDispatcherAction", [arg0]);
-  }, view$5(model.SubModels.Sample, model.CurrentPage.Fields[0])) : model.CurrentPage.Case === "About" ? view$10() : view$11();
+  }, view$5(model.SubModels.Sample, model.CurrentPage.Fields[0])) : model.CurrentPage.Case === "About" ? view$11() : view$12();
   var navbarHtml = map$$1(function (arg0) {
     return new Actions$$1("NavbarActions", [arg0]);
   }, view$1(model.SubModels.Navbar));
@@ -11759,10 +12255,20 @@ var routes = ofArray([function () {
     return Parsing.runM(map$$1, route, str);
   };
 }(), function () {
-  var map$$1 = new Actions$$1("NavigateTo", [new Route("About", [])]);
+  var map$$1 = new Actions$$1("NavigateTo", [new Route("Sample", [new SampleApi.Route("Calculator", [])])]);
 
   var route = function ($var7) {
     return Parsing._end(Parsing.drop($var7));
+  }(Parsing.pStaticStr("/sample/calculator"));
+
+  return function (str) {
+    return Parsing.runM(map$$1, route, str);
+  };
+}(), function () {
+  var map$$1 = new Actions$$1("NavigateTo", [new Route("About", [])]);
+
+  var route = function ($var8) {
+    return Parsing._end(Parsing.drop($var8));
   }(Parsing.pStaticStr("/about"));
 
   return function (str) {

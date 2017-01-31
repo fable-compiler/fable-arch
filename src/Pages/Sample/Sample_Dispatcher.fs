@@ -16,13 +16,15 @@ module Dispatcher =
       Counter: Counter.Model option
       HelloWorld: HelloWorld.Model option
       NestedCounter: NestedCounter.Model option
+      Calculator: Calculator.Model option
     }
 
-    static member Generate (?index, ?counter, ?helloWorld, ?nestedCounter) =
+    static member Generate (?index, ?counter, ?helloWorld, ?nestedCounter, ?calc) =
       { Clock = index
         Counter = counter
         HelloWorld = helloWorld
         NestedCounter = nestedCounter
+        Calculator = calc
       }
 
     static member Initial (currentPage: SampleApi.Route) =
@@ -31,6 +33,7 @@ module Dispatcher =
       | SampleApi.Counter -> Model.Generate (counter = Counter.Model.Initial)
       | SampleApi.HelloWorld -> Model.Generate (helloWorld = "" )
       | SampleApi.NestedCounter -> Model.Generate (nestedCounter = NestedCounter.Model.Initial)
+      | SampleApi.Calculator -> Model.Generate (calc = Calculator.Model.InputStack [])
 
   type NavbarLink =
     { Text: string
@@ -48,6 +51,7 @@ module Dispatcher =
     | CounterActions of Counter.Actions
     | HelloWorldActions of HelloWorld.Actions
     | NestedCounterActions of NestedCounter.Actions
+    | CalcActions of Calculator.Actions
 
   let update model action =
     match action with
@@ -67,6 +71,10 @@ module Dispatcher =
         let (res, action) = NestedCounter.update model.NestedCounter.Value act
         let action' = mapActions NestedCounterActions action
         { model with NestedCounter = Some res}, action'
+    | CalcActions acts -> 
+      let (res, action) = Calculator.update model.Calculator.Value acts
+      let action' = mapActions CalcActions action
+      { model with Calculator = Some res }, action'
     | NavigateTo route ->
         let message =
           [ fun h ->
@@ -109,6 +117,8 @@ module Dispatcher =
           Html.map HelloWorldActions (HelloWorld.view model.HelloWorld.Value)
       | SampleApi.NestedCounter ->
           Html.map NestedCounterActions (NestedCounter.view model.NestedCounter.Value)
+      | SampleApi.Calculator ->
+          Html.map CalcActions (Calculator.view model.Calculator.Value)
 
     div
       []
@@ -121,6 +131,7 @@ module Dispatcher =
                     NavbarLink.Create("Counter", SampleApi.Counter)
                     NavbarLink.Create("Nested counter", SampleApi.NestedCounter)
                     NavbarLink.Create("Clock", SampleApi.Clock)
+                    NavbarLink.Create("Calculator", SampleApi.Calculator)
                   ]
                   subRoute
               ]
