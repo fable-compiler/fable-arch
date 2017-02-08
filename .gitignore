@@ -270,3 +270,5 @@ temp/
 
 .DS_Store
 npm-debug\.log
+**/js/bundle.js
+docs/public/css/style.css
