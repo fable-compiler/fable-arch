@@ -220,20 +220,9 @@ module Main =
 
   let routerF m = router.Route m.Message
 
-  let tickProducer push =
-    window.setInterval((fun _ ->
-        push(SampleDispatcherAction (Pages.Sample.Dispatcher.ClockActions (Pages.Sample.Clock.Tick DateTime.Now)))
-        null
-    ), 1000) |> ignore
-    // Force the first to push to have immediate effect
-    // If we don't do that there is one second before the first push
-    // and the view is rendered with the Model.init values
-    push(SampleDispatcherAction (Pages.Sample.Dispatcher.ClockActions (Pages.Sample.Clock.Tick DateTime.Now)))
-
   createApp Model.Initial view update Virtualdom.createRender
   |> withStartNodeSelector "#app"
   |> withProducer (routeProducer locationHandler router)
-  |> withProducer tickProducer
   |> withSubscriber (routeSubscriber locationHandler routerF)
   |> start
 
