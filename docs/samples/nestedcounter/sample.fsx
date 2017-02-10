@@ -45,7 +45,7 @@ module Counter =
         { model with Value = 0 }, []
   let simpleButton txt action =
     div
-      [ classy "column is-narrow" ]
+      [ classy "column is-narrow is-narrow-mobile" ]
       [ a
           [ classy "button"
             VDom.voidLinkAction<Actions>
@@ -58,10 +58,10 @@ module Counter =
 
   let view model =
     div
-      [ classy "columns is-vcentered" ]
+      [ classy "columns is-vcentered is-flex-mobile" ]
       [
         div
-          [ classy "column is-narrow"
+          [ classy "column is-narrow is-narrow-mobile"
             Style [ "width", "170px" ]
           ]
           [ text (sprintf "Counter value: %i" model.Value) ]
@@ -143,10 +143,10 @@ let simpleButton txt action =
 
 let counterRow (id, counter) =
   div
-    [ classy "columns is-vcentered" ]
+    [ classy "columns is-vcentered is-flex-mobile" ]
     [ VDom.column<Actions>
       div
-        [ classy "column" ]
+        [ classy "column is-narrow" ]
         [
           a
             [ classy "button"
@@ -173,14 +173,12 @@ let view model =
   div
     []
     (div
-      [ classy "columns is-vcentered" ]
+      [ classy "columns is-vcentered is-flex-mobile" ]
       [ VDom.column<Actions>
         simpleButton "Create a new counter" CreateCounter
         simpleButton "Reset all" ResetAll
         VDom.column<Actions>
       ] :: countersView)
-
-
 
 createApp Model.Initial view update Virtualdom.createRender
 |> withStartNodeSelector "#sample"

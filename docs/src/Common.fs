@@ -6,29 +6,26 @@ module Common =
 
   [<RequireQualifiedAccess>]
   module UserApi =
-    type Route
-      = Index
+    type Route =
+      | Index
       | Create
       | Edit of int
       | Show of int
 
   [<RequireQualifiedAccess>]
   module DocsApi =
-    type Route
-      = Index
+    type Route =
+      | Index
       | Viewer of string
 
   [<RequireQualifiedAccess>]
   module SampleApi =
-    type Route
-      = Clock
-      | Counter
-      | HelloWorld
-      | NestedCounter
-      | Calculator
+    type Route =
+      | Index
+      | Viewer of string
 
-  type Route
-    = Index
+  type Route =
+    | Index
     | Docs of DocsApi.Route
     | Sample of SampleApi.Route
     | About
@@ -42,11 +39,8 @@ module Common =
         | DocsApi.Viewer fileName -> Some (sprintf "/docs?fileName=%s" fileName)
       | Sample api ->
         match api with
-        | SampleApi.Clock -> Some "/sample/clock"
-        | SampleApi.Counter -> Some "/sample/counter"
-        | SampleApi.HelloWorld -> Some "/sample/hello-world"
-        | SampleApi.NestedCounter -> Some "/sample/nested-counter"
-        | SampleApi.Calculator -> Some "/sample/calculator"
+        | SampleApi.Index -> Some "/sample"
+        | SampleApi.Viewer fileName -> Some (sprintf "/sample?name=%s" fileName)
       | About -> Some "/about"
 
   let voidLinkAction<'T> : Attribute<'T> = property "href" "javascript:void(0)"

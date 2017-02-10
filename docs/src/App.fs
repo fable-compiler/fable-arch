@@ -118,7 +118,15 @@ module Main =
             |> Optic.set (Model.SubModels_ >-> SubModels.Navbar_ >-> Navbar.Model.CurrentPage_) route
             |> Optic.set (Model.CurrentPage_) route
 
-          m', []
+          let message =
+            match subRoute with
+            | SampleApi.Index -> []
+            | SampleApi.Viewer fileName ->
+              [ fun h ->
+                  h (SampleDispatcherAction (Pages.Sample.Dispatcher.ViewerActions (Pages.Sample.Viewer.SetDoc fileName)))
+              ]
+
+          m', message
     | DocsDispatcherAction act ->
         let (res, action) = Pages.Docs.Dispatcher.update model.SubModels.Docs act
         let action' = mapActions DocsDispatcherAction action
@@ -185,11 +193,8 @@ module Main =
       runM (NavigateTo Index) (pStaticStr "/" |> (drop >> _end))
       runM (NavigateTo (Docs DocsApi.Index)) (pStaticStr "/docs" |> (drop >> _end))
       runM1 (fun fileName -> NavigateTo (Docs (DocsApi.Viewer fileName))) ((pStaticStr "/docs") <?> (pStaticStr "fileName") <=.> pString)
-      runM (NavigateTo (Sample SampleApi.Clock)) (pStaticStr "/sample/clock" |> (drop >> _end))
-      runM (NavigateTo (Sample SampleApi.Counter)) (pStaticStr "/sample/counter" |> (drop >> _end))
-      runM (NavigateTo (Sample SampleApi.HelloWorld)) (pStaticStr "/sample/hello-world" |> (drop >> _end))
-      runM (NavigateTo (Sample SampleApi.NestedCounter)) (pStaticStr "/sample/nested-counter" |> (drop >> _end))
-      runM (NavigateTo (Sample SampleApi.Calculator)) (pStaticStr "/sample/calculator" |> (drop >> _end))
+      runM (NavigateTo (Sample SampleApi.Index)) (pStaticStr "/sample" |> (drop >> _end))
+      runM2 (fun name -> NavigateTo (Sample (SampleApi.Viewer name))) ((pStaticStr "/sample") <?> (pStaticStr "name") <=.> pString)
       runM (NavigateTo About) (pStaticStr "/about" |> (drop >> _end))
     ]
 

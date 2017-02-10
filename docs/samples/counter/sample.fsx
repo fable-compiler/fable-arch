@@ -43,7 +43,7 @@ let update model action =
 let voidLinkAction<'T> : Attribute<'T> = property "href" "javascript:void(0)"
 let simpleButton txt action =
   div
-    [ classy "column is-narrow" ]
+    [ classy "column is-narrow is-narrow-mobile" ]
     [ a
         [ classy "button"
           voidLinkAction<Actions>
@@ -56,17 +56,20 @@ let simpleButton txt action =
 
 let view model =
   div
-    [ classy "columns is-vcentered" ]
-    [
+    [ classy "columns is-vcentered is-flex-mobile" ]
+    [ // We add a column at the beginning and the end to force center of the view
+      div [ classy "column" ] []
       div
-        [ classy "column is-narrow"
+        [ classy "column is-narrow is-narrow-mobile"
           Style [ "width", "170px" ]
         ]
         [ text (sprintf "Counter value: %i" model.Value) ]
       simpleButton "+1" Add
       simpleButton "-1" Sub
       simpleButton "Reset" Reset
+      div [ classy "column" ] []
     ]
+
 
 createSimpleApp Model.Initial view update Virtualdom.createRender
 |> withStartNodeSelector "#sample"

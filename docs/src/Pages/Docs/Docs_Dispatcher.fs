@@ -16,17 +16,12 @@ module Dispatcher =
     { Viewer: Viewer.Model
     }
 
-    static member Generate () =
+    static member Initial (currentPage: DocsApi.Route) =
       { Viewer = Viewer.Model.Initial
       }
 
-    static member Initial (currentPage: DocsApi.Route) =
-      match currentPage with
-      | DocsApi.Index-> Model.Generate ()
-      | DocsApi.Viewer fileName -> Model.Generate ()
-
-  type Actions
-    = NoOp
+  type Actions =
+    | NoOp
     | ViewerActions of Viewer.Actions
 
   let update model action =

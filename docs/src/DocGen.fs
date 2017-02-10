@@ -13,19 +13,29 @@ module DocGen =
   let docFilesDirectory = "doc_files"
 
   #if DEV
-  let rawUrl = ""
+  let rawUrl = sprintf "http://%s" Browser.location.host
+  let createSampleDirectoryURL sampleName =
+    sprintf "%s/samples/%s/public/" rawUrl sampleName
   #else
   let rawUrl = "https://raw.githubusercontent.com/fable-compiler/fable-arch/gh-pages/"
+  let createSampleDirectoryURL sampleName =
+    sprintf "http://fable.io/fable-arch/docs/samples/%s/public" sampleName
   #endif
-  
-  let createSampleURL file =
-    sprintf "%s/%s/%s" rawUrl sampleSourceDirectory file
 
   let createDocFilesDirectoryURL fileName =
     sprintf "%s/%s/%s.md" rawUrl docFilesDirectory fileName
 
   let createDocURL fileName =
     sprintf "#/docs?fileName=%s" fileName
+
+  let createSampleURL name =
+    sprintf "#/sample?name=%s" name
+
+  let createSampleReadmeURL sampleName =
+    sprintf "%s/samples/%s/README.md" rawUrl sampleName
+
+  let githubURL sampleName =
+    sprintf "http://github.com/fable-compiler/fable-arch/tree/master/docs/samples/%s" sampleName
 
   type CaptureState =
     | Nothing
