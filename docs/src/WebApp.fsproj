@@ -63,7 +63,6 @@
     <Compile Include="Pages\About.fs" />
     <Compile Include="Pages\Docs\Docs_Viewer.fs" />
     <Compile Include="Pages\Docs\Docs_Dispatcher.fs" />
-    <Compile Include="Pages\Sample\Sample_Calculator.fs" />
     <Compile Include="Pages\Sample\Sample_Viewer.fs" />
     <Compile Include="Pages\Sample\Sample_Dispatcher.fs" />
     <Compile Include="Navbar.fs" />
