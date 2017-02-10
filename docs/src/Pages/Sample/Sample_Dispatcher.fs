@@ -139,9 +139,12 @@ module Dispatcher =
       [
         h1
           [ classy "title" ]
-          [ text "Advanced" ]
+          [ text "Medium" ]
         tileSection
-          [
+          [ { Title = "Calculator"
+              SubTitle = "A calculator application"
+              FileName = "calculator"
+            }
           ]
       ]
 
@@ -151,7 +154,7 @@ module Dispatcher =
       [
         h1
           [ classy "title" ]
-          [ text "Expert" ]
+          [ text "Advanced" ]
         tileSection
           [
           ]
