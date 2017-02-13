@@ -1,22 +1,17 @@
-(**
- - title: Echo sample - getting started with ajax
- - tagline: Simple ajax demonstration with fable-arch
- - app-style: width:800px; margin:20px auto 50px auto;
- - intro: This is a sample showing how to use ajax calls.
-*)
-
-#r "node_modules/fable-core/Fable.Core.dll"
-#load "node_modules/fable-arch/Fable.Arch.Html.fs"
-#load "node_modules/fable-arch/Fable.Arch.App.fs"
-#load "node_modules/fable-arch/Fable.Arch.Virtualdom.fs"
-
-open Fable.Core
-open Fable.Core.JsInterop
-open Fable.Import.Browser
+// If you are using the sample in standalone please switch the import lines
+// #r "node_modules/fable-core/Fable.Core.dll"
+// #r "node_modules/fable-arch/Fable.Arch.dll"
+// Imports for docs site mode
+#r "../../node_modules/fable-core/Fable.Core.dll"
+#r "../../node_modules/fable-arch/Fable.Arch.dll"
 
 open Fable.Arch
 open Fable.Arch.App
+open Fable.Arch.App.AppApi
 open Fable.Arch.Html
+open Fable.Core.JsInterop
+open Fable.Import.Browser
+
 
 /// Helpers for working with input element from VirtualDom
 let inline onInput x = onEvent "oninput" (fun e -> x (unbox e?target?value))
@@ -41,7 +36,7 @@ type Model =
     Status: Status
   }
 
-  static member Init =
+  static member Initial =
     { InputValue = ""
       ServerResponse = ""
       Status = None
@@ -93,36 +88,60 @@ let update model action =
 // View
 let view model =
   // Choose what we want to display on output
-  let infoText =
+  let resultArea =
     match model.Status with
-    | None -> text ""
-    | Pending -> text "Waiting Server response"
-    | Done -> text (sprintf "The server response is: %s" model.ServerResponse)
+    | None -> span [] [ text "" ]
+    | Pending -> span [] [ text "Waiting Server response" ]
+    | Done ->
+        span
+          []
+          [ text "The server response is:"
+            br []
+            b
+              []
+              [ text model.ServerResponse ]
+          ]
 
   div
-    []
-    [
-      label
-        []
-        [text "Enter a sentence: "]
-      br []
-      textarea
-        [
-            onInput ChangeInput
-            property "value" model.InputValue
+    [ classy "columns is-flex-mobile" ]
+    [ div [ classy "column" ] []
+      div
+        [ classy "column is-narrow is-narrow-mobile"
+          Style [ "width", "400px" ]
         ]
-        []
-      br []
-      button
-        [ onMouseClick (fun _ -> SendEcho) ]
-        [ text "Uppercase by server" ]
-      br []
-      span
-        []
-        [ infoText ]
+        [ label
+            [ classy "label"
+              property "for" "input-area"
+            ]
+            [text "Enter a sentence: "]
+          p
+            [ classy "control" ]
+            [ textarea
+                [
+                  property "id" "input-area"
+                  classy "textarea"
+                  onInput ChangeInput
+                  property "value" model.InputValue
+                ]
+                []
+            ]
+          div
+            [ classy "control" ]
+            [ p
+                []
+                [ button
+                    [ classy "button"
+                      onMouseClick (fun _ -> SendEcho)
+                    ]
+                    [ text "Uppercase by server" ]
+                ]
+            ]
+          resultArea
+        ]
+      div [ classy "column" ] []
     ]
 
-/// Create our application
-createApp Model.Init view update Virtualdom.createRender
-|> withStartNodeSelector "#echo"
+
+createApp Model.Initial view update Virtualdom.createRender
+|> withStartNodeSelector "#sample"
 |> start

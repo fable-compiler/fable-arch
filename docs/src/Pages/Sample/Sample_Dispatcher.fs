@@ -130,6 +130,10 @@ module Dispatcher =
               SubTitle = "A clock showing producer usage."
               FileName = "clock"
             }
+            { Title = "Echo"
+              SubTitle = "An echo application showing how to use make ajax calls"
+              FileName = "echo"
+            }
           ]
       ]
 
