@@ -51,47 +51,44 @@ type Actions =
 
 // Update
 let update model action =
-  let model' =
-    match action with
-    // On input change with update the model value
-    | ChangeInput str ->
-      { model with InputValue = str }
-    // When we got back a server response, we update the value of the server and set the state to Done
-    | ServerResponse str ->
+  match action with
+  // On input change with update the model value
+  | ChangeInput str ->
+      { model with InputValue = str } ,[]
+  // When we got back a server response, we update the value of the server and set the state to Done
+  | ServerResponse str ->
       { model with
           ServerResponse = str
-          Status = Done }
-    // Set the status in the model
-    | SetStatus newStatus ->
-      { model with Status = newStatus }
-    | _ -> model
-
-  // Code used to support delayed code like ajax for example
-  let delayedCall h =
-    match action with
-    | SendEcho ->
-      // Send a fake ajax
-      // First is a callback to execute when done
-      // Second is the data to send
-      fakeAjax
-        (fun data ->
-          h (ServerResponse data)
-        )
-        model.InputValue
-      // We just sent an ajax request so make the state pending in the model
-      h (SetStatus Pending)
-    | _ -> ()
-
-  // We return the model, and a list of Actions to execute
-  model', delayedCall |> toActionList
+          Status = Done }, []
+  // Set the status in the model
+  | SetStatus newStatus ->
+      { model with Status = newStatus }, []
+  | SendEcho ->
+      let message =
+        [ fun h ->
+            fakeAjax
+              (fun data ->
+                h (ServerResponse data)
+              )
+              model.InputValue
+            // We just sent an ajax request so make the state pending in the model
+            h (SetStatus Pending)
+        ]
+      model, message
 
 // View
 let view model =
   // Choose what we want to display on output
   let resultArea =
     match model.Status with
-    | None -> span [] [ text "" ]
-    | Pending -> span [] [ text "Waiting Server response" ]
+    | None ->
+        span
+          []
+          [ text "" ]
+    | Pending ->
+        span
+          []
+          [ text "Waiting Server response" ]
     | Done ->
         span
           []
