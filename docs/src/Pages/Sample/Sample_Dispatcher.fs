@@ -142,7 +142,7 @@ module Dispatcher =
               Height = 300
             }
             { Title = "Echo"
-              SubTitle = "An echo application showing how to use make ajax calls"
+              SubTitle = "An echo application showing how to make ajax calls"
               FileName = "echo"
               Height = 500
             }

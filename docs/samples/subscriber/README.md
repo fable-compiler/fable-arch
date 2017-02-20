@@ -1,6 +1,6 @@
 # Subscrier sample
 
-In this file you can put the documentation shown when the sample is displayed on the docs site.
+This sample take the [hello sample](#/sample/hello?height=350) and add a subscriber to it.
 
 ## Register subscriber
 
