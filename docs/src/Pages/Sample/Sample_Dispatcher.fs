@@ -122,22 +122,22 @@ module Dispatcher =
           [ text "Beginner" ]
         tileSection
           [ { Title = "Hello World"
-              SubTitle = "A simple application showing inputs usage."
+              SubTitle = "A simple application showing inputs usage"
               FileName = "hello"
               Height = 350
             }
             { Title = "Counter"
-              SubTitle = "A simple application showing how to support multiple actions."
+              SubTitle = "A simple application showing how to support multiple actions"
               FileName = "counter"
               Height = 300
             }
             { Title = "Nested counter"
-              SubTitle = "A application showing how to use nested application."
+              SubTitle = "A application showing how to use nested application"
               FileName = "nestedcounter"
               Height = 400
             }
             { Title = "Clock"
-              SubTitle = "A clock showing producer usage."
+              SubTitle = "A clock showing producer usage"
               FileName = "clock"
               Height = 300
             }
@@ -147,8 +147,13 @@ module Dispatcher =
               Height = 500
             }
             { Title = "Subscriber"
-              SubTitle = "This application will show you how to register a subscriber to your application."
+              SubTitle = "This application show you how to register a subscriber to your application"
               FileName = "subscriber"
+              Height = 350
+            }
+            { Title = "Navigation"
+              SubTitle = "This application show you how to use the navigation feature of Fable-Arch"
+              FileName = "navigation"
               Height = 350
             }
           ]
