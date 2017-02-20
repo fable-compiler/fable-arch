@@ -31,21 +31,24 @@ module Viewer =
 
   type Model =
     { CurrentFile: string
+      IframeHeight: int
       DocsHTML: DocHTML list
     }
 
     static member Initial =
       { CurrentFile = ""
         DocsHTML = []
+        IframeHeight = 350
       }
 
   type Actions =
     | SetDoc of string
     | SetDocHTML of string * string
+    | SetHeight of int
 
   let update model action =
     match action with
-    | SetDoc sampleName ->
+    | SetDoc (sampleName) ->
         // Fetch the markdown content only if unknown doc entry
         let exist =
           model.DocsHTML
@@ -60,14 +63,28 @@ module Viewer =
             }
           let message =
             [ fun h ->
-              fetch (DocGen.createSampleReadmeURL sampleName) []
-              |> Promise.bind(fun res ->
-                res.text()
-              )
-              |> Promise.map(fun text ->
-                  h(SetDocHTML (sampleName, Marked.Globals.marked.parse text))
-              )
-              |> ignore
+                fetch (DocGen.createSampleReadmeURL sampleName) []
+                |> Promise.bind(fun res ->
+                  res.text()
+                )
+                |> Promise.map(
+                  fun text ->
+                    h(SetDocHTML (sampleName, Marked.Globals.marked.parse text))
+                )
+                |> ignore
+              fun h ->
+                try
+                  let search = location.href.Split '?'
+                  let parameters = search.[1].Split '&'
+                  let heightParam =
+                    parameters
+                    |> Array.find(fun p -> p.Contains "height")
+                  let height = int (heightParam.Split '=').[1]
+                  h(SetHeight height)
+                // If an error occured when extracting height from the parameters
+                // We do nothing
+                with
+                  | _ -> console.error "Error when extracting the iframe height parameter"
             ]
           m', message
     | SetDocHTML (key, html) ->
@@ -84,6 +101,8 @@ module Viewer =
           )
 
         { model with DocsHTML = docs}, []
+    | SetHeight height ->
+        { model with IframeHeight = height }, []
 
   let iframe x = elem "iframe" x
 
@@ -151,6 +170,7 @@ module Viewer =
                         iframe
                           [ classy "sample-viewer"
                             property "src" (DocGen.createSampleDirectoryURL model.CurrentFile)
+                            property "height" (string model.IframeHeight)
                           ]
                           []
                       ]

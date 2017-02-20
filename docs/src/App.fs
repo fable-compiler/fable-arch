@@ -121,9 +121,9 @@ module Main =
           let message =
             match subRoute with
             | SampleApi.Index -> []
-            | SampleApi.Viewer fileName ->
+            | SampleApi.Viewer (sampleName, _)->
               [ fun h ->
-                  h (SampleDispatcherAction (Pages.Sample.Dispatcher.ViewerActions (Pages.Sample.Viewer.SetDoc fileName)))
+                  h (SampleDispatcherAction (Pages.Sample.Dispatcher.ViewerActions (Pages.Sample.Viewer.SetDoc sampleName)))
               ]
 
           m', message
@@ -182,24 +182,36 @@ module Main =
       ]
 
   // Customs helpers over the RouteParser
-  let (<?>) p1 p2  =
-    p1 .>> pchar '?' .>>. p2
+  let (<?>) p1 p2 =
+      p1 .>> pchar '?' .>>. p2
 
-  let (<=.>) p1 p2  =
+  let (<.?>) p1 p2 =
+      p1 .>> pchar '?' .>> p2
+
+  let (<?.>) p1 p2 =
+    p1 >>. pchar '?' >>. p2
+
+  let (<=>) p1 p2 =
+      p1 .>> pchar '=' .>>. p2
+
+  let (<.=>) p1 p2 =
+      p1 .>> pchar '=' .>> p2
+
+  let (<=.>) p1 p2 =
     p1 >>. pchar '=' >>. p2
 
   let routes =
     [
       runM (NavigateTo Index) (pStaticStr "/" |> (drop >> _end))
-      runM (NavigateTo (Docs DocsApi.Index)) (pStaticStr "/docs" |> (drop >> _end))
       runM1 (fun fileName -> NavigateTo (Docs (DocsApi.Viewer fileName))) ((pStaticStr "/docs") <?> (pStaticStr "fileName") <=.> pString)
+      runM (NavigateTo (Docs DocsApi.Index)) (pStaticStr "/docs" |> (drop >> _end))
       runM (NavigateTo (Sample SampleApi.Index)) (pStaticStr "/sample" |> (drop >> _end))
-      runM2 (fun name -> NavigateTo (Sample (SampleApi.Viewer name))) ((pStaticStr "/sample") <?> (pStaticStr "name") <=.> pString)
+      runM2 (fun info -> NavigateTo(Sample (SampleApi.Viewer info))) (pStaticStr "/sample" </.> pStringTo '?' .>> pStaticStr "height" <=> pint |> _end)
       runM (NavigateTo About) (pStaticStr "/about" |> (drop >> _end))
     ]
-
-
+    
   let mapToRoute route =
+    printfn "%A" route
     match route with
     | NavigateTo r ->
         resolveRoutesToUrl r
@@ -219,7 +231,7 @@ module Main =
         )
 
       PushChange =
-        (fun s -> location.hash <- s)
+        (fun s -> console.log s; location.hash <- s)
     }
 
 

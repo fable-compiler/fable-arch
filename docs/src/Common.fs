@@ -22,8 +22,8 @@ module Common =
   module SampleApi =
     type Route =
       | Index
-      | Viewer of string
-
+      | Viewer of string * int
+      
   type Route =
     | Index
     | Docs of DocsApi.Route
@@ -40,9 +40,9 @@ module Common =
       | Sample api ->
         match api with
         | SampleApi.Index -> Some "/sample"
-        | SampleApi.Viewer fileName -> Some (sprintf "/sample?name=%s" fileName)
+        | SampleApi.Viewer (fileName, height) -> Some (sprintf "/sample/%s?height=%i" fileName height)
       | About -> Some "/about"
-
+       
   let voidLinkAction<'T> : Attribute<'T> = property "href" "javascript:void(0)"
 
   module VDom =

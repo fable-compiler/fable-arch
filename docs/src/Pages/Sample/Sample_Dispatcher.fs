@@ -39,6 +39,7 @@ module Dispatcher =
     { Title: string
       SubTitle: string
       FileName: string
+      Height: int
     }
 
   type SectionsInfo =
@@ -56,6 +57,12 @@ module Dispatcher =
       }
 
   let tileDocs info =
+    let sampleURL =
+      let sampleApi = SampleApi.Viewer (info.FileName, info.Height) 
+      match resolveRoutesToUrl (Sample sampleApi) with
+      | Some url -> sprintf "#%s" url
+      | None -> failwith "Uknown route"
+
     div
       [ classy "tile is-parent is-vertical" ]
       [ article
@@ -64,7 +71,7 @@ module Dispatcher =
               [ classy "title" ]
               [ a
                   [ voidLinkAction<Actions>
-                    property "href" (DocGen.createSampleURL info.FileName)
+                    property "href" sampleURL
                   ]
                   [ text info.Title ]
               ]
@@ -73,7 +80,7 @@ module Dispatcher =
               [ text info.SubTitle ]
           ]
       ]
-
+       
   let tileVertical tiles =
     div
       [ classy "tile is-vertical is-4" ]
@@ -117,22 +124,27 @@ module Dispatcher =
           [ { Title = "Hello World"
               SubTitle = "A simple application showing inputs usage."
               FileName = "hello"
+              Height = 350
             }
             { Title = "Counter"
               SubTitle = "A simple application showing how to support multiple actions."
               FileName = "counter"
+              Height = 300
             }
             { Title = "Nested counter"
               SubTitle = "A application showing how to use nested application."
               FileName = "nestedcounter"
+              Height = 400
             }
             { Title = "Clock"
               SubTitle = "A clock showing producer usage."
               FileName = "clock"
+              Height = 300
             }
             { Title = "Echo"
               SubTitle = "An echo application showing how to use make ajax calls"
               FileName = "echo"
+              Height = 500
             }
           ]
       ]
@@ -148,6 +160,7 @@ module Dispatcher =
           [ { Title = "Calculator"
               SubTitle = "A calculator application"
               FileName = "calculator"
+              Height = 350
             }
           ]
       ]
