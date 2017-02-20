@@ -211,7 +211,6 @@ module Main =
     ]
     
   let mapToRoute route =
-    printfn "%A" route
     match route with
     | NavigateTo r ->
         resolveRoutesToUrl r
@@ -231,7 +230,7 @@ module Main =
         )
 
       PushChange =
-        (fun s -> console.log s; location.hash <- s)
+        (fun s -> location.hash <- s)
     }
 
 

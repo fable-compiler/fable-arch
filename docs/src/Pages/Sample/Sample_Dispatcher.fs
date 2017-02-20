@@ -146,6 +146,11 @@ module Dispatcher =
               FileName = "echo"
               Height = 500
             }
+            { Title = "Subscriber"
+              SubTitle = "This application will show you how to register a subscriber to your application."
+              FileName = "subscriber"
+              Height = 350
+            }
           ]
       ]
 
