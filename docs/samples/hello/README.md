@@ -70,10 +70,3 @@ The function `VDom.onInput` is a simple helper to access the value from the onIn
 module VDom =
   let onInput x = onEvent "oninput" (fun e -> x (unbox e?target?value))
 ```
-
-
-
-
-
-
-

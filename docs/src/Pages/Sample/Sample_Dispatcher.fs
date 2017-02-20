@@ -160,7 +160,7 @@ module Dispatcher =
           [ { Title = "Calculator"
               SubTitle = "A calculator application"
               FileName = "calculator"
-              Height = 350
+              Height = 600
             }
           ]
       ]

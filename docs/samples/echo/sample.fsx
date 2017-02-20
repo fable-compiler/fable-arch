@@ -43,7 +43,6 @@ type Model =
     }
 
 type Actions =
-  | NoOp
   | ChangeInput of string
   | SendEcho
   | ServerResponse of string
