@@ -38,7 +38,7 @@ open Fable.Arch.Html
 
 ### Rollup
 
-If you are using Rollup has the bundler you need to tell it how to bundle virtual-dom.
+If you are using Rollup as the bundler you need to tell it how to bundle virtual-dom.
 
 Example:
 
