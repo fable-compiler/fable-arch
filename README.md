@@ -26,7 +26,7 @@ $ npm install --save-dev fable-arch
 
 ```fsharp
 #r "node_modules/fable-core/Fable.Core.dll"
-#r "node_modules\fable-arch\Fable.Arch.dll"
+#r "node_modules/fable-arch/Fable.Arch.dll"
 
 open Fable.Core
 open Fable.Import
