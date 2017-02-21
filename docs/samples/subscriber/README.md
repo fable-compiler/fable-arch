@@ -1,4 +1,4 @@
-# Subscrier sample
+# Subscriber sample
 
 This sample take the [hello sample](#/sample/hello?height=350) and add a subscriber to it.
 
