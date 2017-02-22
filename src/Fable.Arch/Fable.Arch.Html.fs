@@ -34,6 +34,7 @@ module Types =
     /// Whitespace for formatting
     | WhiteSpace of string
     | Svg of Element<'TMessage> * DomNode<'TMessage> list
+    | VirtualNode of string * Map<string, string> * obj[]
 
 let mapEventHandler<'T1,'T2> (mapping:('T1 -> 'T2)) (e,f) = EventHandler(e, f >> mapping)
 
@@ -60,6 +61,7 @@ let rec map<'T1,'T2> (mapping:('T1 -> 'T2)) (node:DomNode<'T1>) =
     | Text(s) -> Text s
     | WhiteSpace(ws) -> WhiteSpace ws
     | Svg(e,ns) -> Element(mapElem mapping e, ns |> List.map (map mapping))
+    | VirtualNode(tag, props, childrens) -> VirtualNode(tag, props, childrens)
 
 [<AutoOpen>]
 module Tags =
@@ -69,6 +71,8 @@ module Tags =
     let whiteSpace x = WhiteSpace x
     let text x = Text x
 
+    let vnode tag props children = VirtualNode(tag, props, children)
+    
     // Elements - list of elements here: https://developer.mozilla.org/en-US/docs/Web/HTML/Element
     // Void elements
     let br x = voidElem "br" x

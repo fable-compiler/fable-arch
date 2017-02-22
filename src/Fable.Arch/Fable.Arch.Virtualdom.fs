@@ -67,6 +67,7 @@ let rec renderSomething handler node =
     | VoidElement (tag, attrs) -> createTree handler tag attrs []
     | Text str -> box(string str)
     | WhiteSpace str -> box(string str)
+    | VirtualNode(tag, props, childrens) -> h(tag, props, childrens)
 
 let render handler view viewState =
     let tree = renderSomething handler view
