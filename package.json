@@ -15,8 +15,8 @@
     "F#"
   ],
   "devDependencies": {
-    "fable-compiler": "^0.7.37",
-    "fable-core": "^0.7.25",
+    "fable-compiler": "^0.7.43",
+    "fable-core": "^0.7.28",
     "fable-react": "^0.8.0",
     "fs-extra": "^1.0.0"
   },
