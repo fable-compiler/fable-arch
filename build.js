@@ -18,6 +18,10 @@ var targets = {
                 return fable.runCommand("npm", "npm version " + version);
             });
     },
+    dev() {
+        return fable.promisify(fs.remove, "npm")
+            .then(_ => fable.compile({projFile: "src/Fable.Arch", watch: true}))
+    },
     publish() {
         return this.all()
             .then(_ => {

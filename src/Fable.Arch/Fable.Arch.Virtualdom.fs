@@ -37,6 +37,7 @@ let createTree<'T> (handler:'T -> unit) tag (attributes:Attribute<'T> list) chil
                 | Style style -> "style" ==> createObj(unbox style)
                 | Property (k,v) -> k ==> v
                 | EventHandler(ev,f) -> ev ==> ((f >> handler) :> obj)
+                | Hook (k,v) -> k ==> v
             )
 
         match elAttributes with

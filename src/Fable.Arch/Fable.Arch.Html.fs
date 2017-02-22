@@ -2,17 +2,23 @@ module Fable.Arch.Html
 
 [<AutoOpen>]
 module Types =
+    open Fable.Core
+
     type EventHandler<'TMessage> = string*(obj -> 'TMessage)
 
     type Style = (string*string) list
 
     type KeyValue = string*string
 
+    [<Erase>]
+    type HookValue = HookValue 
+
     type Attribute<'TMessage> =
         | EventHandler of EventHandler<'TMessage>
         | Style of Style
         | Property of KeyValue
         | Attribute of KeyValue
+        | Hook of string * HookValue
 
     type Element<'TMessage> = string * Attribute<'TMessage> list
     /// A Node in Html have the following forms
@@ -37,6 +43,7 @@ let mapAttributes<'T1,'T2> (mapping:('T1 -> 'T2)) (attribute:Attribute<'T1>) =
     | Style s -> Style s
     | Property kv -> Property kv
     | Attribute kv -> Attribute kv
+    | Hook (key, value) -> Hook (key, value)
 
 let mapElem<'T1,'T2> (mapping:('T1 -> 'T2)) (node:Element<'T1>) =
     let (tag, attrs) = node
@@ -151,6 +158,7 @@ module Tags =
 
     // Embedded content
     let objectHtml x = elem "object" x
+    let iframe x = elem "iframe" x
 
     // Demarcasting edits
     let del x = elem "del" x
@@ -191,8 +199,29 @@ module Tags =
 
 [<AutoOpen>]
 module Attributes =
+    open Fable.Core
+    open Fable.Core.JsInterop
+    open Fable.Import.Browser
+
     let attribute key value = Attribute.Attribute (key,value)
     let property key value = Attribute.Property (key,value)
+
+    let hook key value = Attribute.Hook (key, value)
+
+    type HookHelper =
+        // Hook
+        [<Emit("(function() { var Hook = function() {}; Hook.prototype.hook = $0; return new Hook(); })()")>]
+        static member CreateHook(hook: JsFunc2<HTMLElement, string, unit>) : HookValue = jsNative
+        [<Emit("(function() { var Hook = function() {}; Hook.prototype.hook = $0; return new Hook(); })()")>]
+        static member CreateHook(hook: JsFunc3<HTMLElement, string, HTMLElement, unit>) : HookValue = jsNative
+        // Unhook
+        [<Emit("(function() { var Hook = function() {}; Hook.prototype.unhook = $0; return new Hook(); })()")>]
+        static member CreateUnhook(unhook: JsFunc2<HTMLElement, string, unit>) : HookValue = jsNative
+        [<Emit("(function() { var Hook = function() {}; Hook.prototype.unhook = $0; return new Hook(); })()")>]
+        static member CreateUnhook(unhook: JsFunc3<HTMLElement, string, HTMLElement, unit>) : HookValue = jsNative
+        // Hook & Unhook
+        [<Emit("(function() { var Hook = function() {}; Hook.prototype.hook = $0; Hook.prototype.unhook = $1; return new Hook(); })()")>]
+        static member CreateTwoWayHook(hook: JsFunc3<HTMLElement, string, HTMLElement, unit>, unhook: JsFunc3<HTMLElement, string, HTMLElement, unit>) : HookValue = jsNative
 
     /// class attribute helper
     let classy value = attribute "class" value
