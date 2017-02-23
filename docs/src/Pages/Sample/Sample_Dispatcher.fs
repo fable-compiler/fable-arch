@@ -156,6 +156,11 @@ module Dispatcher =
               FileName = "navigation"
               Height = 350
             }
+            { Title = "Routing"
+              SubTitle = "This application show you how to use the navigation feature of Fable-Arch"
+              FileName = "routing"
+              Height = 350
+            }
           ]
       ]
 
