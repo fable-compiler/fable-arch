@@ -164,6 +164,9 @@ module Tags =
     let objectHtml x = elem "object" x
     let iframe x = elem "iframe" x
 
+    // canvas 
+    let canvas x = elem "canvas" x
+
     // Demarcasting edits
     let del x = elem "del" x
     let ins x = elem "ins" x
@@ -229,6 +232,21 @@ module Attributes =
 
     /// class attribute helper
     let classy value = attribute "class" value
+
+    let className name = attribute "class" name
+    let height (n: int) = attribute "height" (string n)
+    let width (n: int) = attribute "width" (string n)
+    let src url = attribute "src" url
+    let href url = attribute "href" url
+    let placeholder input = attribute "placeholder" input
+
+    /// Provides means to interact with inner rendering contex of a canvas 
+    let canvasContextHook (ctxHandler: CanvasRenderingContext2D -> unit) = 
+        hook "canvas-ctx" (HookHelper.CreateHook (fun el _ _ -> 
+            let canvas = unbox<HTMLCanvasElement> el
+            let ctx = canvas.getContext_2d()
+            ctxHandler ctx
+        ))
 
     /// Helper to build space separated class
     let classList (list: (string*bool) seq) =
