@@ -65,9 +65,9 @@ const targets = {
     return fable.promisify(fs.readdir, SAMPLES_DIR, (err, files) => {
 
       files.forEach(file => {
-        if (file !== "template") {
-
+        if (file !== "template" && file !== ".DS_Store") {
           const localDir = path.join(SAMPLES_DIR, file)
+          console.log(localDir)
           child_process.execSync("node build.js",  {
             cwd: localDir
           });
