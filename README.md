@@ -1,6 +1,6 @@
-# fable-import-virtualdom
+# Fable-Arch
 
-Fable bindings for virtual-dom
+Framework for building applications based on the elm architecture. [Docs site](http://fable.io/fable-arch/)
 
 ## Installation
 
