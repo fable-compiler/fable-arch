@@ -37,6 +37,7 @@ let createTree<'T> (handler:'T -> unit) tag (attributes:Attribute<'T> list) chil
                 | Style style -> "style" ==> createObj(unbox style)
                 | Property (k,v) -> k ==> v
                 | EventHandler(ev,f) -> ev ==> ((f >> handler) :> obj)
+                | Hook (k,v) -> k ==> v
             )
 
         match elAttributes with
@@ -66,13 +67,18 @@ let rec renderSomething handler node =
     | VoidElement (tag, attrs) -> createTree handler tag attrs []
     | Text str -> box(string str)
     | WhiteSpace str -> box(string str)
+    | VirtualNode(tag, props, childrens) -> h(tag, props, childrens)
 
 let render handler view viewState =
     let tree = renderSomething handler view
     {viewState with NextTree = tree}
 
 let createRender selector handler view =
-    let node = document.body.querySelector(selector) :?> HTMLElement
+    let node = 
+        match selector with
+        | Query sel -> document.body.querySelector(sel) :?> HTMLElement
+        | Node elem -> elem
+
     let tree = renderSomething handler view
     let vdomNode = createElement tree
     node.appendChild(vdomNode) |> ignore

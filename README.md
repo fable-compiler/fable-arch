@@ -1,6 +1,6 @@
-# fable-import-virtualdom
+# Fable-Arch
 
-Fable bindings for virtual-dom
+Framework for building applications based on the elm architecture. [Docs site](http://fable.io/fable-arch/)
 
 ## Installation
 
@@ -26,7 +26,7 @@ $ npm install --save-dev fable-arch
 
 ```fsharp
 #r "node_modules/fable-core/Fable.Core.dll"
-#r "node_modules\fable-arch\Fable.Arch.dll"
+#r "node_modules/fable-arch/Fable.Arch.dll"
 
 open Fable.Core
 open Fable.Import
@@ -38,7 +38,7 @@ open Fable.Arch.Html
 
 ### Rollup
 
-If you are using Rollup has the bundler you need to tell it how to bundle virtual-dom.
+If you are using Rollup as the bundler you need to tell it how to bundle virtual-dom.
 
 Example:
 

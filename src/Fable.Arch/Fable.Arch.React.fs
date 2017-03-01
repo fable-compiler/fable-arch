@@ -1,9 +1,12 @@
 module Fable.Arch.React
 
+open Fable.Arch.App
 open Fable.Core
 open Fable.Core.JsInterop
-open System.Diagnostics
 open Fable.Import.React
+
+open System.Diagnostics
+
 
 type MkView<'model> = ('model->unit) -> ('model->ReactElement)
 type [<Pojo>] Props<'model> = {
@@ -36,7 +39,11 @@ let createRenderer viewFn initModel sel h v =
         s initModel
         fun model -> viewFn model h
 
-    let targetNode = Fable.Import.Browser.document.body.querySelector(sel)
+    let targetNode = 
+        match sel with
+        | Query selector -> Fable.Import.Browser.document.body.querySelector(selector) :?> Fable.Import.Browser.HTMLElement
+        | Node node -> node
+
     let comp = Fable.Helpers.React.com<Components.App<_>,_,_> {main = main} []
     Fable.Import.ReactDom.render(comp,targetNode)
 
