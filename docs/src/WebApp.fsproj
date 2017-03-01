@@ -63,11 +63,7 @@
     <Compile Include="Pages\About.fs" />
     <Compile Include="Pages\Docs\Docs_Viewer.fs" />
     <Compile Include="Pages\Docs\Docs_Dispatcher.fs" />
-    <Compile Include="Pages\Sample\Sample_Clock.fs" />
-    <Compile Include="Pages\Sample\Sample_Counter.fs" />
-    <Compile Include="Pages\Sample\Sample_HelloWorld.fs" />
-    <Compile Include="Pages\Sample\Sample_NestedCounter.fs" />
-    <Compile Include="Pages\Sample\Sample_Calculator.fs" />
+    <Compile Include="Pages\Sample\Sample_Viewer.fs" />
     <Compile Include="Pages\Sample\Sample_Dispatcher.fs" />
     <Compile Include="Navbar.fs" />
     <Compile Include="Header.fs" />

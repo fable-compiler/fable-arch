@@ -8,7 +8,7 @@
     "dev": "concurrently \"npm run serve\" \"npm run watch\"",
     "serve": "http-server . -c-1 -s",
     "setup": "node setup.js",
-    "watch": "node build.js watch",
+    "watch": "node build.js dev",
     "build-css": "node-sass scss/main.sass public/css/style.css",
     "watch-css": "node-sass scss/main.sass public/css/style.css -w scss"
   },
@@ -16,15 +16,16 @@
     "babel-runtime": "^6.20.0",
     "bulma": "^0.3.0",
     "concurrently": "^3.1.0",
-    "fable-core": "^0.7.21",
+    "fable-core": "^0.7.26",
     "fable-powerpack": "^0.0.19",
+    "fable-react": "^0.8.5",
     "node-sass": "^4.3.0",
     "virtual-dom": "^2.1.1"
   },
   "devDependencies": {
     "babel-plugin-transform-runtime": "^6.15.0",
     "fable-arch": "^0.10.0",
-    "fable-compiler": "^0.7.34",
+    "fable-compiler": "^0.7.42",
     "fs-extra": "^1.0.0",
     "http-server": "^0.9.0"
   }

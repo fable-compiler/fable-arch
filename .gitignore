@@ -269,3 +269,7 @@ docs/output/
 temp/
 
 .DS_Store
+npm-debug\.log
+**/js/bundle.js
+**/js/bundle.js.map
+docs/public/css/style.css

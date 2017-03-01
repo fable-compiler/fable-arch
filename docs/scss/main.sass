@@ -36,3 +36,13 @@ $black: #202020
 #github
   color: $black
   border-color: $black
+
+// Needed otherwise iframes show a disabled scrollbar
+html,
+body
+  overflow-y: auto
+  overflow-x: hidden
+
+.sample-viewer
+  width: 100%
+  box-shadow: 0px 0px 2px $purple

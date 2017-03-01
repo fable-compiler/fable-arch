@@ -92,7 +92,7 @@ module Header =
               [ footerLinks
                   [ HeroLink.Create("Home", Route.Index)
                     HeroLink.Create("Docs", (Route.Docs DocsApi.Index))
-                    HeroLink.Create("Samples", (Route.Sample SampleApi.HelloWorld))
+                    HeroLink.Create("Samples", (Route.Sample SampleApi.Index))
                     HeroLink.Create("About", Route.About)
                   ]
                   model.CurrentPage

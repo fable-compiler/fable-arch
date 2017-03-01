@@ -118,7 +118,15 @@ module Main =
             |> Optic.set (Model.SubModels_ >-> SubModels.Navbar_ >-> Navbar.Model.CurrentPage_) route
             |> Optic.set (Model.CurrentPage_) route
 
-          m', []
+          let message =
+            match subRoute with
+            | SampleApi.Index -> []
+            | SampleApi.Viewer (sampleName, _)->
+              [ fun h ->
+                  h (SampleDispatcherAction (Pages.Sample.Dispatcher.ViewerActions (Pages.Sample.Viewer.SetDoc sampleName)))
+              ]
+
+          m', message
     | DocsDispatcherAction act ->
         let (res, action) = Pages.Docs.Dispatcher.update model.SubModels.Docs act
         let action' = mapActions DocsDispatcherAction action
@@ -174,26 +182,34 @@ module Main =
       ]
 
   // Customs helpers over the RouteParser
-  let (<?>) p1 p2  =
-    p1 .>> pchar '?' .>>. p2
+  let (<?>) p1 p2 =
+      p1 .>> pchar '?' .>>. p2
 
-  let (<=.>) p1 p2  =
+  let (<.?>) p1 p2 =
+      p1 .>> pchar '?' .>> p2
+
+  let (<?.>) p1 p2 =
+    p1 >>. pchar '?' >>. p2
+
+  let (<=>) p1 p2 =
+      p1 .>> pchar '=' .>>. p2
+
+  let (<.=>) p1 p2 =
+      p1 .>> pchar '=' .>> p2
+
+  let (<=.>) p1 p2 =
     p1 >>. pchar '=' >>. p2
 
   let routes =
     [
       runM (NavigateTo Index) (pStaticStr "/" |> (drop >> _end))
-      runM (NavigateTo (Docs DocsApi.Index)) (pStaticStr "/docs" |> (drop >> _end))
       runM1 (fun fileName -> NavigateTo (Docs (DocsApi.Viewer fileName))) ((pStaticStr "/docs") <?> (pStaticStr "fileName") <=.> pString)
-      runM (NavigateTo (Sample SampleApi.Clock)) (pStaticStr "/sample/clock" |> (drop >> _end))
-      runM (NavigateTo (Sample SampleApi.Counter)) (pStaticStr "/sample/counter" |> (drop >> _end))
-      runM (NavigateTo (Sample SampleApi.HelloWorld)) (pStaticStr "/sample/hello-world" |> (drop >> _end))
-      runM (NavigateTo (Sample SampleApi.NestedCounter)) (pStaticStr "/sample/nested-counter" |> (drop >> _end))
-      runM (NavigateTo (Sample SampleApi.Calculator)) (pStaticStr "/sample/calculator" |> (drop >> _end))
+      runM (NavigateTo (Docs DocsApi.Index)) (pStaticStr "/docs" |> (drop >> _end))
+      runM (NavigateTo (Sample SampleApi.Index)) (pStaticStr "/sample" |> (drop >> _end))
+      runM2 (fun info -> NavigateTo(Sample (SampleApi.Viewer info))) (pStaticStr "/sample" </.> pStringTo '?' .>> pStaticStr "height" <=> pint |> _end)
       runM (NavigateTo About) (pStaticStr "/about" |> (drop >> _end))
     ]
-
-
+    
   let mapToRoute route =
     match route with
     | NavigateTo r ->
@@ -220,20 +236,9 @@ module Main =
 
   let routerF m = router.Route m.Message
 
-  let tickProducer push =
-    window.setInterval((fun _ ->
-        push(SampleDispatcherAction (Pages.Sample.Dispatcher.ClockActions (Pages.Sample.Clock.Tick DateTime.Now)))
-        null
-    ), 1000) |> ignore
-    // Force the first to push to have immediate effect
-    // If we don't do that there is one second before the first push
-    // and the view is rendered with the Model.init values
-    push(SampleDispatcherAction (Pages.Sample.Dispatcher.ClockActions (Pages.Sample.Clock.Tick DateTime.Now)))
-
   createApp Model.Initial view update Virtualdom.createRender
   |> withStartNodeSelector "#app"
   |> withProducer (routeProducer locationHandler router)
-  |> withProducer tickProducer
   |> withSubscriber (routeSubscriber locationHandler routerF)
   |> start
 
