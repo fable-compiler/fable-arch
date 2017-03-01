@@ -74,7 +74,11 @@ let render handler view viewState =
     {viewState with NextTree = tree}
 
 let createRender selector handler view =
-    let node = document.body.querySelector(selector) :?> HTMLElement
+    let node = 
+        match selector with
+        | Query sel -> document.body.querySelector(sel) :?> HTMLElement
+        | Node elem -> elem
+
     let tree = renderSomething handler view
     let vdomNode = createElement tree
     node.appendChild(vdomNode) |> ignore
