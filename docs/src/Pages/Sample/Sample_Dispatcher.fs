@@ -58,7 +58,7 @@ module Dispatcher =
 
   let tileDocs info =
     let sampleURL =
-      let sampleApi = SampleApi.Viewer (info.FileName, info.Height) 
+      let sampleApi = SampleApi.Viewer (info.FileName, info.Height)
       match resolveRoutesToUrl (Sample sampleApi) with
       | Some url -> sprintf "#%s" url
       | None -> failwith "Uknown route"
@@ -80,7 +80,7 @@ module Dispatcher =
               [ text info.SubTitle ]
           ]
       ]
-       
+
   let tileVertical tiles =
     div
       [ classy "tile is-vertical is-4" ]
@@ -156,10 +156,10 @@ module Dispatcher =
               FileName = "navigation"
               Height = 350
             }
-            { Title = "Routing"
-              SubTitle = "This application show you how to use the navigation feature of Fable-Arch"
-              FileName = "routing"
-              Height = 350
+            { Title = "React"
+              SubTitle = "Port of the counter sample using React"
+              FileName = "reactCounter"
+              Height = 300
             }
           ]
       ]
@@ -176,6 +176,11 @@ module Dispatcher =
               SubTitle = "A calculator application"
               FileName = "calculator"
               Height = 600
+            }
+            { Title = "Routing"
+              SubTitle = "This application show you how to use the navigation feature of Fable-Arch"
+              FileName = "routing"
+              Height = 350
             }
           ]
       ]
@@ -202,7 +207,9 @@ module Dispatcher =
           [ classy "section" ]
           [
             beginnerView
+            hr []
             advancedView
+            hr []
             expertView
           ]
       ]
