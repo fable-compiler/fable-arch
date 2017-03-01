@@ -152,7 +152,7 @@ let saveIntoURL model =
           Page.Unknown(model.NumberA, model.NumberB)
       |> resolveRoutesToUrl
       |> function
-          | Some s -> location.href <- sprintf "#%s" s
+          | Some s -> locationHandler.PushChange (sprintf "#%s" s)
           | None -> ()
   ]
 
@@ -272,4 +272,4 @@ if location.hash = "" then
   location.hash <- "/"
 else
   // Else trigger hashchange to navigate to current route
-  window.dispatchEvent(Event.Create("hashchange") ) |> ignore
+  window.dispatchEvent(Event.Create("hashchange")) |> ignore
