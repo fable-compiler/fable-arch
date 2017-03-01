@@ -19,7 +19,7 @@ module DocGen =
   #else
   let rawUrl = "https://raw.githubusercontent.com/fable-compiler/fable-arch/gh-pages/"
   let createSampleDirectoryURL sampleName =
-    sprintf "http://fable.io/fable-arch/docs/samples/%s/public" sampleName
+    sprintf "http://fable.io/fable-arch/samples/%s/public" sampleName
   #endif
 
   let createDocFilesDirectoryURL fileName =
@@ -34,4 +34,3 @@ module DocGen =
 
   let githubURL sampleName =
     sprintf "http://github.com/fable-compiler/fable-arch/tree/master/docs/samples/%s" sampleName
-    
