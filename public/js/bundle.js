@@ -261,7 +261,7 @@ var _createClass = unwrapExports(createClass);
 var fableGlobal = function () {
     var globalObj = typeof window !== "undefined" ? window
         : (typeof global !== "undefined" ? global
-            : (typeof self !== "undefined" ? self : null));
+            : (typeof self !== "undefined" ? self : {}));
     if (typeof globalObj.__FABLE_CORE__ === "undefined") {
         globalObj.__FABLE_CORE__ = {
             types: new Map(),
@@ -315,6 +315,13 @@ function makeGeneric(typeDef, genArgs) {
 
 
 
+function getPropertyNames(obj) {
+    if (obj == null) {
+        return [];
+    }
+    var propertyMap = typeof obj[_Symbol.reflection] === "function" ? obj[_Symbol.reflection]().properties : obj;
+    return Object.getOwnPropertyNames(propertyMap);
+}
 
 function getRestParams(args, idx) {
     for (var _len = args.length, restArgs = Array(_len > idx ? _len - idx : 0), _key = idx; _key < _len; _key++)
@@ -400,7 +407,7 @@ function equalsRecords(x, y) {
         return true;
     }
     else {
-        var keys = Object.getOwnPropertyNames(x);
+        var keys = getPropertyNames(x);
         for (var i = 0; i < keys.length; i++) {
             if (!equals(x[keys[i]], y[keys[i]]))
                 return false;
@@ -413,7 +420,7 @@ function compareRecords(x, y) {
         return 0;
     }
     else {
-        var keys = Object.getOwnPropertyNames(x);
+        var keys = getPropertyNames(x);
         for (var i = 0; i < keys.length; i++) {
             var res = compare(x[keys[i]], y[keys[i]]);
             if (res !== 0)
@@ -470,23 +477,8 @@ function defaultArg(arg, defaultValue, f) {
     return arg == null ? defaultValue : (f != null ? f(arg) : arg);
 }
 
-function create(pattern, options) {
-    var flags = "g";
-    flags += options & 1 ? "i" : "";
-    flags += options & 2 ? "m" : "";
-    return new RegExp(pattern, flags);
-}
 function escape(str) {
     return str.replace(/[\-\[\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-}
-
-
-function match(str, pattern, options) {
-    if (options === void 0) { options = 0; }
-    var reg = str instanceof RegExp
-        ? (reg = str, str = pattern, reg.lastIndex = options, reg)
-        : reg = create(pattern, options);
-    return reg.exec(str);
 }
 
 var Long = (function () {
@@ -1016,55 +1008,7 @@ var MAX_VALUE = fromBits(0xFFFFFFFF | 0, 0x7FFFFFFF | 0, false);
 var MAX_UNSIGNED_VALUE = fromBits(0xFFFFFFFF | 0, 0xFFFFFFFF | 0, true);
 var MIN_VALUE = fromBits(0, 0x80000000 | 0, false);
 
-function parse(v, kind) {
-    if (kind == null) {
-        kind = typeof v == "string" && v.slice(-1) == "Z" ? 1 : 2;
-    }
-    var date = (v == null) ? new Date() : new Date(v);
-    if (kind === 2) {
-        date.kind = kind;
-    }
-    if (isNaN(date.getTime())) {
-        throw new Error("The string is not a valid Date.");
-    }
-    return date;
-}
-
-
-function now() {
-    return parse();
-}
-
-
-
-
-
-
-
-
-
-function day(d) {
-    return d.kind === 2 ? d.getDate() : d.getUTCDate();
-}
-function hour(d) {
-    return d.kind === 2 ? d.getHours() : d.getUTCHours();
-}
-
-function minute(d) {
-    return d.kind === 2 ? d.getMinutes() : d.getUTCMinutes();
-}
-function month(d) {
-    return (d.kind === 2 ? d.getMonth() : d.getUTCMonth()) + 1;
-}
-function second(d) {
-    return d.kind === 2 ? d.getSeconds() : d.getUTCSeconds();
-}
-function year(d) {
-    return d.kind === 2 ? d.getFullYear() : d.getUTCFullYear();
-}
-
 var fsFormatRegExp = /(^|[^%])%([0+ ]*)(-?\d+)?(?:\.(\d+))?(\w)/;
-var formatRegExp = /\{(\d+)(,-?\d+)?(?:\:(.+?))?\}/g;
 
 
 
@@ -1147,116 +1091,7 @@ function fsFormat(str) {
         return str.replace(/%%/g, "%");
     }
 }
-function format(str) {
-    var args = [];
-    for (var _i = 1; _i < arguments.length; _i++) {
-        args[_i - 1] = arguments[_i];
-    }
-    return str.replace(formatRegExp, function (match$$1, idx, pad, format) {
-        var rep = args[idx], padSymbol = " ";
-        if (typeof rep === "number") {
-            switch ((format || "").substring(0, 1)) {
-                case "f":
-                case "F":
-                    rep = format.length > 1 ? rep.toFixed(format.substring(1)) : rep.toFixed(2);
-                    break;
-                case "g":
-                case "G":
-                    rep = format.length > 1 ? rep.toPrecision(format.substring(1)) : rep.toPrecision();
-                    break;
-                case "e":
-                case "E":
-                    rep = format.length > 1 ? rep.toExponential(format.substring(1)) : rep.toExponential();
-                    break;
-                case "p":
-                case "P":
-                    rep = (format.length > 1 ? (rep * 100).toFixed(format.substring(1)) : (rep * 100).toFixed(2)) + " %";
-                    break;
-                case "x":
-                    rep = toHex(Number(rep));
-                    break;
-                case "X":
-                    rep = toHex(Number(rep)).toUpperCase();
-                    break;
-                default:
-                    var m = /^(0+)(\.0+)?$/.exec(format);
-                    if (m != null) {
-                        var decs = 0;
-                        if (m[2] != null)
-                            rep = rep.toFixed(decs = m[2].length - 1);
-                        pad = "," + (m[1].length + (decs ? decs + 1 : 0)).toString();
-                        padSymbol = "0";
-                    }
-                    else if (format) {
-                        rep = format;
-                    }
-            }
-        }
-        else if (rep instanceof Date) {
-            if (format.length === 1) {
-                switch (format) {
-                    case "D":
-                        rep = rep.toDateString();
-                        break;
-                    case "T":
-                        rep = rep.toLocaleTimeString();
-                        break;
-                    case "d":
-                        rep = rep.toLocaleDateString();
-                        break;
-                    case "t":
-                        rep = rep.toLocaleTimeString().replace(/:\d\d(?!:)/, "");
-                        break;
-                    case "o":
-                    case "O":
-                        if (rep.kind === 2) {
-                            var offset = rep.getTimezoneOffset() * -1;
-                            rep = format("{0:yyyy-MM-dd}T{0:HH:mm}:{1:00.000}{2}{3:00}:{4:00}", rep, second(rep), offset >= 0 ? "+" : "-", ~~(offset / 60), offset % 60);
-                        }
-                        else {
-                            rep = rep.toISOString();
-                        }
-                }
-            }
-            else {
-                rep = format.replace(/\w+/g, function (match2) {
-                    var rep2 = match2;
-                    switch (match2.substring(0, 1)) {
-                        case "y":
-                            rep2 = match2.length < 4 ? year(rep) % 100 : year(rep);
-                            break;
-                        case "h":
-                            rep2 = rep.getHours() > 12 ? hour(rep) % 12 : hour(rep);
-                            break;
-                        case "M":
-                            rep2 = month(rep);
-                            break;
-                        case "d":
-                            rep2 = day(rep);
-                            break;
-                        case "H":
-                            rep2 = hour(rep);
-                            break;
-                        case "m":
-                            rep2 = minute(rep);
-                            break;
-                        case "s":
-                            rep2 = second(rep);
-                            break;
-                    }
-                    if (rep2 !== match2 && rep2 < 10 && match2.length > 1) {
-                        rep2 = "0" + rep2;
-                    }
-                    return rep2;
-                });
-            }
-        }
-        if (!isNaN(pad = parseInt((pad || "").substring(1)))) {
-            rep = padLeft(rep, Math.abs(pad), padSymbol, pad < 0);
-        }
-        return rep;
-    });
-}
+
 
 
 
@@ -3445,11 +3280,8 @@ var SampleApi = function (__exports) {
           type: "WebApp.Common.SampleApi.Route",
           interfaces: ["FSharpUnion", "System.IEquatable", "System.IComparable"],
           cases: {
-            Calculator: [],
-            Clock: [],
-            Counter: [],
-            HelloWorld: [],
-            NestedCounter: []
+            Index: [],
+            Viewer: ["string", "number"]
           }
         };
       }
@@ -3518,16 +3350,12 @@ function resolveRoutesToUrl(r) {
       return "/docs";
     }
   } else if (r.Case === "Sample") {
-    if (r.Fields[0].Case === "Counter") {
-      return "/sample/counter";
-    } else if (r.Fields[0].Case === "HelloWorld") {
-      return "/sample/hello-world";
-    } else if (r.Fields[0].Case === "NestedCounter") {
-      return "/sample/nested-counter";
-    } else if (r.Fields[0].Case === "Calculator") {
-      return "/sample/calculator";
+    if (r.Fields[0].Case === "Viewer") {
+      return fsFormat("/sample/%s?height=%i")(function (x) {
+        return x;
+      })(r.Fields[0].Fields[0])(r.Fields[0].Fields[1]);
     } else {
-      return "/sample/clock";
+      return "/sample";
     }
   } else if (r.Case === "About") {
     return "/about";
@@ -3710,7 +3538,7 @@ var Model$1 = function () {
       return [function (r) {
         return r.CurrentPage;
       }, function (v) {
-        return function (r) {
+        return function (r_1) {
           return new Model(v);
         };
       }];
@@ -3861,7 +3689,7 @@ var Model$2 = function () {
       return [function (r) {
         return r.CurrentPage;
       }, function (v) {
-        return function (r) {
+        return function (r_1) {
           return new Model(v);
         };
       }];
@@ -3963,29 +3791,32 @@ function update$2(model, action) {
   }
 }
 function footerLinkItem(menuLink, currentPage) {
-  var isCurrentPage = function () {
-    var _target0 = function _target0() {
-      return menuLink.Route.Equals(currentPage);
-    };
+  var isCurrentPage = void 0;
+  var $var1 = currentPage.Case === "About" ? [0] : currentPage.Case === "Sample" ? [1] : currentPage.Case === "Docs" ? [2] : [0];
 
-    if (currentPage.Case === "About") {
-      return _target0();
-    } else if (currentPage.Case === "Sample") {
+  switch ($var1[0]) {
+    case 0:
+      isCurrentPage = menuLink.Route.Equals(currentPage);
+      break;
+
+    case 1:
       if (menuLink.Route.Case === "Sample") {
-        return true;
+        isCurrentPage = true;
       } else {
-        return false;
+        isCurrentPage = false;
       }
-    } else if (currentPage.Case === "Docs") {
+
+      break;
+
+    case 2:
       if (menuLink.Route.Case === "Docs") {
-        return true;
+        isCurrentPage = true;
       } else {
-        return false;
+        isCurrentPage = false;
       }
-    } else {
-      return _target0();
-    }
-  }();
+
+      break;
+  }
 
   return Tags.li(ofArray([Attributes.classList(ofArray([["is-active", isCurrentPage]]))]))(ofArray([Tags.a(ofArray([voidLinkAction(), Events.onMouseClick(function (_arg1) {
     return new Actions$2("NavigateTo", [menuLink.Route]);
@@ -3997,7 +3828,7 @@ function footerLinks(items, currentPage) {
   }, items));
 }
 function footer(model) {
-  return Tags.div(ofArray([Attributes.classy("hero-foot")]))(ofArray([Tags.div(ofArray([Attributes.classy("container")]))(ofArray([Tags.nav(ofArray([Attributes.classy("tabs is-boxed")]))(ofArray([footerLinks(ofArray([HeroLink.Create("Home", new Route("Index", [])), HeroLink.Create("Docs", new Route("Docs", [new DocsApi.Route("Index", [])])), HeroLink.Create("Samples", new Route("Sample", [new SampleApi.Route("HelloWorld", [])])), HeroLink.Create("About", new Route("About", []))]), model.CurrentPage)]))]))]));
+  return Tags.div(ofArray([Attributes.classy("hero-foot")]))(ofArray([Tags.div(ofArray([Attributes.classy("container")]))(ofArray([Tags.nav(ofArray([Attributes.classy("tabs is-boxed")]))(ofArray([footerLinks(ofArray([HeroLink.Create("Home", new Route("Index", [])), HeroLink.Create("Docs", new Route("Docs", [new DocsApi.Route("Index", [])])), HeroLink.Create("Samples", new Route("Sample", [new SampleApi.Route("Index", [])])), HeroLink.Create("About", new Route("About", []))]), model.CurrentPage)]))]))]));
 }
 function view$2(model) {
   return Tags.section(ofArray([Attributes.classy("hero is-primary")]))(ofArray([Tags.div(ofArray([Attributes.classy("hero-body")]))(ofArray([Tags.div(ofArray([Attributes.classy("container")]))(ofArray([Tags.div(ofArray([Attributes.classy("columns is-vcentered")]))(ofArray([Tags.div(ofArray([Attributes.classy("column")]))(ofArray([Tags.h1(ofArray([Attributes.classy("title")]))(ofArray([Tags.text("Documentation")])), Tags.h2(ofArray([Attributes.classy("subtitle"), Attributes.property("innerHTML", "Everything you need to create a website using <strong>Fable Arch<strong>")]))(new List$1())]))]))]))])), footer(model)]));
@@ -4529,13 +4360,12 @@ function _fetch(url, init) {
     });
 }
 
-var sampleSourceDirectory = "src/Pages/Sample";
 var docFilesDirectory = "doc_files";
 var rawUrl = "https://raw.githubusercontent.com/fable-compiler/fable-arch/gh-pages/";
-function createSampleURL(file) {
-  return fsFormat("%s/%s/%s")(function (x) {
+function createSampleDirectoryURL(sampleName) {
+  return fsFormat("http://fable.io/fable-arch/samples/%s/public")(function (x) {
     return x;
-  })(rawUrl)(sampleSourceDirectory)(file);
+  })(sampleName);
 }
 function createDocFilesDirectoryURL(fileName) {
   return fsFormat("%s/%s/%s.md")(function (x) {
@@ -4547,345 +4377,16 @@ function createDocURL(fileName) {
     return x;
   })(fileName);
 }
-var CaptureState = function () {
-  function CaptureState(caseName, fields) {
-    _classCallCheck(this, CaptureState);
-
-    this.Case = caseName;
-    this.Fields = fields;
-  }
-
-  _createClass(CaptureState, [{
-    key: _Symbol.reflection,
-    value: function () {
-      return {
-        type: "WebApp.DocGen.CaptureState",
-        interfaces: ["FSharpUnion", "System.IEquatable", "System.IComparable"],
-        cases: {
-          Block: ["string"],
-          Content: [],
-          Nothing: []
-        }
-      };
-    }
-  }, {
-    key: "Equals",
-    value: function (other) {
-      return equalsUnions(this, other);
-    }
-  }, {
-    key: "CompareTo",
-    value: function (other) {
-      return compareUnions(this, other);
-    }
-  }]);
-
-  return CaptureState;
-}();
-setType("WebApp.DocGen.CaptureState", CaptureState);
-var Block = function () {
-  function Block(key, text) {
-    _classCallCheck(this, Block);
-
-    this.Key = key;
-    this.Text = text;
-  }
-
-  _createClass(Block, [{
-    key: _Symbol.reflection,
-    value: function () {
-      return {
-        type: "WebApp.DocGen.Block",
-        interfaces: ["FSharpRecord", "System.IEquatable", "System.IComparable"],
-        properties: {
-          Key: "string",
-          Text: "string"
-        }
-      };
-    }
-  }, {
-    key: "Equals",
-    value: function (other) {
-      return equalsRecords(this, other);
-    }
-  }, {
-    key: "CompareTo",
-    value: function (other) {
-      return compareRecords(this, other);
-    }
-  }], [{
-    key: "Create",
-    value: function (key, content) {
-      return new Block(key, content);
-    }
-  }]);
-
-  return Block;
-}();
-setType("WebApp.DocGen.Block", Block);
-var ParserResult = function () {
-  function ParserResult(text, blocks, captureState, offset) {
-    _classCallCheck(this, ParserResult);
-
-    this.Text = text;
-    this.Blocks = blocks;
-    this.CaptureState = captureState;
-    this.Offset = offset;
-  }
-
-  _createClass(ParserResult, [{
-    key: _Symbol.reflection,
-    value: function () {
-      return {
-        type: "WebApp.DocGen.ParserResult",
-        interfaces: ["FSharpRecord", "System.IEquatable", "System.IComparable"],
-        properties: {
-          Text: "string",
-          Blocks: makeGeneric(List$1, {
-            T: Block
-          }),
-          CaptureState: CaptureState,
-          Offset: "number"
-        }
-      };
-    }
-  }, {
-    key: "Equals",
-    value: function (other) {
-      return equalsRecords(this, other);
-    }
-  }, {
-    key: "CompareTo",
-    value: function (other) {
-      return compareRecords(this, other);
-    }
-  }], [{
-    key: "Initial",
-    get: function () {
-      return new ParserResult("", new List$1(), new CaptureState("Nothing", []), 0);
-    }
-  }]);
-
-  return ParserResult;
-}();
-setType("WebApp.DocGen.ParserResult", ParserResult);
-
-function _Contains___(p, s) {
-  if (s.indexOf(p) >= 0) {
-    return s;
-  }
-}
-
-function _IsBeginBlock___(input) {
-  var pattern = ".*\\[BeginBlock:([a-z0-9]*)\\]";
-  var m = match(input, pattern, 1);
-
-  if (m != null) {
-    return m[1];
-  }
-}
-
-function _IsEndBlock___(input) {
-  var pattern = ".*\\[EndBlock\\]";
-  var m = match(input, pattern, 1);
-
-  if (m != null) {
-    return true;
-  }
-}
-
-function _IsBlock___(input) {
-  var pattern = ".*\\[Block:([a-z0-9]*)\\]";
-  var m = match(input, pattern, 1);
-
-  if (m != null) {
-    return m[1];
-  }
-}
-
-function _IsFsharpBlock___(input) {
-  var pattern = ".*\\[FsharpBlock:([a-z0-9]*)\\]";
-  var m = match(input, pattern, 1);
-
-  if (m != null) {
-    return m[1];
-  }
-}
-
-function countStart(chars, index) {
-  if (chars.tail == null) {
-    return index;
-  } else if (chars.head === " ") {
-    return countStart(chars.tail, index + 1);
-  } else {
-    return index;
-  }
-}
-function generateBlock(result, blockName, format$$1) {
-  var exist = exists(function (x) {
-    return x.Key === blockName;
-  }, result.Blocks);
-  var blockText = exist ? function (x) {
-    return x.Text;
-  }(filter$$1(function (x) {
-    return x.Key === blockName;
-  }, result.Blocks).head) : "";
-  return new ParserResult(format$$1(function (x) {
+function createSampleReadmeURL(sampleName) {
+  return fsFormat("%s/samples/%s/README.md")(function (x) {
     return x;
-  })(result.Text)(blockText), result.Blocks, result.CaptureState, result.Offset);
+  })(rawUrl)(sampleName);
 }
-function generateDocumentation(text) {
-  var lines = toList(split$$1(text, "\n"));
-
-  var parseSample = function parseSample(lines_1) {
-    return function (result) {
-      if (lines_1.tail == null) {
-        return result;
-      } else {
-        var newResult = function () {
-          var activePatternResult561 = _Contains___("[BeginDocs]", lines_1.head);
-
-          if (activePatternResult561 != null) {
-            var line = activePatternResult561;
-            var CaptureState_1 = new CaptureState("Content", []);
-            var Offset = countStart(toList(line.split("")), 0);
-            return new ParserResult(result.Text, result.Blocks, CaptureState_1, Offset);
-          } else {
-            var activePatternResult559 = _Contains___("[EndDocs]", lines_1.head);
-
-            if (activePatternResult559 != null) {
-              var _line = activePatternResult559;
-
-              var _CaptureState_ = new CaptureState("Nothing", []);
-
-              var _Offset = 0;
-              return new ParserResult(result.Text, result.Blocks, _CaptureState_, _Offset);
-            } else {
-              var activePatternResult557 = _IsBeginBlock___(lines_1.head);
-
-              if (activePatternResult557 != null) {
-                var groupName = activePatternResult557;
-
-                var _CaptureState_2 = new CaptureState("Block", [groupName]);
-
-                var _Offset2 = countStart(toList(lines_1.head.split("")), 0);
-
-                return new ParserResult(result.Text, result.Blocks, _CaptureState_2, _Offset2);
-              } else {
-                var activePatternResult556 = _IsEndBlock___(lines_1.head);
-
-                if (activePatternResult556 != null) {
-                  var _CaptureState_3 = new CaptureState("Nothing", []);
-
-                  var _Offset3 = 0;
-                  return new ParserResult(result.Text, result.Blocks, _CaptureState_3, _Offset3);
-                } else if (result.CaptureState.Case === "Block") {
-                  var exist = exists(function (x) {
-                    return x.Key === result.CaptureState.Fields[0];
-                  }, result.Blocks);
-                  var blocks_ = exist ? map$1(function (x) {
-                    if (x.Key === result.CaptureState.Fields[0]) {
-                      var _Text = fsFormat("%s\n%s")(function (x) {
-                        return x;
-                      })(x.Text)(lines_1.head.substr(result.Offset));
-
-                      return new Block(x.Key, _Text);
-                    } else {
-                      return x;
-                    }
-                  }, result.Blocks) : new List$1(function (arg00) {
-                    return function (arg10) {
-                      return Block.Create(arg00, arg10);
-                    };
-                  }(result.CaptureState.Fields[0])(lines_1.head.substr(result.Offset)), result.Blocks);
-                  return new ParserResult(result.Text, blocks_, result.CaptureState, result.Offset);
-                } else if (result.CaptureState.Case === "Nothing") {
-                  return result;
-                } else {
-                  var activePatternResult551 = _IsBlock___(lines_1.head);
-
-                  if (activePatternResult551 != null) {
-                    var name = activePatternResult551;
-                    return generateBlock(result, name, fsFormat("%s\n%s"));
-                  } else {
-                    var activePatternResult550 = _IsFsharpBlock___(lines_1.head);
-
-                    if (activePatternResult550 != null) {
-                      var _name = activePatternResult550;
-                      return generateBlock(result, _name, fsFormat("%s\n```fsharp\n%s```"));
-                    } else {
-                      return new ParserResult(fsFormat("%s\n%s")(function (x) {
-                        return x;
-                      })(result.Text)(lines_1.head.substr(result.Offset)), result.Blocks, result.CaptureState, result.Offset);
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }();
-
-        return parseSample(lines_1.tail)(newResult);
-      }
-    };
-  };
-
-  var result = parseSample(lines)(ParserResult.Initial);
-  return result.Text;
+function githubURL(sampleName) {
+  return fsFormat("http://github.com/fable-compiler/fable-arch/tree/master/docs/samples/%s")(function (x) {
+    return x;
+  })(sampleName);
 }
-var Documentation = function () {
-  _createClass(Documentation, [{
-    key: _Symbol.reflection,
-    value: function () {
-      return {
-        type: "WebApp.DocGen.Documentation",
-        properties: {
-          Html: "string"
-        }
-      };
-    }
-  }]);
-
-  function Documentation(url) {
-    _classCallCheck(this, Documentation);
-
-    this.generated = false;
-    this.html = "";
-    this.sourceFile = createSampleURL(url);
-  }
-
-  _createClass(Documentation, [{
-    key: "RetrieveFile",
-    value: function () {
-      var _this = this;
-
-      _fetch(this.sourceFile, {}).then(function (res) {
-        return res.text();
-      }).then(function (text) {
-        _this.html = function () {
-          var objectArg = marked;
-          return function (arg00) {
-            return objectArg.parse(arg00);
-          };
-        }()(generateDocumentation(text));
-
-        _this.generated = true;
-      });
-    }
-  }, {
-    key: "Html",
-    get: function () {
-      if (!this.generated) {
-        this.RetrieveFile();
-      }
-
-      return this.html;
-    }
-  }]);
-
-  return Documentation;
-}();
-setType("WebApp.DocGen.Documentation", Documentation);
 
 var State = function () {
   function State(caseName, fields) {
@@ -5073,15 +4574,15 @@ function update$4(model, action) {
   }
 }
 function view$4(model) {
-  var doc = function () {
-    try {
-      return find(function (x) {
-        return x.FileName === model.CurrentFile;
-      }, model.DocsHTML);
-    } catch (matchValue) {
-      return null;
-    }
-  }();
+  var doc = void 0;
+
+  try {
+    doc = find(function (x) {
+      return x.FileName === model.CurrentFile;
+    }, model.DocsHTML);
+  } catch (matchValue) {
+    doc = null;
+  }
 
   var html = (function () {
     return doc != null;
@@ -5629,18 +5130,9 @@ var Model$3 = function () {
       return compareRecords(this, other);
     }
   }], [{
-    key: "Generate",
-    value: function () {
-      return new Model$$1(Model$4.Initial);
-    }
-  }, {
     key: "Initial",
     value: function (currentPage) {
-      if (currentPage.Case === "Viewer") {
-        return Model$$1.Generate();
-      } else {
-        return Model$$1.Generate();
-      }
+      return new Model$$1(Model$4.Initial);
     }
   }]);
 
@@ -5740,7 +5232,7 @@ function tileVertical(tiles) {
     }, list);
   }(tiles));
 }
-var indexView = Tags.div(ofArray([Attributes.classy("container")]))(ofArray([Tags.div(ofArray([Attributes.classy("section")]))(ofArray([Tags.div(ofArray([Attributes.classy("tile is-ancestor")]))(ofArray([tileVertical(ofArray([new TileDocs("Hot Module Replacement (HMR)", "Hot Module Reloading, or Replacement, is a feature where you inject update modules in a running application.\r\n                                  This opens up the possibility to time travel in the application without loosing context.\r\n                                  It also makes it easier to try out changes in the functionality while retaining the state of the application.", "hmr")])), tileVertical(ofArray([new TileDocs("Subscriber", "A subscriber is a function attach to an application. This subscriber will be notify every time an event/message\r\n                                  is being handle by the application.", "subscriber")]))]))]))]));
+var indexView = Tags.div(ofArray([Attributes.classy("container")]))(ofArray([Tags.div(ofArray([Attributes.classy("section")]))(ofArray([Tags.div(ofArray([Attributes.classy("tile is-ancestor")]))(ofArray([tileVertical(ofArray([new TileDocs("Hot Module Replacement (HMR)", "Hot Module Reloading, or Replacement, is a feature where you inject update modules in a running application.\n                                  This opens up the possibility to time travel in the application without losing context.\n                                  It also makes it easier to try out changes in the functionality while retaining the state of the application.", "hmr")])), tileVertical(ofArray([new TileDocs("Subscriber", "A subscriber is a function attached to an application. The subscriber will be notified every time an event/message\n                                  is handled by the application.", "subscriber")]))]))]))]));
 function view$3(model, subRoute) {
   if (subRoute.Case === "Viewer") {
     return map$$1(function (arg0) {
@@ -5751,6 +5243,550 @@ function view$3(model, subRoute) {
   }
 }
 
+// 7.2.1 RequireObjectCoercible(argument)
+var _defined = function(it){
+  if(it == undefined)throw TypeError("Can't call method on  " + it);
+  return it;
+};
+
+var _stringWs = '\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002\u2003' +
+  '\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF';
+
+var $export$3 = _export;
+var defined = _defined;
+var fails   = _fails;
+var spaces  = _stringWs;
+var space   = '[' + spaces + ']';
+var non     = '\u200b\u0085';
+var ltrim   = RegExp('^' + space + space + '*');
+var rtrim   = RegExp(space + space + '*$');
+
+var exporter = function(KEY, exec, ALIAS){
+  var exp   = {};
+  var FORCE = fails(function(){
+    return !!spaces[KEY]() || non[KEY]() != non;
+  });
+  var fn = exp[KEY] = FORCE ? exec(trim$1) : spaces[KEY];
+  if(ALIAS)exp[ALIAS] = fn;
+  $export$3($export$3.P + $export$3.F * FORCE, 'String', exp);
+};
+
+// 1 -> String#trimLeft
+// 2 -> String#trimRight
+// 3 -> String#trim
+var trim$1 = exporter.trim = function(string, TYPE){
+  string = String(defined(string));
+  if(TYPE & 1)string = string.replace(ltrim, '');
+  if(TYPE & 2)string = string.replace(rtrim, '');
+  return string;
+};
+
+var _stringTrim = exporter;
+
+var $parseInt$1 = _global.parseInt;
+var $trim     = _stringTrim.trim;
+var ws        = _stringWs;
+var hex       = /^[\-+]?0[xX]/;
+
+var _parseInt$3 = $parseInt$1(ws + '08') !== 8 || $parseInt$1(ws + '0x16') !== 22 ? function parseInt(str, radix){
+  var string = $trim(String(str), 3);
+  return $parseInt$1(string, (radix >>> 0) || (hex.test(string) ? 16 : 10));
+} : $parseInt$1;
+
+var $export$2   = _export;
+var $parseInt = _parseInt$3;
+// 20.1.2.13 Number.parseInt(string, radix)
+$export$2($export$2.S + $export$2.F * (Number.parseInt != $parseInt), 'Number', {parseInt: $parseInt});
+
+var _parseInt$1 = parseInt;
+
+var _parseInt = createCommonjsModule(function (module) {
+module.exports = { "default": _parseInt$1, __esModule: true };
+});
+
+var _Number$parseInt = unwrapExports(_parseInt);
+
+var State$1 = function () {
+  function State(caseName, fields) {
+    _classCallCheck(this, State);
+
+    this.Case = caseName;
+    this.Fields = fields;
+  }
+
+  _createClass(State, [{
+    key: _Symbol.reflection,
+    value: function () {
+      return {
+        type: "WebApp.Pages.Sample.Viewer.State",
+        interfaces: ["FSharpUnion", "System.IEquatable", "System.IComparable"],
+        cases: {
+          Available: [],
+          Pending: []
+        }
+      };
+    }
+  }, {
+    key: "Equals",
+    value: function (other) {
+      return equalsUnions(this, other);
+    }
+  }, {
+    key: "CompareTo",
+    value: function (other) {
+      return compareUnions(this, other);
+    }
+  }]);
+
+  return State;
+}();
+setType("WebApp.Pages.Sample.Viewer.State", State$1);
+var DocHTML$1 = function () {
+  function DocHTML(sampleName, html, state) {
+    _classCallCheck(this, DocHTML);
+
+    this.SampleName = sampleName;
+    this.Html = html;
+    this.State = state;
+  }
+
+  _createClass(DocHTML, [{
+    key: _Symbol.reflection,
+    value: function () {
+      return {
+        type: "WebApp.Pages.Sample.Viewer.DocHTML",
+        interfaces: ["FSharpRecord", "System.IEquatable", "System.IComparable"],
+        properties: {
+          SampleName: "string",
+          Html: "string",
+          State: State$1
+        }
+      };
+    }
+  }, {
+    key: "Equals",
+    value: function (other) {
+      return equalsRecords(this, other);
+    }
+  }, {
+    key: "CompareTo",
+    value: function (other) {
+      return compareRecords(this, other);
+    }
+  }], [{
+    key: "Initial",
+    value: function (sampleName) {
+      return new DocHTML(sampleName, "", new State$1("Pending", []));
+    }
+  }]);
+
+  return DocHTML;
+}();
+setType("WebApp.Pages.Sample.Viewer.DocHTML", DocHTML$1);
+var Model$6 = function () {
+  function Model(currentFile, iframeHeight, docsHTML) {
+    _classCallCheck(this, Model);
+
+    this.CurrentFile = currentFile;
+    this.IframeHeight = iframeHeight;
+    this.DocsHTML = docsHTML;
+  }
+
+  _createClass(Model, [{
+    key: _Symbol.reflection,
+    value: function () {
+      return {
+        type: "WebApp.Pages.Sample.Viewer.Model",
+        interfaces: ["FSharpRecord", "System.IEquatable", "System.IComparable"],
+        properties: {
+          CurrentFile: "string",
+          IframeHeight: "number",
+          DocsHTML: makeGeneric(List$1, {
+            T: DocHTML$1
+          })
+        }
+      };
+    }
+  }, {
+    key: "Equals",
+    value: function (other) {
+      return equalsRecords(this, other);
+    }
+  }, {
+    key: "CompareTo",
+    value: function (other) {
+      return compareRecords(this, other);
+    }
+  }], [{
+    key: "Initial",
+    get: function () {
+      var CurrentFile = "";
+      var DocsHTML = new List$1();
+      return new Model(CurrentFile, 350, DocsHTML);
+    }
+  }]);
+
+  return Model;
+}();
+setType("WebApp.Pages.Sample.Viewer.Model", Model$6);
+var Actions$6 = function () {
+  function Actions(caseName, fields) {
+    _classCallCheck(this, Actions);
+
+    this.Case = caseName;
+    this.Fields = fields;
+  }
+
+  _createClass(Actions, [{
+    key: _Symbol.reflection,
+    value: function () {
+      return {
+        type: "WebApp.Pages.Sample.Viewer.Actions",
+        interfaces: ["FSharpUnion", "System.IEquatable", "System.IComparable"],
+        cases: {
+          SetDoc: ["string"],
+          SetDocHTML: ["string", "string"],
+          SetHeight: ["number"]
+        }
+      };
+    }
+  }, {
+    key: "Equals",
+    value: function (other) {
+      return equalsUnions(this, other);
+    }
+  }, {
+    key: "CompareTo",
+    value: function (other) {
+      return compareUnions(this, other);
+    }
+  }]);
+
+  return Actions;
+}();
+setType("WebApp.Pages.Sample.Viewer.Actions", Actions$6);
+function update$6(model, action) {
+  if (action.Case === "SetDocHTML") {
+    var docs = map$1(function (doc) {
+      if (doc.SampleName === action.Fields[0]) {
+        var State_1 = new State$1("Available", []);
+        return new DocHTML$1(doc.SampleName, action.Fields[1], State_1);
+      } else {
+        return doc;
+      }
+    }, model.DocsHTML);
+    return [new Model$6(model.CurrentFile, model.IframeHeight, docs), new List$1()];
+  } else if (action.Case === "SetHeight") {
+    return [new Model$6(model.CurrentFile, action.Fields[0], model.DocsHTML), new List$1()];
+  } else {
+    var exist = exists(function (x) {
+      return x.SampleName === action.Fields[0];
+    }, model.DocsHTML);
+
+    if (exist) {
+      return [new Model$6(action.Fields[0], model.IframeHeight, model.DocsHTML), new List$1()];
+    } else {
+      var m_ = void 0;
+      var DocsHTML = new List$1(DocHTML$1.Initial(action.Fields[0]), model.DocsHTML);
+      m_ = new Model$6(action.Fields[0], model.IframeHeight, DocsHTML);
+      var message = ofArray([function (h) {
+        _fetch(createSampleReadmeURL(action.Fields[0]), {}).then(function (res) {
+          return res.text();
+        }).then(function (text) {
+          h(new Actions$6("SetDocHTML", [action.Fields[0], marked.parse(text)]));
+        });
+      }, function (h_1) {
+        try {
+          var search = split$$1(location.href, "?");
+          var parameters = split$$1(search[1], "&");
+          var heightParam = parameters.find(function (p) {
+            return p.indexOf("height") >= 0;
+          });
+
+          var height = _Number$parseInt(split$$1(heightParam, "=")[1]);
+
+          h_1(new Actions$6("SetHeight", [height]));
+        } catch (matchValue) {
+          console.error("Error when extracting the iframe height parameter");
+        }
+      }]);
+      return [m_, message];
+    }
+  }
+}
+function iframe(x) {
+  var tagName = "iframe";
+  return function (children) {
+    return Tags.elem(tagName, x, children);
+  };
+}
+function view$6(model) {
+  var doc = void 0;
+
+  try {
+    doc = find(function (x) {
+      return x.SampleName === model.CurrentFile;
+    }, model.DocsHTML);
+  } catch (matchValue) {
+    doc = null;
+  }
+
+  var html = (function () {
+    return doc != null;
+  }(null) ? doc.State.Equals(new State$1("Available", [])) : false) ? Tags.div(ofArray([Attributes.property("innerHTML", doc.Html)]))(new List$1()) : Tags.div(ofArray([Attributes.classy("has-text-centered")]))(ofArray([Tags.i(ofArray([Attributes.classy("fa fa-spinner fa-pulse fa-3x fa-fw")]))(new List$1())]));
+  return Tags.div(ofArray([Attributes.classy("section")]))(ofArray([Tags.div(ofArray([Attributes.classy("content")]))(ofArray([Tags.div(ofArray([Attributes.classy("container")]))(ofArray([Tags.h1(ofArray([Attributes.classy("has-text-centered")]))(ofArray([Tags.text("Demo")])), Tags.div(ofArray([Attributes.classy("columns")]))(ofArray([Tags.div(ofArray([Attributes.classy("column is-half is-offset-one-quarter has-text-centered")]))(ofArray([Tags.a(ofArray([Attributes.classy("button is-primary is-pulled-left"), Attributes.property("href", createSampleDirectoryURL(model.CurrentFile)), Attributes.property("target", "_blank")]))(ofArray([Tags.text("Open in tab")])), Tags.a(ofArray([Attributes.classy("button is-pulled-right"), Attributes.property("href", githubURL(model.CurrentFile)), Attributes.property("target", "_blank")]))(ofArray([Tags.span(ofArray([Attributes.classy("icon")]))(ofArray([Tags.i(ofArray([Attributes.classy("fa fa-github")]))(new List$1())])), Tags.span(new List$1())(ofArray([Tags.text("Go to source")]))])), Tags.br(new List$1()), Tags.br(new List$1()), iframe(ofArray([Attributes.classy("sample-viewer"), Attributes.property("src", createSampleDirectoryURL(model.CurrentFile)), Attributes.property("height", String(model.IframeHeight))]))(new List$1())]))])), Tags.div(ofArray([Attributes.classy("content")]))(ofArray([Tags.h1(ofArray([Attributes.classy("has-text-centered")]))(ofArray([Tags.text("Explanations")])), Tags.div(ofArray([Attributes.classy("container")]))(ofArray([html]))]))]))]))]));
+}
+
+var Model$5 = function () {
+  function Model$$1(viewer) {
+    _classCallCheck(this, Model$$1);
+
+    this.Viewer = viewer;
+  }
+
+  _createClass(Model$$1, [{
+    key: _Symbol.reflection,
+    value: function () {
+      return {
+        type: "WebApp.Pages.Sample.Dispatcher.Model",
+        interfaces: ["FSharpRecord", "System.IEquatable", "System.IComparable"],
+        properties: {
+          Viewer: Model$6
+        }
+      };
+    }
+  }, {
+    key: "Equals",
+    value: function (other) {
+      return equalsRecords(this, other);
+    }
+  }, {
+    key: "CompareTo",
+    value: function (other) {
+      return compareRecords(this, other);
+    }
+  }], [{
+    key: "Initial",
+    value: function (currentPage) {
+      return new Model$$1(Model$6.Initial);
+    }
+  }]);
+
+  return Model$$1;
+}();
+setType("WebApp.Pages.Sample.Dispatcher.Model", Model$5);
+var Actions$5 = function () {
+  function Actions$$1(caseName, fields) {
+    _classCallCheck(this, Actions$$1);
+
+    this.Case = caseName;
+    this.Fields = fields;
+  }
+
+  _createClass(Actions$$1, [{
+    key: _Symbol.reflection,
+    value: function () {
+      return {
+        type: "WebApp.Pages.Sample.Dispatcher.Actions",
+        interfaces: ["FSharpUnion", "System.IEquatable", "System.IComparable"],
+        cases: {
+          NoOp: [],
+          ViewerActions: [Actions$6]
+        }
+      };
+    }
+  }, {
+    key: "Equals",
+    value: function (other) {
+      return equalsUnions(this, other);
+    }
+  }, {
+    key: "CompareTo",
+    value: function (other) {
+      return compareUnions(this, other);
+    }
+  }]);
+
+  return Actions$$1;
+}();
+setType("WebApp.Pages.Sample.Dispatcher.Actions", Actions$5);
+function update$5(model, action) {
+  if (action.Case === "ViewerActions") {
+    var patternInput = update$6(model.Viewer, action.Fields[0]);
+    var action_ = AppApi.mapActions(function (arg0) {
+      return new Actions$5("ViewerActions", [arg0]);
+    })(patternInput[1]);
+    return [new Model$5(patternInput[0]), action_];
+  } else {
+    return [model, new List$1()];
+  }
+}
+var TileDocs$1 = function () {
+  function TileDocs(title, subTitle, fileName, height) {
+    _classCallCheck(this, TileDocs);
+
+    this.Title = title;
+    this.SubTitle = subTitle;
+    this.FileName = fileName;
+    this.Height = height;
+  }
+
+  _createClass(TileDocs, [{
+    key: _Symbol.reflection,
+    value: function () {
+      return {
+        type: "WebApp.Pages.Sample.Dispatcher.TileDocs",
+        interfaces: ["FSharpRecord", "System.IEquatable", "System.IComparable"],
+        properties: {
+          Title: "string",
+          SubTitle: "string",
+          FileName: "string",
+          Height: "number"
+        }
+      };
+    }
+  }, {
+    key: "Equals",
+    value: function (other) {
+      return equalsRecords(this, other);
+    }
+  }, {
+    key: "CompareTo",
+    value: function (other) {
+      return compareRecords(this, other);
+    }
+  }]);
+
+  return TileDocs;
+}();
+setType("WebApp.Pages.Sample.Dispatcher.TileDocs", TileDocs$1);
+var SectionsInfo = function () {
+  function SectionsInfo(section1, section2, section3) {
+    _classCallCheck(this, SectionsInfo);
+
+    this.Section1 = section1;
+    this.Section2 = section2;
+    this.Section3 = section3;
+  }
+
+  _createClass(SectionsInfo, [{
+    key: _Symbol.reflection,
+    value: function () {
+      return {
+        type: "WebApp.Pages.Sample.Dispatcher.SectionsInfo",
+        interfaces: ["FSharpRecord", "System.IEquatable", "System.IComparable"],
+        properties: {
+          Section1: makeGeneric(List$1, {
+            T: TileDocs$1
+          }),
+          Section2: makeGeneric(List$1, {
+            T: TileDocs$1
+          }),
+          Section3: makeGeneric(List$1, {
+            T: TileDocs$1
+          })
+        }
+      };
+    }
+  }, {
+    key: "Equals",
+    value: function (other) {
+      return equalsRecords(this, other);
+    }
+  }, {
+    key: "CompareTo",
+    value: function (other) {
+      return compareRecords(this, other);
+    }
+  }], [{
+    key: "Initial",
+    get: function () {
+      return new SectionsInfo(new List$1(), new List$1(), new List$1());
+    }
+  }]);
+
+  return SectionsInfo;
+}();
+setType("WebApp.Pages.Sample.Dispatcher.SectionsInfo", SectionsInfo);
+function tileDocs$1(info) {
+  var sampleURL = void 0;
+  var sampleApi = new SampleApi.Route("Viewer", [info.FileName, info.Height]);
+  var matchValue = resolveRoutesToUrl(new Route("Sample", [sampleApi]));
+
+  if (matchValue == null) {
+    throw new Error("Uknown route");
+  } else {
+    sampleURL = fsFormat("#%s")(function (x) {
+      return x;
+    })(matchValue);
+  }
+
+  return Tags.div(ofArray([Attributes.classy("tile is-parent is-vertical")]))(ofArray([Tags.article(ofArray([Attributes.classy("tile is-child notification")]))(ofArray([Tags.p(ofArray([Attributes.classy("title")]))(ofArray([Tags.a(ofArray([voidLinkAction(), Attributes.property("href", sampleURL)]))(ofArray([Tags.text(info.Title)]))])), Tags.p(ofArray([Attributes.classy("subtitle")]))(ofArray([Tags.text(info.SubTitle)]))]))]));
+}
+function tileVertical$1(tiles) {
+  return Tags.div(ofArray([Attributes.classy("tile is-vertical is-4")]))(function (list) {
+    return map$1(function (info) {
+      return tileDocs$1(info);
+    }, list);
+  }(tiles));
+}
+function tileSection(tiles) {
+  var divideTiles = function divideTiles(tiles_1) {
+    return function (index) {
+      return function (sectionsInfo) {
+        divideTiles: while (true) {
+          if (tiles_1.tail == null) {
+            return sectionsInfo;
+          } else {
+            var sectionsInfo_ = void 0;
+            var matchValue = index % 3;
+
+            switch (matchValue) {
+              case 0:
+                sectionsInfo_ = new SectionsInfo(append$$1(sectionsInfo.Section1, ofArray([tiles_1.head])), sectionsInfo.Section2, sectionsInfo.Section3);
+                break;
+
+              case 1:
+                var Section2 = append$$1(sectionsInfo.Section2, ofArray([tiles_1.head]));
+                sectionsInfo_ = new SectionsInfo(sectionsInfo.Section1, Section2, sectionsInfo.Section3);
+                break;
+
+              case 2:
+                var Section3 = append$$1(sectionsInfo.Section3, ofArray([tiles_1.head]));
+                sectionsInfo_ = new SectionsInfo(sectionsInfo.Section1, sectionsInfo.Section2, Section3);
+                break;
+
+              default:
+                throw new Error("Should not happened");
+            }
+
+            tiles_1 = tiles_1.tail;
+            index = index + 1;
+            sectionsInfo = sectionsInfo_;
+            continue divideTiles;
+          }
+        }
+      };
+    };
+  };
+
+  var info = divideTiles(tiles)(0)(SectionsInfo.Initial);
+  return Tags.div(ofArray([Attributes.classy("tile is-ancestor")]))(ofArray([tileVertical$1(info.Section1), tileVertical$1(info.Section2), tileVertical$1(info.Section3)]));
+}
+var beginnerView = Tags.div(new List$1())(ofArray([Tags.h1(ofArray([Attributes.classy("title")]))(ofArray([Tags.text("Beginner")])), tileSection(ofArray([new TileDocs$1("Hello World", "A simple application showing inputs usage", "hello", 350), new TileDocs$1("Counter", "A simple application showing how to support multiple actions", "counter", 300), new TileDocs$1("Nested counter", "A application showing how to use nested application", "nestedcounter", 400), new TileDocs$1("Clock", "A clock showing producer usage", "clock", 300), new TileDocs$1("Echo", "An echo application showing how to make ajax calls", "echo", 500), new TileDocs$1("Subscriber", "This application show you how to register a subscriber to your application", "subscriber", 350), new TileDocs$1("Navigation", "This application show you how to use the navigation feature of Fable-Arch", "navigation", 350), new TileDocs$1("React", "Port of the counter sample using React", "reactCounter", 300)]))]));
+var advancedView = Tags.div(new List$1())(ofArray([Tags.h1(ofArray([Attributes.classy("title")]))(ofArray([Tags.text("Medium")])), tileSection(ofArray([new TileDocs$1("Calculator", "A calculator application", "calculator", 600), new TileDocs$1("Routing", "This application show you how to use the navigation feature of Fable-Arch", "routing", 350)]))]));
+var expertView = Tags.div(new List$1())(ofArray([Tags.h1(ofArray([Attributes.classy("title")]))(ofArray([Tags.text("Advanced")])), tileSection(new List$1()), Tags.div(new List$1())(ofArray([Tags.text("Nothing to show yet")]))]));
+var indexView$1 = Tags.div(ofArray([Attributes.classy("container")]))(ofArray([Tags.div(ofArray([Attributes.classy("section")]))(ofArray([beginnerView, Tags.hr(new List$1()), advancedView, Tags.hr(new List$1()), expertView]))]));
+function view$5(model, subRoute) {
+  if (subRoute.Case === "Viewer") {
+    return map$$1(function (arg0) {
+      return new Actions$5("ViewerActions", [arg0]);
+    }, view$6(model.Viewer));
+  } else {
+    return indexView$1;
+  }
+}
+
 // 7.1.4 ToInteger
 var ceil  = Math.ceil;
 var floor = Math.floor;
@@ -5758,19 +5794,13 @@ var _toInteger = function(it){
   return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
 };
 
-// 7.2.1 RequireObjectCoercible(argument)
-var _defined = function(it){
-  if(it == undefined)throw TypeError("Can't call method on  " + it);
-  return it;
-};
-
 var toInteger = _toInteger;
-var defined   = _defined;
+var defined$1   = _defined;
 // true  -> String#at
 // false -> String#codePointAt
 var _stringAt = function(TO_STRING){
   return function(that, pos){
-    var s = String(defined(that))
+    var s = String(defined$1(that))
       , i = toInteger(pos)
       , l = s.length
       , a, b;
@@ -5807,9 +5837,9 @@ var _iobject = Object('z').propertyIsEnumerable(0) ? Object : function(it){
 
 // to indexed object, toObject with fallback for non-array-like ES3 strings
 var IObject = _iobject;
-var defined$1 = _defined;
+var defined$2 = _defined;
 var _toIobject = function(it){
-  return IObject(defined$1(it));
+  return IObject(defined$2(it));
 };
 
 // 7.1.15 ToLength
@@ -5993,9 +6023,9 @@ var _iterCreate = function(Constructor, NAME, next){
 };
 
 // 7.1.13 ToObject(argument)
-var defined$2 = _defined;
+var defined$3 = _defined;
 var _toObject = function(it){
-  return Object(defined$2(it));
+  return Object(defined$3(it));
 };
 
 // 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
@@ -6013,7 +6043,7 @@ var _objectGpo = Object.getPrototypeOf || function(O){
 };
 
 var LIBRARY        = _library;
-var $export$2        = _export;
+var $export$4        = _export;
 var redefine       = _redefine;
 var hide$1           = _hide;
 var has            = _has;
@@ -6077,7 +6107,7 @@ var _iterDefine = function(Base, NAME, Constructor, next, DEFAULT, IS_SET, FORCE
     };
     if(FORCED)for(key in methods){
       if(!(key in proto))redefine(proto, key, methods[key]);
-    } else $export$2($export$2.P + $export$2.F * (BUGGY || VALUES_BUG), NAME, methods);
+    } else $export$4($export$4.P + $export$4.F * (BUGGY || VALUES_BUG), NAME, methods);
   }
   return methods;
 };
@@ -6099,717 +6129,40 @@ _iterDefine(String, 'String', function(iterated){
   return {value: point, done: false};
 });
 
-var _addToUnscopables = function(){ /* empty */ };
-
-var _iterStep = function(done, value){
-  return {value: value, done: !!done};
-};
-
-var addToUnscopables = _addToUnscopables;
-var step             = _iterStep;
-var Iterators$2        = _iterators;
-var toIObject$2        = _toIobject;
-
-// 22.1.3.4 Array.prototype.entries()
-// 22.1.3.13 Array.prototype.keys()
-// 22.1.3.29 Array.prototype.values()
-// 22.1.3.30 Array.prototype[@@iterator]()
-var es6_array_iterator = _iterDefine(Array, 'Array', function(iterated, kind){
-  this._t = toIObject$2(iterated); // target
-  this._i = 0;                   // next index
-  this._k = kind;                // kind
-// 22.1.5.2.1 %ArrayIteratorPrototype%.next()
-}, function(){
-  var O     = this._t
-    , kind  = this._k
-    , index = this._i++;
-  if(!O || index >= O.length){
-    this._t = undefined;
-    return step(1);
-  }
-  if(kind == 'keys'  )return step(0, index);
-  if(kind == 'values')return step(0, O[index]);
-  return step(0, [index, O[index]]);
-}, 'values');
-
-// argumentsList[@@iterator] is %ArrayProto_values% (9.4.4.6, 9.4.4.7)
-Iterators$2.Arguments = Iterators$2.Array;
-
-addToUnscopables('keys');
-addToUnscopables('values');
-addToUnscopables('entries');
-
-var global$3        = _global;
-var hide$2          = _hide;
-var Iterators$1     = _iterators;
-var TO_STRING_TAG = _wks('toStringTag');
-
-for(var collections = ['NodeList', 'DOMTokenList', 'MediaList', 'StyleSheetList', 'CSSRuleList'], i = 0; i < 5; i++){
-  var NAME       = collections[i]
-    , Collection = global$3[NAME]
-    , proto      = Collection && Collection.prototype;
-  if(proto && !proto[TO_STRING_TAG])hide$2(proto, TO_STRING_TAG, NAME);
-  Iterators$1[NAME] = Iterators$1.Array;
-}
-
-var f$1 = _wks;
-
-var _wksExt = {
-	f: f$1
-};
-
-var iterator$2 = _wksExt.f('iterator');
-
-var iterator = createCommonjsModule(function (module) {
-module.exports = { "default": iterator$2, __esModule: true };
-});
-
-var _meta = createCommonjsModule(function (module) {
-var META     = _uid('meta')
-  , isObject = _isObject
-  , has      = _has
-  , setDesc  = _objectDp.f
-  , id       = 0;
-var isExtensible = Object.isExtensible || function(){
-  return true;
-};
-var FREEZE = !_fails(function(){
-  return isExtensible(Object.preventExtensions({}));
-});
-var setMeta = function(it){
-  setDesc(it, META, {value: {
-    i: 'O' + ++id, // object ID
-    w: {}          // weak collections IDs
-  }});
-};
-var fastKey = function(it, create){
-  // return primitive with prefix
-  if(!isObject(it))return typeof it == 'symbol' ? it : (typeof it == 'string' ? 'S' : 'P') + it;
-  if(!has(it, META)){
-    // can't set metadata to uncaught frozen object
-    if(!isExtensible(it))return 'F';
-    // not necessary to add metadata
-    if(!create)return 'E';
-    // add missing metadata
-    setMeta(it);
-  // return object ID
-  } return it[META].i;
-};
-var getWeak = function(it, create){
-  if(!has(it, META)){
-    // can't set metadata to uncaught frozen object
-    if(!isExtensible(it))return true;
-    // not necessary to add metadata
-    if(!create)return false;
-    // add missing metadata
-    setMeta(it);
-  // return hash weak collections IDs
-  } return it[META].w;
-};
-// add metadata on freeze-family methods calling
-var onFreeze = function(it){
-  if(FREEZE && meta.NEED && isExtensible(it) && !has(it, META))setMeta(it);
-  return it;
-};
-var meta = module.exports = {
-  KEY:      META,
-  NEED:     false,
-  fastKey:  fastKey,
-  getWeak:  getWeak,
-  onFreeze: onFreeze
-};
-});
-
-var global$5         = _global;
-var core$1           = _core;
-var LIBRARY$1        = _library;
-var wksExt$1         = _wksExt;
-var defineProperty$4 = _objectDp.f;
-var _wksDefine = function(name){
-  var $Symbol = core$1.Symbol || (core$1.Symbol = LIBRARY$1 ? {} : global$5.Symbol || {});
-  if(name.charAt(0) != '_' && !(name in $Symbol))defineProperty$4($Symbol, name, {value: wksExt$1.f(name)});
-};
-
-var getKeys$1   = _objectKeys;
-var toIObject$4 = _toIobject;
-var _keyof = function(object, el){
-  var O      = toIObject$4(object)
-    , keys   = getKeys$1(O)
-    , length = keys.length
-    , index  = 0
-    , key;
-  while(length > index)if(O[key = keys[index++]] === el)return key;
-};
-
-var f$2 = Object.getOwnPropertySymbols;
-
-var _objectGops = {
-	f: f$2
-};
-
-var f$3 = {}.propertyIsEnumerable;
-
-var _objectPie = {
-	f: f$3
-};
-
-// all enumerable object keys, includes symbols
-var getKeys$2 = _objectKeys;
-var gOPS    = _objectGops;
-var pIE     = _objectPie;
-var _enumKeys = function(it){
-  var result     = getKeys$2(it)
-    , getSymbols = gOPS.f;
-  if(getSymbols){
-    var symbols = getSymbols(it)
-      , isEnum  = pIE.f
-      , i       = 0
-      , key;
-    while(symbols.length > i)if(isEnum.call(it, key = symbols[i++]))result.push(key);
-  } return result;
-};
-
-// 7.2.2 IsArray(argument)
-var cof$1 = _cof;
-var _isArray = Array.isArray || function isArray(arg){
-  return cof$1(arg) == 'Array';
-};
-
-// 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
-var $keys$2      = _objectKeysInternal;
-var hiddenKeys = _enumBugKeys.concat('length', 'prototype');
-
-var f$5 = Object.getOwnPropertyNames || function getOwnPropertyNames(O){
-  return $keys$2(O, hiddenKeys);
-};
-
-var _objectGopn = {
-	f: f$5
-};
-
-// fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
-var toIObject$5 = _toIobject;
-var gOPN$1      = _objectGopn.f;
-var toString$2  = {}.toString;
-
-var windowNames = typeof window == 'object' && window && Object.getOwnPropertyNames
-  ? Object.getOwnPropertyNames(window) : [];
-
-var getWindowNames = function(it){
+// call something on iterator step with safe closing on error
+var anObject$3 = _anObject;
+var _iterCall = function(iterator, fn, value, entries){
   try {
-    return gOPN$1(it);
+    return entries ? fn(anObject$3(value)[0], value[1]) : fn(value);
+  // 7.4.6 IteratorClose(iterator, completion)
   } catch(e){
-    return windowNames.slice();
+    var ret = iterator['return'];
+    if(ret !== undefined)anObject$3(ret.call(iterator));
+    throw e;
   }
 };
 
-var f$4 = function getOwnPropertyNames(it){
-  return windowNames && toString$2.call(it) == '[object Window]' ? getWindowNames(it) : gOPN$1(toIObject$5(it));
+// check on default Array iterator
+var Iterators$1  = _iterators;
+var ITERATOR$1   = _wks('iterator');
+var ArrayProto = Array.prototype;
+
+var _isArrayIter = function(it){
+  return it !== undefined && (Iterators$1.Array === it || ArrayProto[ITERATOR$1] === it);
 };
 
-var _objectGopnExt = {
-	f: f$4
+var $defineProperty = _objectDp;
+var createDesc$1      = _propertyDesc;
+
+var _createProperty = function(object, index, value){
+  if(index in object)$defineProperty.f(object, index, createDesc$1(0, value));
+  else object[index] = value;
 };
-
-var pIE$1            = _objectPie;
-var createDesc$2     = _propertyDesc;
-var toIObject$6      = _toIobject;
-var toPrimitive$2    = _toPrimitive;
-var has$5            = _has;
-var IE8_DOM_DEFINE$1 = _ie8DomDefine;
-var gOPD$1           = Object.getOwnPropertyDescriptor;
-
-var f$6 = _descriptors ? gOPD$1 : function getOwnPropertyDescriptor(O, P){
-  O = toIObject$6(O);
-  P = toPrimitive$2(P, true);
-  if(IE8_DOM_DEFINE$1)try {
-    return gOPD$1(O, P);
-  } catch(e){ /* empty */ }
-  if(has$5(O, P))return createDesc$2(!pIE$1.f.call(O, P), O[P]);
-};
-
-var _objectGopd = {
-	f: f$6
-};
-
-// ECMAScript 6 symbols shim
-var global$4         = _global;
-var has$4            = _has;
-var DESCRIPTORS    = _descriptors;
-var $export$3        = _export;
-var redefine$1       = _redefine;
-var META           = _meta.KEY;
-var $fails         = _fails;
-var shared$1         = _shared;
-var setToStringTag$2 = _setToStringTag;
-var uid$1            = _uid;
-var wks            = _wks;
-var wksExt         = _wksExt;
-var wksDefine      = _wksDefine;
-var keyOf          = _keyof;
-var enumKeys       = _enumKeys;
-var isArray$1        = _isArray;
-var anObject$3       = _anObject;
-var toIObject$3      = _toIobject;
-var toPrimitive$1    = _toPrimitive;
-var createDesc$1     = _propertyDesc;
-var _create        = _objectCreate;
-var gOPNExt        = _objectGopnExt;
-var $GOPD          = _objectGopd;
-var $DP            = _objectDp;
-var $keys$1          = _objectKeys;
-var gOPD           = $GOPD.f;
-var dP$3             = $DP.f;
-var gOPN           = gOPNExt.f;
-var $Symbol        = global$4.Symbol;
-var $JSON          = global$4.JSON;
-var _stringify     = $JSON && $JSON.stringify;
-var PROTOTYPE$2      = 'prototype';
-var HIDDEN         = wks('_hidden');
-var TO_PRIMITIVE   = wks('toPrimitive');
-var isEnum         = {}.propertyIsEnumerable;
-var SymbolRegistry = shared$1('symbol-registry');
-var AllSymbols     = shared$1('symbols');
-var OPSymbols      = shared$1('op-symbols');
-var ObjectProto$1    = Object[PROTOTYPE$2];
-var USE_NATIVE     = typeof $Symbol == 'function';
-var QObject        = global$4.QObject;
-// Don't use setters in Qt Script, https://github.com/zloirock/core-js/issues/173
-var setter = !QObject || !QObject[PROTOTYPE$2] || !QObject[PROTOTYPE$2].findChild;
-
-// fallback for old Android, https://code.google.com/p/v8/issues/detail?id=687
-var setSymbolDesc = DESCRIPTORS && $fails(function(){
-  return _create(dP$3({}, 'a', {
-    get: function(){ return dP$3(this, 'a', {value: 7}).a; }
-  })).a != 7;
-}) ? function(it, key, D){
-  var protoDesc = gOPD(ObjectProto$1, key);
-  if(protoDesc)delete ObjectProto$1[key];
-  dP$3(it, key, D);
-  if(protoDesc && it !== ObjectProto$1)dP$3(ObjectProto$1, key, protoDesc);
-} : dP$3;
-
-var wrap = function(tag){
-  var sym = AllSymbols[tag] = _create($Symbol[PROTOTYPE$2]);
-  sym._k = tag;
-  return sym;
-};
-
-var isSymbol = USE_NATIVE && typeof $Symbol.iterator == 'symbol' ? function(it){
-  return typeof it == 'symbol';
-} : function(it){
-  return it instanceof $Symbol;
-};
-
-var $defineProperty = function defineProperty(it, key, D){
-  if(it === ObjectProto$1)$defineProperty(OPSymbols, key, D);
-  anObject$3(it);
-  key = toPrimitive$1(key, true);
-  anObject$3(D);
-  if(has$4(AllSymbols, key)){
-    if(!D.enumerable){
-      if(!has$4(it, HIDDEN))dP$3(it, HIDDEN, createDesc$1(1, {}));
-      it[HIDDEN][key] = true;
-    } else {
-      if(has$4(it, HIDDEN) && it[HIDDEN][key])it[HIDDEN][key] = false;
-      D = _create(D, {enumerable: createDesc$1(0, false)});
-    } return setSymbolDesc(it, key, D);
-  } return dP$3(it, key, D);
-};
-var $defineProperties = function defineProperties(it, P){
-  anObject$3(it);
-  var keys = enumKeys(P = toIObject$3(P))
-    , i    = 0
-    , l = keys.length
-    , key;
-  while(l > i)$defineProperty(it, key = keys[i++], P[key]);
-  return it;
-};
-var $create = function create(it, P){
-  return P === undefined ? _create(it) : $defineProperties(_create(it), P);
-};
-var $propertyIsEnumerable = function propertyIsEnumerable(key){
-  var E = isEnum.call(this, key = toPrimitive$1(key, true));
-  if(this === ObjectProto$1 && has$4(AllSymbols, key) && !has$4(OPSymbols, key))return false;
-  return E || !has$4(this, key) || !has$4(AllSymbols, key) || has$4(this, HIDDEN) && this[HIDDEN][key] ? E : true;
-};
-var $getOwnPropertyDescriptor = function getOwnPropertyDescriptor(it, key){
-  it  = toIObject$3(it);
-  key = toPrimitive$1(key, true);
-  if(it === ObjectProto$1 && has$4(AllSymbols, key) && !has$4(OPSymbols, key))return;
-  var D = gOPD(it, key);
-  if(D && has$4(AllSymbols, key) && !(has$4(it, HIDDEN) && it[HIDDEN][key]))D.enumerable = true;
-  return D;
-};
-var $getOwnPropertyNames = function getOwnPropertyNames(it){
-  var names  = gOPN(toIObject$3(it))
-    , result = []
-    , i      = 0
-    , key;
-  while(names.length > i){
-    if(!has$4(AllSymbols, key = names[i++]) && key != HIDDEN && key != META)result.push(key);
-  } return result;
-};
-var $getOwnPropertySymbols = function getOwnPropertySymbols(it){
-  var IS_OP  = it === ObjectProto$1
-    , names  = gOPN(IS_OP ? OPSymbols : toIObject$3(it))
-    , result = []
-    , i      = 0
-    , key;
-  while(names.length > i){
-    if(has$4(AllSymbols, key = names[i++]) && (IS_OP ? has$4(ObjectProto$1, key) : true))result.push(AllSymbols[key]);
-  } return result;
-};
-
-// 19.4.1.1 Symbol([description])
-if(!USE_NATIVE){
-  $Symbol = function Symbol(){
-    if(this instanceof $Symbol)throw TypeError('Symbol is not a constructor!');
-    var tag = uid$1(arguments.length > 0 ? arguments[0] : undefined);
-    var $set = function(value){
-      if(this === ObjectProto$1)$set.call(OPSymbols, value);
-      if(has$4(this, HIDDEN) && has$4(this[HIDDEN], tag))this[HIDDEN][tag] = false;
-      setSymbolDesc(this, tag, createDesc$1(1, value));
-    };
-    if(DESCRIPTORS && setter)setSymbolDesc(ObjectProto$1, tag, {configurable: true, set: $set});
-    return wrap(tag);
-  };
-  redefine$1($Symbol[PROTOTYPE$2], 'toString', function toString(){
-    return this._k;
-  });
-
-  $GOPD.f = $getOwnPropertyDescriptor;
-  $DP.f   = $defineProperty;
-  _objectGopn.f = gOPNExt.f = $getOwnPropertyNames;
-  _objectPie.f  = $propertyIsEnumerable;
-  _objectGops.f = $getOwnPropertySymbols;
-
-  if(DESCRIPTORS && !_library){
-    redefine$1(ObjectProto$1, 'propertyIsEnumerable', $propertyIsEnumerable, true);
-  }
-
-  wksExt.f = function(name){
-    return wrap(wks(name));
-  };
-}
-
-$export$3($export$3.G + $export$3.W + $export$3.F * !USE_NATIVE, {Symbol: $Symbol});
-
-for(var symbols = (
-  // 19.4.2.2, 19.4.2.3, 19.4.2.4, 19.4.2.6, 19.4.2.8, 19.4.2.9, 19.4.2.10, 19.4.2.11, 19.4.2.12, 19.4.2.13, 19.4.2.14
-  'hasInstance,isConcatSpreadable,iterator,match,replace,search,species,split,toPrimitive,toStringTag,unscopables'
-).split(','), i$1 = 0; symbols.length > i$1; )wks(symbols[i$1++]);
-
-for(var symbols = $keys$1(wks.store), i$1 = 0; symbols.length > i$1; )wksDefine(symbols[i$1++]);
-
-$export$3($export$3.S + $export$3.F * !USE_NATIVE, 'Symbol', {
-  // 19.4.2.1 Symbol.for(key)
-  'for': function(key){
-    return has$4(SymbolRegistry, key += '')
-      ? SymbolRegistry[key]
-      : SymbolRegistry[key] = $Symbol(key);
-  },
-  // 19.4.2.5 Symbol.keyFor(sym)
-  keyFor: function keyFor(key){
-    if(isSymbol(key))return keyOf(SymbolRegistry, key);
-    throw TypeError(key + ' is not a symbol!');
-  },
-  useSetter: function(){ setter = true; },
-  useSimple: function(){ setter = false; }
-});
-
-$export$3($export$3.S + $export$3.F * !USE_NATIVE, 'Object', {
-  // 19.1.2.2 Object.create(O [, Properties])
-  create: $create,
-  // 19.1.2.4 Object.defineProperty(O, P, Attributes)
-  defineProperty: $defineProperty,
-  // 19.1.2.3 Object.defineProperties(O, Properties)
-  defineProperties: $defineProperties,
-  // 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
-  getOwnPropertyDescriptor: $getOwnPropertyDescriptor,
-  // 19.1.2.7 Object.getOwnPropertyNames(O)
-  getOwnPropertyNames: $getOwnPropertyNames,
-  // 19.1.2.8 Object.getOwnPropertySymbols(O)
-  getOwnPropertySymbols: $getOwnPropertySymbols
-});
-
-// 24.3.2 JSON.stringify(value [, replacer [, space]])
-$JSON && $export$3($export$3.S + $export$3.F * (!USE_NATIVE || $fails(function(){
-  var S = $Symbol();
-  // MS Edge converts symbol values to JSON as {}
-  // WebKit converts symbol values to JSON as null
-  // V8 throws on boxed symbols
-  return _stringify([S]) != '[null]' || _stringify({a: S}) != '{}' || _stringify(Object(S)) != '{}';
-})), 'JSON', {
-  stringify: function stringify(it){
-    if(it === undefined || isSymbol(it))return; // IE8 returns string on undefined
-    var args = [it]
-      , i    = 1
-      , replacer, $replacer;
-    while(arguments.length > i)args.push(arguments[i++]);
-    replacer = args[1];
-    if(typeof replacer == 'function')$replacer = replacer;
-    if($replacer || !isArray$1(replacer))replacer = function(key, value){
-      if($replacer)value = $replacer.call(this, key, value);
-      if(!isSymbol(value))return value;
-    };
-    args[1] = replacer;
-    return _stringify.apply($JSON, args);
-  }
-});
-
-// 19.4.3.4 Symbol.prototype[@@toPrimitive](hint)
-$Symbol[PROTOTYPE$2][TO_PRIMITIVE] || _hide($Symbol[PROTOTYPE$2], TO_PRIMITIVE, $Symbol[PROTOTYPE$2].valueOf);
-// 19.4.3.5 Symbol.prototype[@@toStringTag]
-setToStringTag$2($Symbol, 'Symbol');
-// 20.2.1.9 Math[@@toStringTag]
-setToStringTag$2(Math, 'Math', true);
-// 24.3.3 JSON[@@toStringTag]
-setToStringTag$2(global$4.JSON, 'JSON', true);
-
-_wksDefine('asyncIterator');
-
-_wksDefine('observable');
-
-var index = _core.Symbol;
-
-var symbol = createCommonjsModule(function (module) {
-module.exports = { "default": index, __esModule: true };
-});
-
-var _typeof_1 = createCommonjsModule(function (module, exports) {
-"use strict";
-
-exports.__esModule = true;
-
-var _iterator = iterator;
-
-var _iterator2 = _interopRequireDefault(_iterator);
-
-var _symbol = symbol;
-
-var _symbol2 = _interopRequireDefault(_symbol);
-
-var _typeof = typeof _symbol2.default === "function" && typeof _iterator2.default === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default && obj !== _symbol2.default.prototype ? "symbol" : typeof obj; };
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-exports.default = typeof _symbol2.default === "function" && _typeof(_iterator2.default) === "symbol" ? function (obj) {
-  return typeof obj === "undefined" ? "undefined" : _typeof(obj);
-} : function (obj) {
-  return obj && typeof _symbol2.default === "function" && obj.constructor === _symbol2.default && obj !== _symbol2.default.prototype ? "symbol" : typeof obj === "undefined" ? "undefined" : _typeof(obj);
-};
-});
-
-var _typeof = unwrapExports(_typeof_1);
-
-var Actions$6 = function () {
-  function Actions(caseName, fields) {
-    _classCallCheck(this, Actions);
-
-    this.Case = caseName;
-    this.Fields = fields;
-  }
-
-  _createClass(Actions, [{
-    key: _Symbol.reflection,
-    value: function () {
-      return {
-        type: "WebApp.Pages.Sample.Clock.Actions",
-        interfaces: ["FSharpUnion", "System.IEquatable", "System.IComparable"],
-        cases: {
-          Tick: [Date]
-        }
-      };
-    }
-  }, {
-    key: "Equals",
-    value: function (other) {
-      return equalsUnions(this, other);
-    }
-  }, {
-    key: "CompareTo",
-    value: function (other) {
-      return compareUnions(this, other);
-    }
-  }]);
-
-  return Actions;
-}();
-setType("WebApp.Pages.Sample.Clock.Actions", Actions$6);
-var Model$6 = function () {
-  function Model(time, date$$1) {
-    _classCallCheck(this, Model);
-
-    this.Time = time;
-    this.Date = date$$1;
-  }
-
-  _createClass(Model, [{
-    key: _Symbol.reflection,
-    value: function () {
-      return {
-        type: "WebApp.Pages.Sample.Clock.Model",
-        interfaces: ["FSharpRecord", "System.IEquatable", "System.IComparable"],
-        properties: {
-          Time: "string",
-          Date: "string"
-        }
-      };
-    }
-  }, {
-    key: "Equals",
-    value: function (other) {
-      return equalsRecords(this, other);
-    }
-  }, {
-    key: "CompareTo",
-    value: function (other) {
-      return compareRecords(this, other);
-    }
-  }], [{
-    key: "Initial",
-    get: function () {
-      return new Model("00:00:00", "01/01/1970");
-    }
-  }]);
-
-  return Model;
-}();
-setType("WebApp.Pages.Sample.Clock.Model", Model$6);
-function normalizeNumber(x) {
-  if (x < 10) {
-    return fsFormat("0%i")(function (x) {
-      return x;
-    })(x);
-  } else {
-    return String(x);
-  }
-}
-function update$6(model, action) {
-  var patternInput = function () {
-    var day$$1 = normalizeNumber(day(action.Fields[0]));
-    var month$$1 = normalizeNumber(month(action.Fields[0]));
-    var date$$1 = fsFormat("%s/%s/%i")(function (x) {
-      return x;
-    })(month$$1)(day$$1)(year(action.Fields[0]));
-    return [new Model$6(format("{0:HH:mm:ss}", action.Fields[0]), date$$1), new List$1()];
-  }();
-
-  return [patternInput[0], patternInput[1]];
-}
-function sampleDemo(model) {
-  return Tags.div(ofArray([Attributes.classy("content has-text-centered")]))(ofArray([Tags.h1(ofArray([Attributes.classy("is-marginless")]))(ofArray([Tags.text(fsFormat("%s %s")(function (x) {
-    return x;
-  })(model.Date)(model.Time))]))]));
-}
-var docs = new Documentation("Sample_Clock.fs");
-function view$6(model) {
-  return VDom.Html.sampleView("Clock sample", sampleDemo(model), docs.Html);
-}
-
-var Actions$7 = function () {
-  function Actions(caseName, fields) {
-    _classCallCheck(this, Actions);
-
-    this.Case = caseName;
-    this.Fields = fields;
-  }
-
-  _createClass(Actions, [{
-    key: _Symbol.reflection,
-    value: function () {
-      return {
-        type: "WebApp.Pages.Sample.Counter.Actions",
-        interfaces: ["FSharpUnion", "System.IEquatable", "System.IComparable"],
-        cases: {
-          Add: [],
-          Reset: [],
-          Sub: []
-        }
-      };
-    }
-  }, {
-    key: "Equals",
-    value: function (other) {
-      return equalsUnions(this, other);
-    }
-  }, {
-    key: "CompareTo",
-    value: function (other) {
-      return compareUnions(this, other);
-    }
-  }]);
-
-  return Actions;
-}();
-setType("WebApp.Pages.Sample.Counter.Actions", Actions$7);
-var Model$7 = function () {
-  function Model(value) {
-    _classCallCheck(this, Model);
-
-    this.Value = value;
-  }
-
-  _createClass(Model, [{
-    key: _Symbol.reflection,
-    value: function () {
-      return {
-        type: "WebApp.Pages.Sample.Counter.Model",
-        interfaces: ["FSharpRecord", "System.IEquatable", "System.IComparable"],
-        properties: {
-          Value: "number"
-        }
-      };
-    }
-  }, {
-    key: "Equals",
-    value: function (other) {
-      return equalsRecords(this, other);
-    }
-  }, {
-    key: "CompareTo",
-    value: function (other) {
-      return compareRecords(this, other);
-    }
-  }], [{
-    key: "Initial",
-    get: function () {
-      return new Model(0);
-    }
-  }]);
-
-  return Model;
-}();
-setType("WebApp.Pages.Sample.Counter.Model", Model$7);
-function update$7(model, action) {
-  if (action.Case === "Sub") {
-    return [new Model$7(model.Value - 1), new List$1()];
-  } else if (action.Case === "Reset") {
-    return [new Model$7(0), new List$1()];
-  } else {
-    return [new Model$7(model.Value + 1), new List$1()];
-  }
-}
-function simpleButton(txt, action) {
-  return Tags.div(ofArray([Attributes.classy("column is-narrow")]))(ofArray([Tags.a(ofArray([Attributes.classy("button"), voidLinkAction(), Events.onMouseClick(function (_arg1) {
-    return action;
-  })]))(ofArray([Tags.text(txt)]))]));
-}
-function sampleDemo$1(model) {
-  return Tags.div(ofArray([Attributes.classy("columns is-vcentered")]))(ofArray([Tags.div(ofArray([Attributes.classy("column is-narrow"), new Types.Attribute("Style", [ofArray([["width", "170px"]])])]))(ofArray([Tags.text(fsFormat("Counter value: %i")(function (x) {
-    return x;
-  })(model.Value))])), simpleButton("+1", new Actions$7("Add", [])), simpleButton("-1", new Actions$7("Sub", [])), simpleButton("Reset", new Actions$7("Reset", []))]));
-}
-var docs$1 = new Documentation("Sample_Counter.fs");
-function view$7(model) {
-  return VDom.Html.sampleView("Counter sample", sampleDemo$1(model), docs$1.Html);
-}
 
 // getting tag from 19.1.3.6 Object.prototype.toString()
-var cof$2 = _cof;
+var cof$1 = _cof;
 var TAG$1 = _wks('toStringTag');
-var ARG = cof$2(function(){ return arguments; }()) == 'Arguments';
+var ARG = cof$1(function(){ return arguments; }()) == 'Arguments';
 
 // fallback for IE11 Script Access Denied error
 var tryGet = function(it, key){
@@ -6824,981 +6177,18 @@ var _classof = function(it){
     // @@toStringTag case
     : typeof (T = tryGet(O = Object(it), TAG$1)) == 'string' ? T
     // builtinTag case
-    : ARG ? cof$2(O)
+    : ARG ? cof$1(O)
     // ES3 arguments fallback
-    : (B = cof$2(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
+    : (B = cof$1(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
 };
 
 var classof   = _classof;
-var ITERATOR$1  = _wks('iterator');
-var Iterators$3 = _iterators;
+var ITERATOR$2  = _wks('iterator');
+var Iterators$2 = _iterators;
 var core_getIteratorMethod = _core.getIteratorMethod = function(it){
-  if(it != undefined)return it[ITERATOR$1]
+  if(it != undefined)return it[ITERATOR$2]
     || it['@@iterator']
-    || Iterators$3[classof(it)];
-};
-
-var anObject$4 = _anObject;
-var get      = core_getIteratorMethod;
-var core_getIterator = _core.getIterator = function(it){
-  var iterFn = get(it);
-  if(typeof iterFn != 'function')throw TypeError(it + ' is not iterable!');
-  return anObject$4(iterFn.call(it));
-};
-
-var getIterator$1 = core_getIterator;
-
-var getIterator = createCommonjsModule(function (module) {
-module.exports = { "default": getIterator$1, __esModule: true };
-});
-
-var _getIterator = unwrapExports(getIterator);
-
-var Actions$8 = function () {
-  function Actions$$1(caseName, fields) {
-    _classCallCheck(this, Actions$$1);
-
-    this.Case = caseName;
-    this.Fields = fields;
-  }
-
-  _createClass(Actions$$1, [{
-    key: _Symbol.reflection,
-    value: function () {
-      return {
-        type: "WebApp.Pages.Sample.NestedCounter.Actions",
-        interfaces: ["FSharpUnion", "System.IEquatable", "System.IComparable"],
-        cases: {
-          CounterActions: ["number", Model$7, Actions$7],
-          CreateCounter: [],
-          DeleteCounter: ["number"],
-          ResetAll: []
-        }
-      };
-    }
-  }, {
-    key: "Equals",
-    value: function (other) {
-      return equalsUnions(this, other);
-    }
-  }, {
-    key: "CompareTo",
-    value: function (other) {
-      return compareUnions(this, other);
-    }
-  }]);
-
-  return Actions$$1;
-}();
-setType("WebApp.Pages.Sample.NestedCounter.Actions", Actions$8);
-var Model$8 = function () {
-  function Model$$1(counters, nextId) {
-    _classCallCheck(this, Model$$1);
-
-    this.Counters = counters;
-    this.NextId = nextId;
-  }
-
-  _createClass(Model$$1, [{
-    key: _Symbol.reflection,
-    value: function () {
-      return {
-        type: "WebApp.Pages.Sample.NestedCounter.Model",
-        interfaces: ["FSharpRecord", "System.IEquatable", "System.IComparable"],
-        properties: {
-          Counters: makeGeneric(List$1, {
-            T: Tuple(["number", Model$7])
-          }),
-          NextId: "number"
-        }
-      };
-    }
-  }, {
-    key: "Equals",
-    value: function (other) {
-      return equalsRecords(this, other);
-    }
-  }, {
-    key: "CompareTo",
-    value: function (other) {
-      return compareRecords(this, other);
-    }
-  }], [{
-    key: "Initial",
-    get: function () {
-      return new Model$$1(new List$1(), 0);
-    }
-  }]);
-
-  return Model$$1;
-}();
-setType("WebApp.Pages.Sample.NestedCounter.Model", Model$8);
-function update$8(model, action) {
-  if (action.Case === "DeleteCounter") {
-    var counters = filter$$1(function (tupledArg) {
-      return tupledArg[0] !== action.Fields[0];
-    }, model.Counters);
-    return [new Model$8(counters, model.NextId), new List$1()];
-  } else if (action.Case === "ResetAll") {
-    var message = ofArray([function (h) {
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = _getIterator(model.Counters), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var forLoopVar = _step.value;
-          h(new Actions$8("CounterActions", [forLoopVar[0], forLoopVar[1], new Actions$7("Reset", [])]));
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
-    }]);
-    return [model, message];
-  } else if (action.Case === "CounterActions") {
-    var _ret = function () {
-      var patternInput = update$7(action.Fields[1], action.Fields[2]);
-      var mActions = AppApi.mapActions(function (tupledArg) {
-        return new Actions$8("CounterActions", [tupledArg[0], tupledArg[1], tupledArg[2]]);
-      })(patternInput[1]);
-      var counters = map$1(function (tupledArg) {
-        if (tupledArg[0] === action.Fields[0]) {
-          return [tupledArg[0], patternInput[0]];
-        } else {
-          return [tupledArg[0], tupledArg[1]];
-        }
-      }, model.Counters);
-      return {
-        v: [new Model$8(counters, model.NextId), mActions]
-      };
-    }();
-
-    if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
-  } else {
-    return [new Model$8(append$$1(model.Counters, ofArray([[model.NextId, Model$7.Initial]])), model.NextId + 1), new List$1()];
-  }
-}
-function simpleButton$1(txt, action) {
-  return Tags.div(ofArray([Attributes.classy("column is-narrow")]))(ofArray([Tags.a(ofArray([Attributes.classy("button"), voidLinkAction(), Events.onMouseClick(function (_arg1) {
-    return action;
-  })]))(ofArray([Tags.text(txt)]))]));
-}
-function counterRow(id, counter) {
-  return Tags.div(ofArray([Attributes.classy("columns is-vcentered")]))(ofArray([VDom.Html.column(), Tags.div(ofArray([Attributes.classy("column")]))(ofArray([Tags.a(ofArray([Attributes.classy("button"), voidLinkAction(), Events.onMouseClick(function (_arg1) {
-    return new Actions$8("DeleteCounter", [id]);
-  })]))(ofArray([Tags.i(ofArray([Attributes.classy("fa fa-trash")]))(new List$1())]))])), Tags.div(new List$1())(ofArray([map$$1(function (act) {
-    return new Actions$8("CounterActions", [id, counter, act]);
-  }, sampleDemo$1(counter))])), VDom.Html.column()]));
-}
-function sampleDemo$2(model) {
-  var countersView = map$1(function (tupledArg) {
-    return counterRow(tupledArg[0], tupledArg[1]);
-  }, model.Counters);
-  return Tags.div(new List$1())(new List$1(Tags.div(ofArray([Attributes.classy("columns is-vcentered")]))(ofArray([VDom.Html.column(), simpleButton$1("Create a new counter", new Actions$8("CreateCounter", [])), simpleButton$1("Reset all", new Actions$8("ResetAll", [])), VDom.Html.column()])), countersView));
-}
-var docs$2 = new Documentation("Sample_NestedCounter.fs");
-function view$8(model) {
-  return VDom.Html.sampleView("Nested counter sample", sampleDemo$2(model), docs$2.Html);
-}
-
-var _stringWs = '\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002\u2003' +
-  '\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF';
-
-var $export$5 = _export;
-var defined$3 = _defined;
-var fails   = _fails;
-var spaces  = _stringWs;
-var space   = '[' + spaces + ']';
-var non     = '\u200b\u0085';
-var ltrim   = RegExp('^' + space + space + '*');
-var rtrim   = RegExp(space + space + '*$');
-
-var exporter = function(KEY, exec, ALIAS){
-  var exp   = {};
-  var FORCE = fails(function(){
-    return !!spaces[KEY]() || non[KEY]() != non;
-  });
-  var fn = exp[KEY] = FORCE ? exec(trim$1) : spaces[KEY];
-  if(ALIAS)exp[ALIAS] = fn;
-  $export$5($export$5.P + $export$5.F * FORCE, 'String', exp);
-};
-
-// 1 -> String#trimLeft
-// 2 -> String#trimRight
-// 3 -> String#trim
-var trim$1 = exporter.trim = function(string, TYPE){
-  string = String(defined$3(string));
-  if(TYPE & 1)string = string.replace(ltrim, '');
-  if(TYPE & 2)string = string.replace(rtrim, '');
-  return string;
-};
-
-var _stringTrim = exporter;
-
-var $parseInt$1 = _global.parseInt;
-var $trim     = _stringTrim.trim;
-var ws        = _stringWs;
-var hex       = /^[\-+]?0[xX]/;
-
-var _parseInt$3 = $parseInt$1(ws + '08') !== 8 || $parseInt$1(ws + '0x16') !== 22 ? function parseInt(str, radix){
-  var string = $trim(String(str), 3);
-  return $parseInt$1(string, (radix >>> 0) || (hex.test(string) ? 16 : 10));
-} : $parseInt$1;
-
-var $export$4   = _export;
-var $parseInt = _parseInt$3;
-// 20.1.2.13 Number.parseInt(string, radix)
-$export$4($export$4.S + $export$4.F * (Number.parseInt != $parseInt), 'Number', {parseInt: $parseInt});
-
-var _parseInt$1 = parseInt;
-
-var _parseInt = createCommonjsModule(function (module) {
-module.exports = { "default": _parseInt$1, __esModule: true };
-});
-
-var _Number$parseInt = unwrapExports(_parseInt);
-
-var Input = function () {
-  function Input(caseName, fields) {
-    _classCallCheck(this, Input);
-
-    this.Case = caseName;
-    this.Fields = fields;
-  }
-
-  _createClass(Input, [{
-    key: _Symbol.reflection,
-    value: function () {
-      return {
-        type: "WebApp.Pages.Sample.Calculator.Input",
-        interfaces: ["FSharpUnion", "System.IEquatable", "System.IComparable"],
-        cases: {
-          Clear: [],
-          Const: ["number"],
-          Div: [],
-          Equals: [],
-          Minus: [],
-          Plus: [],
-          Times: []
-        }
-      };
-    }
-  }, {
-    key: "Equals",
-    value: function (other) {
-      return equalsUnions(this, other);
-    }
-  }, {
-    key: "CompareTo",
-    value: function (other) {
-      return compareUnions(this, other);
-    }
-  }]);
-
-  return Input;
-}();
-setType("WebApp.Pages.Sample.Calculator.Input", Input);
-var Model$9 = function () {
-  function Model(caseName, fields) {
-    _classCallCheck(this, Model);
-
-    this.Case = caseName;
-    this.Fields = fields;
-  }
-
-  _createClass(Model, [{
-    key: _Symbol.reflection,
-    value: function () {
-      return {
-        type: "WebApp.Pages.Sample.Calculator.Model",
-        interfaces: ["FSharpUnion", "System.IEquatable", "System.IComparable"],
-        cases: {
-          InputStack: [makeGeneric(List$1, {
-            T: Input
-          })]
-        }
-      };
-    }
-  }, {
-    key: "Equals",
-    value: function (other) {
-      return equalsUnions(this, other);
-    }
-  }, {
-    key: "CompareTo",
-    value: function (other) {
-      return compareUnions(this, other);
-    }
-  }]);
-
-  return Model;
-}();
-setType("WebApp.Pages.Sample.Calculator.Model", Model$9);
-var Actions$9 = function () {
-  function Actions(caseName, fields) {
-    _classCallCheck(this, Actions);
-
-    this.Case = caseName;
-    this.Fields = fields;
-  }
-
-  _createClass(Actions, [{
-    key: _Symbol.reflection,
-    value: function () {
-      return {
-        type: "WebApp.Pages.Sample.Calculator.Actions",
-        interfaces: ["FSharpUnion", "System.IEquatable", "System.IComparable"],
-        cases: {
-          PushInput: [Input]
-        }
-      };
-    }
-  }, {
-    key: "Equals",
-    value: function (other) {
-      return equalsUnions(this, other);
-    }
-  }, {
-    key: "CompareTo",
-    value: function (other) {
-      return compareUnions(this, other);
-    }
-  }]);
-
-  return Actions;
-}();
-setType("WebApp.Pages.Sample.Calculator.Actions", Actions$9);
-
-function _Operation___(_arg1) {
-  if (_arg1.Case === "Plus") {
-    return new Input("Plus", []);
-  } else if (_arg1.Case === "Minus") {
-    return new Input("Minus", []);
-  } else if (_arg1.Case === "Times") {
-    return new Input("Times", []);
-  } else if (_arg1.Case === "Div") {
-    return new Input("Div", []);
-  }
-}
-
-function concatInts(x, y) {
-  return _Number$parseInt(fsFormat("%d%d")(function (x) {
-    return x;
-  })(x)(y));
-}
-function opString(_arg1) {
-  if (_arg1.Case === "Plus") {
-    return "+";
-  } else if (_arg1.Case === "Minus") {
-    return "-";
-  } else if (_arg1.Case === "Times") {
-    return "*";
-  } else if (_arg1.Case === "Div") {
-    return "/";
-  } else if (_arg1.Case === "Equals") {
-    return "=";
-  } else if (_arg1.Case === "Clear") {
-    return "CE";
-  } else {
-    return "";
-  }
-}
-function inputString(_arg1) {
-  var activePatternResult1050 = _Operation___(_arg1);
-
-  if (activePatternResult1050 != null) {
-    var op = activePatternResult1050;
-    return opString(op);
-  } else if (_arg1.Case === "Const") {
-    return String(_arg1.Fields[0]);
-  } else {
-    return "";
-  }
-}
-function modelString(_arg1) {
-  return join("", function (list) {
-    return map$1(function (_arg1_1) {
-      return inputString(_arg1_1);
-    }, list);
-  }(_arg1.Fields[0]));
-}
-function solve(_arg1) {
-  var _target1 = function _target1() {
-    throw new Error("C:\\Users\\mmangel\\Workspaces\\Perso\\fable-arch\\docs\\src\\Pages/Sample/Sample_Calculator.fs", 67, 13);
-  };
-
-  if (_arg1.Fields[0].tail != null) {
-    if (_arg1.Fields[0].head.Case === "Const") {
-      if (_arg1.Fields[0].tail.tail != null) {
-        var activePatternResult1053 = _Operation___(_arg1.Fields[0].tail.head);
-
-        if (activePatternResult1053 != null) {
-          if (_arg1.Fields[0].tail.tail.tail != null) {
-            if (_arg1.Fields[0].tail.tail.head.Case === "Const") {
-              if (_arg1.Fields[0].tail.tail.tail.tail == null) {
-                var op = activePatternResult1053;
-                var x = _arg1.Fields[0].head.Fields[0];
-                var y = _arg1.Fields[0].tail.tail.head.Fields[0];
-
-                if (op.Case === "Plus") {
-                  return x + y;
-                } else if (op.Case === "Minus") {
-                  return x - y;
-                } else if (op.Case === "Times") {
-                  return x * y;
-                } else if (op.Case === "Div") {
-                  return ~~(x / y);
-                } else {
-                  throw new Error("Will not happen");
-                }
-              } else {
-                return _target1();
-              }
-            } else {
-              return _target1();
-            }
-          } else {
-            return _target1();
-          }
-        } else {
-          return _target1();
-        }
-      } else {
-        return _target1();
-      }
-    } else {
-      return _target1();
-    }
-  } else {
-    return _target1();
-  }
-}
-function update$9(_arg2, _arg1) {
-  if (_arg1.Fields[0].Equals(new Input("Clear", []))) {
-    return [new Model$9("InputStack", [new List$1()]), new List$1()];
-  } else {
-    var _target3 = function _target3() {
-      var _target1 = function _target1() {
-        return [new Model$9("InputStack", [_arg2.Fields[0]]), new List$1()];
-      };
-
-      if (_arg2.Fields[0].tail != null) {
-        if (_arg2.Fields[0].head.Case === "Const") {
-          if (_arg2.Fields[0].tail.tail != null) {
-            var activePatternResult1059 = _Operation___(_arg2.Fields[0].tail.head);
-
-            if (activePatternResult1059 != null) {
-              if (_arg2.Fields[0].tail.tail.tail != null) {
-                if (_arg2.Fields[0].tail.tail.head.Case === "Const") {
-                  if (_arg2.Fields[0].tail.tail.tail.tail == null) {
-                    var op = activePatternResult1059;
-                    var x = _arg2.Fields[0].head.Fields[0];
-                    var y = _arg2.Fields[0].tail.tail.head.Fields[0];
-
-                    if (_arg1.Fields[0].Case === "Const") {
-                      var y_ = _arg1.Fields[0].Fields[0];
-                      return [new Model$9("InputStack", [ofArray([new Input("Const", [x]), op, new Input("Const", [concatInts(y, y_)])])]), new List$1()];
-                    } else if (_arg1.Fields[0].Case === "Equals") {
-                      return [new Model$9("InputStack", [ofArray([new Input("Const", [solve(new Model$9("InputStack", [_arg2.Fields[0]]))])])]), new List$1()];
-                    } else {
-                      var activePatternResult1058 = _Operation___(_arg1.Fields[0]);
-
-                      if (activePatternResult1058 != null) {
-                        var op_1 = activePatternResult1058;
-                        var result = solve(new Model$9("InputStack", [_arg2.Fields[0]]));
-                        return [new Model$9("InputStack", [ofArray([new Input("Const", [result]), op_1])]), new List$1()];
-                      } else {
-                        return [new Model$9("InputStack", [_arg2.Fields[0]]), new List$1()];
-                      }
-                    }
-                  } else {
-                    return _target1();
-                  }
-                } else {
-                  return _target1();
-                }
-              } else {
-                return _target1();
-              }
-            } else {
-              return _target1();
-            }
-          } else {
-            return _target1();
-          }
-        } else {
-          return _target1();
-        }
-      } else {
-        return _target1();
-      }
-    };
-
-    if (_arg2.Fields[0].tail != null) {
-      if (_arg2.Fields[0].head.Case === "Const") {
-        if (_arg2.Fields[0].tail.tail != null) {
-          var activePatternResult1060 = _Operation___(_arg2.Fields[0].tail.head);
-
-          if (activePatternResult1060 != null) {
-            if (_arg2.Fields[0].tail.tail.tail == null) {
-              var op = activePatternResult1060;
-              var x = _arg2.Fields[0].head.Fields[0];
-
-              if (_arg1.Fields[0].Case === "Const") {
-                var y = _arg1.Fields[0].Fields[0];
-                return [new Model$9("InputStack", [ofArray([new Input("Const", [x]), op, new Input("Const", [y])])]), new List$1()];
-              } else {
-                var activePatternResult1057 = _Operation___(_arg1.Fields[0]);
-
-                if (activePatternResult1057 != null) {
-                  var otherOp = activePatternResult1057;
-                  return [new Model$9("InputStack", [ofArray([new Input("Const", [x]), otherOp])]), new List$1()];
-                } else {
-                  return [new Model$9("InputStack", [_arg2.Fields[0]]), new List$1()];
-                }
-              }
-            } else {
-              return _target3();
-            }
-          } else {
-            return _target3();
-          }
-        } else {
-          var _x = _arg2.Fields[0].head.Fields[0];
-
-          if (_arg1.Fields[0].Case === "Const") {
-            var _y = _arg1.Fields[0].Fields[0];
-            return [new Model$9("InputStack", [ofArray([new Input("Const", [concatInts(_x, _y)])])]), new List$1()];
-          } else {
-            var activePatternResult1056 = _Operation___(_arg1.Fields[0]);
-
-            if (activePatternResult1056 != null) {
-              var _op = activePatternResult1056;
-              return [new Model$9("InputStack", [ofArray([new Input("Const", [_x]), _op])]), new List$1()];
-            } else {
-              return [new Model$9("InputStack", [_arg2.Fields[0]]), new List$1()];
-            }
-          }
-        }
-      } else {
-        return _target3();
-      }
-    } else {
-      var activePatternResult1055 = _Operation___(_arg1.Fields[0]);
-
-      if (activePatternResult1055 != null) {
-        var _op2 = activePatternResult1055;
-        return [new Model$9("InputStack", [new List$1()]), new List$1()];
-      } else if (_arg1.Fields[0].Case === "Equals") {
-        return [new Model$9("InputStack", [new List$1()]), new List$1()];
-      } else {
-        return [new Model$9("InputStack", [ofArray([_arg1.Fields[0]])]), new List$1()];
-      }
-    }
-  }
-}
-function digitStyle() {
-  return new Types.Attribute("Style", [ofArray([["height", "50px"], ["width", "55px"], ["font-size", "20px"], ["cursor", "pointer"], ["padding", "15px"], ["padding-top", "5px"], ["margin", "5px"], ["text-align", "center"], ["line-height", "40px"], ["background-color", "lightgreen"], ["box-shadow", "0 0 3px black"]])]);
-}
-function opButtonStyle() {
-  return new Types.Attribute("Style", [ofArray([["height", "50px"], ["width", "55px"], ["font-size", "20px"], ["padding", "15px"], ["padding-top", "5px"], ["text-align", "center"], ["line-height", "40px"], ["cursor", "pointer"], ["margin", "5px"], ["background-color", "lightblue"], ["box-shadow", "0 0 3px black"]])]);
-}
-function demoView(model) {
-  var digit = function digit(n) {
-    return Tags.div(ofArray([digitStyle(), Events.onMouseClick(function (_arg1) {
-      return new Actions$9("PushInput", [new Input("Const", [n])]);
-    })]))(ofArray([Tags.text(String(n))]));
-  };
-
-  var opBtn = function opBtn(input) {
-    var content = function () {
-      var activePatternResult1068 = _Operation___(input);
-
-      if (activePatternResult1068 != null) {
-        var op = activePatternResult1068;
-        return opString(op);
-      } else if (input.Case === "Equals") {
-        return "=";
-      } else if (input.Case === "Clear") {
-        return "CE";
-      } else {
-        return "";
-      }
-    }();
-
-    return Tags.div(ofArray([opButtonStyle(), Events.onMouseClick(function (_arg2) {
-      return new Actions$9("PushInput", [input]);
-    })]))(ofArray([Tags.text(content)]));
-  };
-
-  var row = function row(xs) {
-    return Tags.tr(new List$1())(toList(delay(function () {
-      return map$2(function (x) {
-        return Tags.td(new List$1())(ofArray([x]));
-      }, xs);
-    })));
-  };
-
-  return Tags.div(ofArray([new Types.Attribute("Style", [ofArray([["width", "320px"], ["border", "2px black solid"], ["border-radius", "15px"], ["padding", "10px"]])])]))(ofArray([Tags.h1(ofArray([new Types.Attribute("Style", [ofArray([["font-size", "24px"], ["padding-left", "20px"], ["height", "30px"]])])]))(ofArray([Tags.text(modelString(model))])), Tags.br(new List$1()), Tags.table(new List$1())(ofArray([function () {
-    var clo0 = row;
-    return function (arg00) {
-      return clo0(arg00);
-    };
-  }()(ofArray([digit(1), digit(2), digit(3), opBtn(new Input("Plus", []))])), function () {
-    var clo0 = row;
-    return function (arg00) {
-      return clo0(arg00);
-    };
-  }()(ofArray([digit(4), digit(5), digit(6), opBtn(new Input("Minus", []))])), function () {
-    var clo0 = row;
-    return function (arg00) {
-      return clo0(arg00);
-    };
-  }()(ofArray([digit(7), digit(8), digit(9), opBtn(new Input("Times", []))])), function () {
-    var clo0 = row;
-    return function (arg00) {
-      return clo0(arg00);
-    };
-  }()(ofArray([opBtn(new Input("Clear", [])), digit(0), opBtn(new Input("Equals", [])), opBtn(new Input("Div", []))]))]))]));
-}
-var docs$3 = new Documentation("Sample_Calculator.fs");
-function view$9(model) {
-  return VDom.Html.sampleView("Calculator", demoView(model), docs$3.Html);
-}
-
-var Actions$10 = function () {
-  function Actions(caseName, fields) {
-    _classCallCheck(this, Actions);
-
-    this.Case = caseName;
-    this.Fields = fields;
-  }
-
-  _createClass(Actions, [{
-    key: _Symbol.reflection,
-    value: function () {
-      return {
-        type: "WebApp.Pages.Sample.HelloWorld.Actions",
-        interfaces: ["FSharpUnion", "System.IEquatable", "System.IComparable"],
-        cases: {
-          ChangeInput: ["string"]
-        }
-      };
-    }
-  }, {
-    key: "Equals",
-    value: function (other) {
-      return equalsUnions(this, other);
-    }
-  }, {
-    key: "CompareTo",
-    value: function (other) {
-      return compareUnions(this, other);
-    }
-  }]);
-
-  return Actions;
-}();
-setType("WebApp.Pages.Sample.HelloWorld.Actions", Actions$10);
-function update$10(model, action) {
-  return [action.Fields[0], new List$1()];
-}
-function sampleDemo$3(model) {
-  return Tags.div(new List$1())(ofArray([Tags.label(ofArray([Attributes.classy("label")]))(ofArray([Tags.text("Enter your name:")])), Tags.p(ofArray([Attributes.classy("control")]))(ofArray([Tags.input(ofArray([Attributes.classy("input"), Attributes.property("type", "text"), Attributes.property("placeholder", "Ex: Joe Doe"), Attributes.property("value", model), VDom.Html.onInput(function (arg0) {
-    return new Actions$10("ChangeInput", [arg0]);
-  })]))])), Tags.span(new List$1())(ofArray([Tags.text(fsFormat("Hello %s")(function (x) {
-    return x;
-  })(model))]))]));
-}
-var docs$4 = new Documentation("Sample_HelloWorld.fs");
-function view$10(model) {
-  return VDom.Html.sampleView("Hello world sample", sampleDemo$3(model), docs$4.Html);
-}
-
-var Model$5 = function () {
-  function Model$$1(clock, counter, helloWorld, nestedCounter, calculator) {
-    _classCallCheck(this, Model$$1);
-
-    this.Clock = clock;
-    this.Counter = counter;
-    this.HelloWorld = helloWorld;
-    this.NestedCounter = nestedCounter;
-    this.Calculator = calculator;
-  }
-
-  _createClass(Model$$1, [{
-    key: _Symbol.reflection,
-    value: function () {
-      return {
-        type: "WebApp.Pages.Sample.Dispatcher.Model",
-        interfaces: ["FSharpRecord", "System.IEquatable", "System.IComparable"],
-        properties: {
-          Clock: Option(Model$6),
-          Counter: Option(Model$7),
-          HelloWorld: Option("string"),
-          NestedCounter: Option(Model$8),
-          Calculator: Option(Model$9)
-        }
-      };
-    }
-  }, {
-    key: "Equals",
-    value: function (other) {
-      return equalsRecords(this, other);
-    }
-  }, {
-    key: "CompareTo",
-    value: function (other) {
-      return compareRecords(this, other);
-    }
-  }], [{
-    key: "Generate",
-    value: function (index, counter, helloWorld, nestedCounter, calc) {
-      return new Model$$1(index, counter, helloWorld, nestedCounter, calc);
-    }
-  }, {
-    key: "Initial",
-    value: function (currentPage) {
-      if (currentPage.Case === "Counter") {
-        return Model$$1.Generate(null, Model$7.Initial);
-      } else if (currentPage.Case === "HelloWorld") {
-        return Model$$1.Generate(null, null, "");
-      } else if (currentPage.Case === "NestedCounter") {
-        return Model$$1.Generate(null, null, null, Model$8.Initial);
-      } else if (currentPage.Case === "Calculator") {
-        return Model$$1.Generate(null, null, null, null, new Model$9("InputStack", [new List$1()]));
-      } else {
-        return Model$$1.Generate(Model$6.Initial);
-      }
-    }
-  }]);
-
-  return Model$$1;
-}();
-setType("WebApp.Pages.Sample.Dispatcher.Model", Model$5);
-var NavbarLink = function () {
-  function NavbarLink(text, route) {
-    _classCallCheck(this, NavbarLink);
-
-    this.Text = text;
-    this.Route = route;
-  }
-
-  _createClass(NavbarLink, [{
-    key: _Symbol.reflection,
-    value: function () {
-      return {
-        type: "WebApp.Pages.Sample.Dispatcher.NavbarLink",
-        interfaces: ["FSharpRecord", "System.IEquatable", "System.IComparable"],
-        properties: {
-          Text: "string",
-          Route: SampleApi.Route
-        }
-      };
-    }
-  }, {
-    key: "Equals",
-    value: function (other) {
-      return equalsRecords(this, other);
-    }
-  }, {
-    key: "CompareTo",
-    value: function (other) {
-      return compareRecords(this, other);
-    }
-  }], [{
-    key: "Create",
-    value: function (text, route) {
-      return new NavbarLink(text, route);
-    }
-  }]);
-
-  return NavbarLink;
-}();
-setType("WebApp.Pages.Sample.Dispatcher.NavbarLink", NavbarLink);
-var Actions$5 = function () {
-  function Actions$$1(caseName, fields) {
-    _classCallCheck(this, Actions$$1);
-
-    this.Case = caseName;
-    this.Fields = fields;
-  }
-
-  _createClass(Actions$$1, [{
-    key: _Symbol.reflection,
-    value: function () {
-      return {
-        type: "WebApp.Pages.Sample.Dispatcher.Actions",
-        interfaces: ["FSharpUnion", "System.IEquatable", "System.IComparable"],
-        cases: {
-          CalcActions: [Actions$9],
-          ClockActions: [Actions$6],
-          CounterActions: [Actions$7],
-          HelloWorldActions: [Actions$10],
-          NavigateTo: [SampleApi.Route],
-          NestedCounterActions: [Actions$8]
-        }
-      };
-    }
-  }, {
-    key: "Equals",
-    value: function (other) {
-      return equalsUnions(this, other);
-    }
-  }, {
-    key: "CompareTo",
-    value: function (other) {
-      return compareUnions(this, other);
-    }
-  }]);
-
-  return Actions$$1;
-}();
-setType("WebApp.Pages.Sample.Dispatcher.Actions", Actions$5);
-function update$5(model, action) {
-  if (action.Case === "CounterActions") {
-    var _ret = function () {
-      var patternInput = update$7(model.Counter, action.Fields[0]);
-      var action_ = AppApi.mapActions(function (arg0) {
-        return new Actions$5("CounterActions", [arg0]);
-      })(patternInput[1]);
-      return {
-        v: [function () {
-          var Counter = patternInput[0];
-          return new Model$5(model.Clock, Counter, model.HelloWorld, model.NestedCounter, model.Calculator);
-        }(), action_]
-      };
-    }();
-
-    if ((typeof _ret === "undefined" ? "undefined" : _typeof(_ret)) === "object") return _ret.v;
-  } else if (action.Case === "HelloWorldActions") {
-    var _ret2 = function () {
-      var patternInput = update$10(model.HelloWorld, action.Fields[0]);
-      var action_ = AppApi.mapActions(function (arg0) {
-        return new Actions$5("HelloWorldActions", [arg0]);
-      })(patternInput[1]);
-      return {
-        v: [function () {
-          var HelloWorld = patternInput[0];
-          return new Model$5(model.Clock, model.Counter, HelloWorld, model.NestedCounter, model.Calculator);
-        }(), action_]
-      };
-    }();
-
-    if ((typeof _ret2 === "undefined" ? "undefined" : _typeof(_ret2)) === "object") return _ret2.v;
-  } else if (action.Case === "NestedCounterActions") {
-    var _ret3 = function () {
-      var patternInput = update$8(model.NestedCounter, action.Fields[0]);
-      var action_ = AppApi.mapActions(function (arg0) {
-        return new Actions$5("NestedCounterActions", [arg0]);
-      })(patternInput[1]);
-      return {
-        v: [function () {
-          var NestedCounter = patternInput[0];
-          return new Model$5(model.Clock, model.Counter, model.HelloWorld, NestedCounter, model.Calculator);
-        }(), action_]
-      };
-    }();
-
-    if ((typeof _ret3 === "undefined" ? "undefined" : _typeof(_ret3)) === "object") return _ret3.v;
-  } else if (action.Case === "CalcActions") {
-    var _ret4 = function () {
-      var patternInput = update$9(model.Calculator, action.Fields[0]);
-      var action_ = AppApi.mapActions(function (arg0) {
-        return new Actions$5("CalcActions", [arg0]);
-      })(patternInput[1]);
-      return {
-        v: [function () {
-          var Calculator = patternInput[0];
-          return new Model$5(model.Clock, model.Counter, model.HelloWorld, model.NestedCounter, Calculator);
-        }(), action_]
-      };
-    }();
-
-    if ((typeof _ret4 === "undefined" ? "undefined" : _typeof(_ret4)) === "object") return _ret4.v;
-  } else if (action.Case === "NavigateTo") {
-    var message = ofArray([function (h) {
-      var url = resolveRoutesToUrl(new Route("Sample", [action.Fields[0]]));
-
-      if (url == null) {
-        throw new Error("Cannot be reached. Route should always be resolve");
-      } else {
-        location.hash = url;
-      }
-    }]);
-    return [model, message];
-  } else {
-    var patternInput = update$6(model.Clock, action.Fields[0]);
-    var action_ = AppApi.mapActions(function (arg0) {
-      return new Actions$5("ClockActions", [arg0]);
-    })(patternInput[1]);
-    return [new Model$5(patternInput[0], model.Counter, model.HelloWorld, model.NestedCounter, model.Calculator), action_];
-  }
-}
-function navItem$1(item, currentPage) {
-  return Tags.a(ofArray([Attributes.classList(ofArray([["is-active", item.Route.Equals(currentPage)], ["nav-item is-tab", true]])), voidLinkAction(), Events.onMouseClick(function (_arg1) {
-    return new Actions$5("NavigateTo", [item.Route]);
-  })]))(ofArray([Tags.text(item.Text)]));
-}
-function navbar(items, currentPage) {
-  return Tags.div(ofArray([Attributes.classy("nav-left")]))(map$1(function (item) {
-    return navItem$1(item, currentPage);
-  }, items));
-}
-function view$5(model, subRoute) {
-  var htmlContent = subRoute.Case === "Counter" ? map$$1(function (arg0) {
-    return new Actions$5("CounterActions", [arg0]);
-  }, view$7(model.Counter)) : subRoute.Case === "HelloWorld" ? map$$1(function (arg0) {
-    return new Actions$5("HelloWorldActions", [arg0]);
-  }, view$10(model.HelloWorld)) : subRoute.Case === "NestedCounter" ? map$$1(function (arg0) {
-    return new Actions$5("NestedCounterActions", [arg0]);
-  }, view$8(model.NestedCounter)) : subRoute.Case === "Calculator" ? map$$1(function (arg0) {
-    return new Actions$5("CalcActions", [arg0]);
-  }, view$9(model.Calculator)) : map$$1(function (arg0) {
-    return new Actions$5("ClockActions", [arg0]);
-  }, view$6(model.Clock));
-  return Tags.div(new List$1())(ofArray([Tags.nav(ofArray([Attributes.classy("nav has-shadow")]))(ofArray([Tags.div(ofArray([Attributes.classy("container")]))(ofArray([navbar(ofArray([NavbarLink.Create("Hello world", new SampleApi.Route("HelloWorld", [])), NavbarLink.Create("Counter", new SampleApi.Route("Counter", [])), NavbarLink.Create("Nested counter", new SampleApi.Route("NestedCounter", [])), NavbarLink.Create("Clock", new SampleApi.Route("Clock", [])), NavbarLink.Create("Calculator", new SampleApi.Route("Calculator", []))]), subRoute)]))])), Tags.div(ofArray([Attributes.classy("container")]))(ofArray([htmlContent]))]));
-}
-
-// call something on iterator step with safe closing on error
-var anObject$5 = _anObject;
-var _iterCall = function(iterator, fn, value, entries){
-  try {
-    return entries ? fn(anObject$5(value)[0], value[1]) : fn(value);
-  // 7.4.6 IteratorClose(iterator, completion)
-  } catch(e){
-    var ret = iterator['return'];
-    if(ret !== undefined)anObject$5(ret.call(iterator));
-    throw e;
-  }
-};
-
-// check on default Array iterator
-var Iterators$4  = _iterators;
-var ITERATOR$2   = _wks('iterator');
-var ArrayProto = Array.prototype;
-
-var _isArrayIter = function(it){
-  return it !== undefined && (Iterators$4.Array === it || ArrayProto[ITERATOR$2] === it);
-};
-
-var $defineProperty$1 = _objectDp;
-var createDesc$3      = _propertyDesc;
-
-var _createProperty = function(object, index, value){
-  if(index in object)$defineProperty$1.f(object, index, createDesc$3(0, value));
-  else object[index] = value;
+    || Iterators$2[classof(it)];
 };
 
 var ITERATOR$3     = _wks('iterator');
@@ -7824,7 +6214,7 @@ var _iterDetect = function(exec, skipClosing){
 };
 
 var ctx$1            = _ctx;
-var $export$6        = _export;
+var $export$5        = _export;
 var toObject$1       = _toObject;
 var call           = _iterCall;
 var isArrayIter    = _isArrayIter;
@@ -7832,7 +6222,7 @@ var toLength$1       = _toLength;
 var createProperty = _createProperty;
 var getIterFn      = core_getIteratorMethod;
 
-$export$6($export$6.S + $export$6.F * !_iterDetect(function(iter){ Array.from(iter); }), 'Array', {
+$export$5($export$5.S + $export$5.F * !_iterDetect(function(iter){ Array.from(iter); }), 'Array', {
   // 22.1.2.1 Array.from(arrayLike, mapfn = undefined, thisArg = undefined)
   from: function from(arrayLike/*, mapfn = undefined, thisArg = undefined*/){
     var O       = toObject$1(arrayLike)
@@ -7939,8 +6329,8 @@ var Compose = function (__exports) {
           return [function (a) {
             return _arg2[0](_arg1_1[0](a));
           }, function (c) {
-            return function (a) {
-              return _arg1_1[1](_arg2[1](c)(_arg1_1[0](a)))(a);
+            return function (a_1) {
+              return _arg1_1[1](_arg2[1](c)(_arg1_1[0](a_1)))(a_1);
             };
           }];
         };
@@ -7952,8 +6342,8 @@ var Compose = function (__exports) {
           return [function (a) {
             return _arg4[0](_arg2[0](a));
           }, function (c) {
-            return function (a) {
-              return _arg2[1](_arg4[1](c)(_arg2[0](a)))(a);
+            return function (a_1) {
+              return _arg2[1](_arg4[1](c)(_arg2[0](a_1)))(a_1);
             };
           }];
         };
@@ -7965,8 +6355,8 @@ var Compose = function (__exports) {
           return [function (a) {
             return _arg6[0](_arg3[0](a));
           }, function (c) {
-            return function (a) {
-              return _arg3[1](_arg6[1](c))(a);
+            return function (a_1) {
+              return _arg3[1](_arg6[1](c))(a_1);
             };
           }];
         };
@@ -7978,8 +6368,8 @@ var Compose = function (__exports) {
           return [function (a) {
             return _arg8[0](_arg4[0](a));
           }, function (c) {
-            return function (a) {
-              return _arg4[1](_arg8[1](c))(a);
+            return function (a_1) {
+              return _arg4[1](_arg8[1](c))(a_1);
             };
           }];
         };
@@ -8027,14 +6417,10 @@ var Compose = function (__exports) {
           return [function (a) {
             return defaultArg(_arg1_1[0](a), null, _arg2[0]);
           }, function (c) {
-            return function (a) {
+            return function (a_1) {
               return function (_arg9) {
-                if (_arg9 != null) {
-                  return _arg1_1[1](_arg9)(a);
-                } else {
-                  return a;
-                }
-              }(defaultArg(_arg1_1[0](a), null, _arg2[1](c)));
+                return _arg9 != null ? _arg1_1[1](_arg9)(a_1) : a_1;
+              }(defaultArg(_arg1_1[0](a_1), null, _arg2[1](c)));
             };
           }];
         };
@@ -8046,14 +6432,10 @@ var Compose = function (__exports) {
           return [function (a) {
             return defaultArg(_arg2[0](a), null, _arg4[0]);
           }, function (c) {
-            return function (a) {
+            return function (a_1) {
               return function (_arg10) {
-                if (_arg10 != null) {
-                  return _arg2[1](_arg10)(a);
-                } else {
-                  return a;
-                }
-              }(defaultArg(_arg2[0](a), null, _arg4[1](c)));
+                return _arg10 != null ? _arg2[1](_arg10)(a_1) : a_1;
+              }(defaultArg(_arg2[0](a_1), null, _arg4[1](c)));
             };
           }];
         };
@@ -8065,8 +6447,8 @@ var Compose = function (__exports) {
           return [function (a) {
             return defaultArg(_arg3[0](a), null, _arg6[0]);
           }, function (c) {
-            return function (a) {
-              return _arg3[1](_arg6[1](c))(a);
+            return function (a_1) {
+              return _arg3[1](_arg6[1](c))(a_1);
             };
           }];
         };
@@ -8078,8 +6460,8 @@ var Compose = function (__exports) {
           return [function (a) {
             return defaultArg(_arg4[0](a), null, _arg8[0]);
           }, function (c) {
-            return function (a) {
-              return _arg4[1](_arg8[1](c))(a);
+            return function (a_1) {
+              return _arg4[1](_arg8[1](c))(a_1);
             };
           }];
         };
@@ -8237,11 +6619,7 @@ var Optic = function (__exports) {
         return function (f) {
           return function (a) {
             return function (_arg5) {
-              if (_arg5 != null) {
-                return _arg4[1](_arg5)(a);
-              } else {
-                return a;
-              }
+              return _arg5 != null ? _arg4[1](_arg5)(a) : a;
             }(defaultArg(_arg4[0](a), null, f));
           };
         };
@@ -8282,9 +6660,9 @@ var Optics = function (__exports) {
   var id_ = __exports.id_ = function () {
     return [function (x) {
       return x;
-    }, function (x) {
+    }, function (x_1) {
       return function (_arg1) {
-        return x;
+        return x_1;
       };
     }];
   };
@@ -8292,8 +6670,8 @@ var Optics = function (__exports) {
   var box_ = __exports.box_ = function () {
     return [function (value) {
       return value;
-    }, function (value) {
-      return value;
+    }, function (value_1) {
+      return value_1;
     }];
   };
 
@@ -8332,32 +6710,20 @@ var Optics = function (__exports) {
   var Choice$$1 = __exports.Choice = function (__exports) {
     var choice1Of2_ = __exports.choice1Of2_ = function () {
       return [function (x) {
-        if (x.Case === "Choice1Of2") {
-          return x.Fields[0];
-        }
+        return x.Case === "Choice1Of2" ? x.Fields[0] : null;
       }, function (v) {
-        return function (x) {
-          if (x.Case === "Choice1Of2") {
-            return new Choice("Choice1Of2", [v]);
-          } else {
-            return x;
-          }
+        return function (x_1) {
+          return x_1.Case === "Choice1Of2" ? new Choice("Choice1Of2", [v]) : x_1;
         };
       }];
     };
 
     var choice2Of2_ = __exports.choice2Of2_ = function () {
       return [function (x) {
-        if (x.Case === "Choice2Of2") {
-          return x.Fields[0];
-        }
+        return x.Case === "Choice2Of2" ? x.Fields[0] : null;
       }, function (v) {
-        return function (x) {
-          if (x.Case === "Choice2Of2") {
-            return new Choice("Choice2Of2", [v]);
-          } else {
-            return x;
-          }
+        return function (x_1) {
+          return x_1.Case === "Choice2Of2" ? new Choice("Choice2Of2", [v]) : x_1;
         };
       }];
     };
@@ -8368,33 +6734,21 @@ var Optics = function (__exports) {
   var List = __exports.List = function (__exports) {
     var head_ = __exports.head_ = function () {
       return [function (_arg1) {
-        if (_arg1.tail != null) {
-          return _arg1.head;
-        }
+        return _arg1.tail != null ? _arg1.head : null;
       }, function (v) {
         return function (_arg2) {
-          if (_arg2.tail != null) {
-            return new List$1(v, _arg2.tail);
-          } else {
-            return _arg2;
-          }
+          return _arg2.tail != null ? new List$1(v, _arg2.tail) : _arg2;
         };
       }];
     };
 
     var pos_ = __exports.pos_ = function (i) {
       return [function (_arg1) {
-        if (_arg1.length > i) {
-          return item(i, _arg1);
-        }
+        return _arg1.length > i ? item(i, _arg1) : null;
       }, function (v) {
         return function (l) {
           return mapIndexed$$1(function (i_, x) {
-            if (i === i_) {
-              return v;
-            } else {
-              return x;
-            }
+            return i === i_ ? v : x;
           }, l);
         };
       }];
@@ -8402,16 +6756,10 @@ var Optics = function (__exports) {
 
     var tail_ = __exports.tail_ = function () {
       return [function (_arg1) {
-        if (_arg1.tail != null) {
-          return _arg1.tail;
-        }
+        return _arg1.tail != null ? _arg1.tail : null;
       }, function (t) {
         return function (_arg2) {
-          if (_arg2.tail == null) {
-            return new List$1();
-          } else {
-            return new List$1(_arg2.head, t);
-          }
+          return _arg2.tail == null ? new List$1() : new List$1(_arg2.head, t);
         };
       }];
     };
@@ -8433,11 +6781,7 @@ var Optics = function (__exports) {
         return tryFind$1(k, table);
       }, function (v) {
         return function (x) {
-          if (x.has(k)) {
-            return add$2(k, v, x);
-          } else {
-            return x;
-          }
+          return x.has(k) ? add$2(k, v, x) : x;
         };
       }];
     };
@@ -8447,11 +6791,7 @@ var Optics = function (__exports) {
         return tryFind$1(k, table);
       }, function (v) {
         return function (x) {
-          if (v != null) {
-            return add$2(k, v, x);
-          } else {
-            return remove$1(k, x);
-          }
+          return v != null ? add$2(k, v, x) : remove$1(k, x);
         };
       }];
     };
@@ -8481,11 +6821,7 @@ var Optics = function (__exports) {
         return x;
       }, function (v) {
         return function (_arg1) {
-          if (_arg1 == null) {
-            return null;
-          } else {
-            return v;
-          }
+          return _arg1 == null ? null : v;
         };
       }];
     };
@@ -8496,13 +6832,13 @@ var Optics = function (__exports) {
   return __exports;
 }({});
 
-var markdownText = "\r\n# About\r\n\r\nThis website is written with:\r\n\r\n- [Fable](http://fable.io/) a transpiler F# to Javascript\r\n- [Fable-arch](https://github.com/fable-compiler/fable-arch) a set of tools for building modern web applications inspired by the [elm architecture](http://guide.elm-lang.org/architecture/index.html).\r\n- [Bulma](http://bulma.io/) a modern CSS framework based on Flexbox\r\n- [Marked](https://github.com/chjj/marked) a markdown parser and compiler. Built for speed\r\n- [PrismJS](http://prismjs.com/) a lightweight, extensible syntax highlighter\r\n    ";
-function view$11() {
+var markdownText = "\n# About\n\nThis website is written with:\n\n- [Fable](http://fable.io/) a transpiler F# to Javascript\n- [Fable-arch](https://github.com/fable-compiler/fable-arch) a set of tools for building modern web applications inspired by the [elm architecture](http://guide.elm-lang.org/architecture/index.html).\n- [Bulma](http://bulma.io/) a modern CSS framework based on Flexbox\n- [Marked](https://github.com/chjj/marked) a markdown parser and compiler. Built for speed\n- [PrismJS](http://prismjs.com/) a lightweight, extensible syntax highlighter\n    ";
+function view$7() {
   return Tags.div(ofArray([Attributes.classy("section")]))(ofArray([Tags.div(ofArray([Attributes.classy("container")]))(ofArray([Tags.div(ofArray([Attributes.classy("content"), Attributes.property("innerHTML", marked.parse(markdownText))]))(new List$1())]))]));
 }
 
-var markdownText$1 = "\r\n# Fable-arch samples\r\n\r\nFable-arch is a set of tools for building modern web applications inspired by the [elm architecture](http://guide.elm-lang.org/architecture/index.html).\r\n\r\nFable-arch use [Fable](http://fable.io/) which allow you to write your code using F# and compile in JavaScript.\r\n\r\nIt is implemented around a set of abstractions which makes it possible to implement custom renderers if there is a need.\r\nFable-arch comes with a HTML Dsl and a renderer built on top of [virtual-dom](https://github.com/Matt-Esch/virtual-dom) and all\r\nthe samples here are using those two tools.\r\nHopefully the samples here show you how to get started and gives you some inspiration about how to build your application using Fable-arch.\r\n\r\nYou can also contribute more examples by sending us a pull request.\r\n    ";
-function view$12() {
+var markdownText$1 = "\n# Fable-arch samples\n\nFable-arch is a set of tools for building modern web applications inspired by the [elm architecture](http://guide.elm-lang.org/architecture/index.html).\n\nFable-arch use [Fable](http://fable.io/) which allow you to write your code using F# and compile in JavaScript.\n\nIt is implemented around a set of abstractions which makes it possible to implement custom renderers if there is a need.\nFable-arch comes with a HTML Dsl and a renderer built on top of [virtual-dom](https://github.com/Matt-Esch/virtual-dom) and all\nthe samples here are using those two tools.\nHopefully the samples here show you how to get started and gives you some inspiration about how to build your application using Fable-arch.\n\nYou can also contribute more examples by sending us a pull request.\n    ";
+function view$8() {
   return Tags.div(ofArray([Attributes.classy("section")]))(ofArray([Tags.div(ofArray([Attributes.classy("container")]))(ofArray([Tags.div(ofArray([Attributes.classy("content"), Attributes.property("innerHTML", marked.parse(markdownText$1))]))(new List$1())]))]));
 }
 
@@ -9321,12 +7657,12 @@ var RouteParser = function (__exports) {
 }({});
 
 var nativeIsArray = Array.isArray;
-var toString$3 = Object.prototype.toString;
+var toString$2 = Object.prototype.toString;
 
-var index$4 = nativeIsArray || isArray$3;
+var index$2 = nativeIsArray || isArray$2;
 
-function isArray$3(obj) {
-    return toString$3.call(obj) === "[object Array]"
+function isArray$2(obj) {
+    return toString$2.call(obj) === "[object Array]"
 }
 
 var version$1 = "2";
@@ -9423,7 +7759,7 @@ function renderThunk(thunk, previous) {
     return renderedThunk
 }
 
-var index$6 = function isObject(x) {
+var index$4 = function isObject(x) {
 	return typeof x === "object" && x !== null;
 };
 
@@ -9435,7 +7771,7 @@ function isHook$1(hook) {
        typeof hook.unhook === "function" && !hook.hasOwnProperty("unhook"))
 }
 
-var isObject$3 = index$6;
+var isObject$3 = index$4;
 var isHook = isVhook;
 
 var diffProps_1 = diffProps$1;
@@ -9494,7 +7830,7 @@ function getPrototype(value) {
   }
 }
 
-var isArray$2 = index$4;
+var isArray$1 = index$2;
 
 var VPatch = vpatch;
 var isVNode = isVnode;
@@ -9910,7 +8246,7 @@ function keyIndex(children) {
 
 function appendPatch(apply, patch) {
     if (apply) {
-        if (isArray$2(apply)) {
+        if (isArray$1(apply)) {
             apply.push(patch);
         } else {
             apply = [apply, patch];
@@ -9928,7 +8264,7 @@ var diff_1 = diff$1;
 
 var slice$1 = Array.prototype.slice;
 
-var index$10 = iterativelyWalk;
+var index$8 = iterativelyWalk;
 
 function iterativelyWalk(nodes, cb) {
     if (!('length' in nodes)) {
@@ -10209,7 +8545,7 @@ function escapeAttributeValue(str) {
     return escapeText(str).replace(/"/g, "&quot;")
 }
 
-var domWalk$1 = index$10;
+var domWalk$1 = index$8;
 var dispatchEvent$1 = dispatchEvent_1;
 var addEventListener$1 = addEventListener_1;
 var removeEventListener$1 = removeEventListener_1;
@@ -10462,7 +8798,7 @@ Event$2.prototype.preventDefault = function _Event_preventDefault() {
     
 };
 
-var domWalk = index$10;
+var domWalk = index$8;
 
 var Comment = domComment;
 var DOMText = domText;
@@ -10489,33 +8825,33 @@ function Document$1() {
     this.nodeType = 9;
 }
 
-var proto$1 = Document$1.prototype;
-proto$1.createTextNode = function createTextNode(value) {
+var proto = Document$1.prototype;
+proto.createTextNode = function createTextNode(value) {
     return new DOMText(value, this)
 };
 
-proto$1.createElementNS = function createElementNS(namespace, tagName) {
+proto.createElementNS = function createElementNS(namespace, tagName) {
     var ns = namespace === null ? null : String(namespace);
     return new DOMElement(tagName, this, ns)
 };
 
-proto$1.createElement = function createElement(tagName) {
+proto.createElement = function createElement(tagName) {
     return new DOMElement(tagName, this)
 };
 
-proto$1.createDocumentFragment = function createDocumentFragment() {
+proto.createDocumentFragment = function createDocumentFragment() {
     return new DocumentFragment(this)
 };
 
-proto$1.createEvent = function createEvent(family) {
+proto.createEvent = function createEvent(family) {
     return new Event$1(family)
 };
 
-proto$1.createComment = function createComment(data) {
+proto.createComment = function createComment(data) {
     return new Comment(data, this)
 };
 
-proto$1.getElementById = function getElementById(id) {
+proto.getElementById = function getElementById(id) {
     id = String(id);
 
     var result = domWalk(this.childNodes, function (node) {
@@ -10527,22 +8863,22 @@ proto$1.getElementById = function getElementById(id) {
     return result || null
 };
 
-proto$1.getElementsByClassName = DOMElement.prototype.getElementsByClassName;
-proto$1.getElementsByTagName = DOMElement.prototype.getElementsByTagName;
-proto$1.contains = DOMElement.prototype.contains;
+proto.getElementsByClassName = DOMElement.prototype.getElementsByClassName;
+proto.getElementsByTagName = DOMElement.prototype.getElementsByTagName;
+proto.contains = DOMElement.prototype.contains;
 
-proto$1.removeEventListener = removeEventListener;
-proto$1.addEventListener = addEventListener;
-proto$1.dispatchEvent = dispatchEvent;
+proto.removeEventListener = removeEventListener;
+proto.addEventListener = addEventListener;
+proto.dispatchEvent = dispatchEvent;
 
 var Document = document$3;
 
-var index$8 = new Document();
+var index$6 = new Document();
 
 var document_1 = createCommonjsModule(function (module) {
 var topLevel = typeof commonjsGlobal !== 'undefined' ? commonjsGlobal :
     typeof window !== 'undefined' ? window : {};
-var minDoc = index$8;
+var minDoc = index$6;
 
 if (typeof document !== 'undefined') {
     module.exports = document;
@@ -10557,7 +8893,7 @@ if (typeof document !== 'undefined') {
 }
 });
 
-var isObject$4 = index$6;
+var isObject$4 = index$4;
 var isHook$2 = isVhook;
 
 var applyProperties_1 = applyProperties$1;
@@ -10957,7 +9293,7 @@ function replaceRoot(oldRoot, newRoot) {
 }
 
 var document$2 = document_1;
-var isArray$4 = index$4;
+var isArray$3 = index$2;
 
 var render$1 = createElement_1;
 var domIndex = domIndex_1;
@@ -11006,7 +9342,7 @@ function applyPatch(rootNode, domNode, patchList, renderOptions) {
 
     var newNode;
 
-    if (isArray$4(patchList)) {
+    if (isArray$3(patchList)) {
         for (var i = 0; i < patchList.length; i++) {
             newNode = patchOp(patchList[i], domNode, renderOptions);
 
@@ -11156,7 +9492,7 @@ VirtualText.prototype.type = "VirtualText";
  * split('..word1 word2..', /([a-z]+)(\d+)/i);
  * // -> ['..', 'word', '1', ' ', 'word', '2', '..']
  */
-var index$14 = (function split(undef) {
+var index$12 = (function split(undef) {
 
   var nativeSplit = String.prototype.split,
     compliantExecNpcg = /()??/.exec("")[1] === undef,
@@ -11232,7 +9568,7 @@ var index$14 = (function split(undef) {
   return self;
 })();
 
-var split$2 = index$14;
+var split$2 = index$12;
 
 var classIdSplit = /([\.#]?[a-zA-Z0-9\u007F-\uFFFF_:-]+)/;
 var notClassId = /^\.|#/;
@@ -11307,7 +9643,7 @@ var root = typeof window !== 'undefined' ?
     window : typeof commonjsGlobal !== 'undefined' ?
     commonjsGlobal : {};
 
-var index$18 = Individual$1;
+var index$16 = Individual$1;
 
 function Individual$1(key, value) {
     if (key in root) {
@@ -11319,7 +9655,7 @@ function Individual$1(key, value) {
     return value;
 }
 
-var Individual = index$18;
+var Individual = index$16;
 
 var oneVersion = OneVersion;
 
@@ -11347,7 +9683,7 @@ OneVersionConstraint('ev-store', MY_VERSION);
 
 var hashKey = '__EV_STORE_KEY@' + MY_VERSION;
 
-var index$16 = EvStore$1;
+var index$14 = EvStore$1;
 
 function EvStore$1(elem) {
     var hash = elem[hashKey];
@@ -11359,7 +9695,7 @@ function EvStore$1(elem) {
     return hash;
 }
 
-var EvStore = index$16;
+var EvStore = index$14;
 
 var evHook$1 = EvHook;
 
@@ -11385,7 +9721,7 @@ EvHook.prototype.unhook = function(node, propertyName) {
     es[propName] = undefined;
 };
 
-var isArray$5 = index$4;
+var isArray$4 = index$2;
 
 var VNode$1 = vnode;
 var VText$1 = vtext;
@@ -11399,7 +9735,7 @@ var parseTag = parseTag_1;
 var softSetHook = softSetHook$1;
 var evHook = evHook$1;
 
-var index$12 = h$2;
+var index$10 = h$2;
 
 function h$2(tagName, properties, children) {
     var childNodes = [];
@@ -11452,7 +9788,7 @@ function addChild(c, childNodes, tag, props) {
         childNodes.push(new VText$1(String(c)));
     } else if (isChild(c)) {
         childNodes.push(c);
-    } else if (isArray$5(c)) {
+    } else if (isArray$4(c)) {
         for (var i = 0; i < c.length; i++) {
             addChild(c[i], childNodes, tag, props);
         }
@@ -11491,7 +9827,7 @@ function isChild(x) {
 }
 
 function isChildren(x) {
-    return typeof x === 'string' || isArray$5(x) || isChild(x);
+    return typeof x === 'string' || isArray$4(x) || isChild(x);
 }
 
 function UnexpectedVirtualElement(data) {
@@ -11521,7 +9857,7 @@ function errorString(obj) {
     }
 }
 
-var h$1 = index$12;
+var h$1 = index$10;
 
 var h_1 = h$1;
 
@@ -11536,7 +9872,7 @@ var create$6 = createElement_1$2;
 var VNode = vnode;
 var VText = vtext;
 
-var index$2 = {
+var index = {
     diff: diff,
     patch: patch,
     h: h,
@@ -11545,10 +9881,10 @@ var index$2 = {
     VText: VText
 };
 
-var index_1 = index$2.h;
-var index_2 = index$2.create;
-var index_3 = index$2.diff;
-var index_4 = index$2.patch;
+var index_1 = index.h;
+var index_2 = index.create;
+var index_3 = index.diff;
+var index_4 = index.patch;
 
 var _createClass$6 = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -11755,12 +10091,12 @@ function createRender(selector, handler, view) {
 }
 
 var SubModels = function () {
-  function SubModels(navbar$$1, header, docs$$1, sample) {
+  function SubModels(navbar, header, docs, sample) {
     _classCallCheck(this, SubModels);
 
-    this.Navbar = navbar$$1;
+    this.Navbar = navbar;
     this.Header = header;
-    this.Docs = docs$$1;
+    this.Docs = docs;
     this.Sample = sample;
   }
 
@@ -11799,8 +10135,8 @@ var SubModels = function () {
       return [function (r) {
         return r.Header;
       }, function (v) {
-        return function (r) {
-          return new SubModels(r.Navbar, v, r.Docs, r.Sample);
+        return function (r_1) {
+          return new SubModels(r_1.Navbar, v, r_1.Docs, r_1.Sample);
         };
       }];
     }
@@ -11810,8 +10146,8 @@ var SubModels = function () {
       return [function (r) {
         return r.Docs;
       }, function (v) {
-        return function (r) {
-          return new SubModels(r.Navbar, r.Header, v, r.Sample);
+        return function (r_1) {
+          return new SubModels(r_1.Navbar, r_1.Header, v, r_1.Sample);
         };
       }];
     }
@@ -11821,9 +10157,9 @@ var SubModels = function () {
       return [function (r) {
         return r.Sample;
       }, function (v) {
-        return function (r) {
+        return function (r_1) {
           var Sample = v;
-          return new SubModels(r.Navbar, r.Header, r.Docs, Sample);
+          return new SubModels(r_1.Navbar, r_1.Header, r_1.Docs, Sample);
         };
       }];
     }
@@ -11833,8 +10169,8 @@ var SubModels = function () {
       return [function (r) {
         return r.Navbar;
       }, function (v) {
-        return function (r) {
-          return new SubModels(v, r.Header, r.Docs, r.Sample);
+        return function (r_1) {
+          return new SubModels(v, r_1.Header, r_1.Docs, r_1.Sample);
         };
       }];
     }
@@ -11884,8 +10220,8 @@ var Model$$1 = function () {
       return [function (r) {
         return r.SubModels;
       }, function (v) {
-        return function (r) {
-          return new Model$$1(r.CurrentPage, v);
+        return function (r_1) {
+          return new Model$$1(r_1.CurrentPage, v);
         };
       }];
     }
@@ -11895,8 +10231,8 @@ var Model$$1 = function () {
       return [function (r) {
         return r.CurrentPage;
       }, function (v) {
-        return function (r) {
-          return new Model$$1(v, r.SubModels);
+        return function (r_1) {
+          return new Model$$1(v, r_1.SubModels);
         };
       }];
     }
@@ -11951,13 +10287,13 @@ function update$$1(model, action) {
       return new Actions$$1("DocsDispatcherAction", [arg0]);
     })(patternInput[1]);
 
-    var m_ = function (arg0) {
-      return function (arg1) {
-        return Optic.Set.op_HatEquals_0(arg0, arg1);
+    var m_ = function (arg0_2) {
+      return function (arg1_1) {
+        return Optic.Set.op_HatEquals_0(arg0_2, arg1_1);
       };
-    }(new Optic.Set("Set", []))(function (arg0) {
+    }(new Optic.Set("Set", []))(function (arg0_1) {
       return function (arg1) {
-        return Compose.Lens.op_GreaterMinusGreater_0(arg0, arg1);
+        return Compose.Lens.op_GreaterMinusGreater_0(arg0_1, arg1);
       };
     }(new Compose.Lens("Lens", []))(SubModels.Docs_)(Model$$1.SubModels_))(patternInput[0])(model);
 
@@ -11966,221 +10302,233 @@ function update$$1(model, action) {
     if (function () {
       return model.SubModels.Sample != null;
     }(null)) {
-      var _patternInput = update$5(model.SubModels.Sample, action.Fields[0]);
+      var patternInput_1 = update$5(model.SubModels.Sample, action.Fields[0]);
+      var action__1 = AppApi.mapActions(function (arg0_3) {
+        return new Actions$$1("SampleDispatcherAction", [arg0_3]);
+      })(patternInput_1[1]);
 
-      var _action_ = AppApi.mapActions(function (arg0) {
-        return new Actions$$1("SampleDispatcherAction", [arg0]);
-      })(_patternInput[1]);
-
-      var _m_ = function (arg0) {
-        return function (arg1) {
-          return Optic.Set.op_HatEquals_1(arg0, arg1);
+      var m__1 = function (arg0_5) {
+        return function (arg1_3) {
+          return Optic.Set.op_HatEquals_1(arg0_5, arg1_3);
         };
-      }(new Optic.Set("Set", []))(function (arg0) {
-        return function (arg1) {
-          return Compose.Lens.op_GreaterMinusGreater_1(arg0, arg1);
+      }(new Optic.Set("Set", []))(function (arg0_4) {
+        return function (arg1_2) {
+          return Compose.Lens.op_GreaterMinusGreater_1(arg0_4, arg1_2);
         };
-      }(new Compose.Lens("Lens", []))(SubModels.Sample_)(Model$$1.SubModels_))(_patternInput[0])(model);
+      }(new Compose.Lens("Lens", []))(SubModels.Sample_)(Model$$1.SubModels_))(patternInput_1[0])(model);
 
-      return [_m_, _action_];
+      return [m__1, action__1];
     } else {
       return [model, new List$1()];
     }
   } else if (action.Case === "NavbarActions") {
-    var _patternInput2 = update$1(model.SubModels.Navbar, action.Fields[0]);
+    var patternInput_2 = update$1(model.SubModels.Navbar, action.Fields[0]);
+    var action__2 = AppApi.mapActions(function (arg0_6) {
+      return new Actions$$1("NavbarActions", [arg0_6]);
+    })(patternInput_2[1]);
 
-    var _action_2 = AppApi.mapActions(function (arg0) {
-      return new Actions$$1("NavbarActions", [arg0]);
-    })(_patternInput2[1]);
-
-    var _m_2 = function (arg0) {
-      return function (arg1) {
-        return Optic.Set.op_HatEquals_0(arg0, arg1);
+    var m__2 = function (arg0_8) {
+      return function (arg1_5) {
+        return Optic.Set.op_HatEquals_0(arg0_8, arg1_5);
       };
-    }(new Optic.Set("Set", []))(function (arg0) {
-      return function (arg1) {
-        return Compose.Lens.op_GreaterMinusGreater_0(arg0, arg1);
+    }(new Optic.Set("Set", []))(function (arg0_7) {
+      return function (arg1_4) {
+        return Compose.Lens.op_GreaterMinusGreater_0(arg0_7, arg1_4);
       };
-    }(new Compose.Lens("Lens", []))(SubModels.Navbar_)(Model$$1.SubModels_))(_patternInput2[0])(model);
+    }(new Compose.Lens("Lens", []))(SubModels.Navbar_)(Model$$1.SubModels_))(patternInput_2[0])(model);
 
-    return [_m_2, _action_2];
+    return [m__2, action__2];
   } else if (action.Case === "HeaderActions") {
-    var _patternInput3 = update$2(model.SubModels.Header, action.Fields[0]);
+    var patternInput_3 = update$2(model.SubModels.Header, action.Fields[0]);
+    var action__3 = AppApi.mapActions(function (arg0_9) {
+      return new Actions$$1("HeaderActions", [arg0_9]);
+    })(patternInput_3[1]);
 
-    var _action_3 = AppApi.mapActions(function (arg0) {
-      return new Actions$$1("HeaderActions", [arg0]);
-    })(_patternInput3[1]);
-
-    var _m_3 = function (arg0) {
-      return function (arg1) {
-        return Optic.Set.op_HatEquals_0(arg0, arg1);
+    var m__3 = function (arg0_11) {
+      return function (arg1_7) {
+        return Optic.Set.op_HatEquals_0(arg0_11, arg1_7);
       };
-    }(new Optic.Set("Set", []))(function (arg0) {
-      return function (arg1) {
-        return Compose.Lens.op_GreaterMinusGreater_0(arg0, arg1);
+    }(new Optic.Set("Set", []))(function (arg0_10) {
+      return function (arg1_6) {
+        return Compose.Lens.op_GreaterMinusGreater_0(arg0_10, arg1_6);
       };
-    }(new Compose.Lens("Lens", []))(SubModels.Header_)(Model$$1.SubModels_))(_patternInput3[0])(model);
+    }(new Compose.Lens("Lens", []))(SubModels.Header_)(Model$$1.SubModels_))(patternInput_3[0])(model);
 
-    return [_m_3, _action_3];
+    return [m__3, action__3];
   } else if (action.Case === "NoOp") {
     return [model, new List$1()];
   } else if (action.Fields[0].Case === "About") {
-    var _m_4 = function (arg0) {
-      return function (arg1) {
-        return Optic.Set.op_HatEquals_0(arg0, arg1);
+    var m__4 = function (arg0_12) {
+      return function (arg1_8) {
+        return Optic.Set.op_HatEquals_0(arg0_12, arg1_8);
       };
-    }(new Optic.Set("Set", []))(Model$$1.CurrentPage_)(action.Fields[0])(function (arg0) {
-      return function (arg1) {
-        return Optic.Set.op_HatEquals_0(arg0, arg1);
+    }(new Optic.Set("Set", []))(Model$$1.CurrentPage_)(action.Fields[0])(function (arg0_15) {
+      return function (arg1_11) {
+        return Optic.Set.op_HatEquals_0(arg0_15, arg1_11);
       };
-    }(new Optic.Set("Set", []))(function (arg0) {
-      return function (arg1) {
-        return Compose.Lens.op_GreaterMinusGreater_0(arg0, arg1);
+    }(new Optic.Set("Set", []))(function (arg0_14) {
+      return function (arg1_10) {
+        return Compose.Lens.op_GreaterMinusGreater_0(arg0_14, arg1_10);
       };
-    }(new Compose.Lens("Lens", []))(Model$1.CurrentPage_)(function (arg0) {
-      return function (arg1) {
-        return Compose.Lens.op_GreaterMinusGreater_0(arg0, arg1);
+    }(new Compose.Lens("Lens", []))(Model$1.CurrentPage_)(function (arg0_13) {
+      return function (arg1_9) {
+        return Compose.Lens.op_GreaterMinusGreater_0(arg0_13, arg1_9);
       };
-    }(new Compose.Lens("Lens", []))(SubModels.Navbar_)(Model$$1.SubModels_)))(action.Fields[0])(function (arg0) {
-      return function (arg1) {
-        return Optic.Set.op_HatEquals_0(arg0, arg1);
+    }(new Compose.Lens("Lens", []))(SubModels.Navbar_)(Model$$1.SubModels_)))(action.Fields[0])(function (arg0_18) {
+      return function (arg1_14) {
+        return Optic.Set.op_HatEquals_0(arg0_18, arg1_14);
       };
-    }(new Optic.Set("Set", []))(function (arg0) {
-      return function (arg1) {
-        return Compose.Lens.op_GreaterMinusGreater_0(arg0, arg1);
+    }(new Optic.Set("Set", []))(function (arg0_17) {
+      return function (arg1_13) {
+        return Compose.Lens.op_GreaterMinusGreater_0(arg0_17, arg1_13);
       };
-    }(new Compose.Lens("Lens", []))(Model$2.CurrentPage_)(function (arg0) {
-      return function (arg1) {
-        return Compose.Lens.op_GreaterMinusGreater_0(arg0, arg1);
+    }(new Compose.Lens("Lens", []))(Model$2.CurrentPage_)(function (arg0_16) {
+      return function (arg1_12) {
+        return Compose.Lens.op_GreaterMinusGreater_0(arg0_16, arg1_12);
       };
     }(new Compose.Lens("Lens", []))(SubModels.Header_)(Model$$1.SubModels_)))(action.Fields[0])(model)));
 
-    return [_m_4, new List$1()];
+    return [m__4, new List$1()];
   } else if (action.Fields[0].Case === "Docs") {
-    var _m_5 = function (arg0) {
-      return function (arg1) {
-        return Optic.Set.op_HatEquals_0(arg0, arg1);
+    var m__5 = function (arg0_19) {
+      return function (arg1_15) {
+        return Optic.Set.op_HatEquals_0(arg0_19, arg1_15);
       };
-    }(new Optic.Set("Set", []))(Model$$1.CurrentPage_)(action.Fields[0])(function (arg0) {
-      return function (arg1) {
-        return Optic.Set.op_HatEquals_0(arg0, arg1);
+    }(new Optic.Set("Set", []))(Model$$1.CurrentPage_)(action.Fields[0])(function (arg0_22) {
+      return function (arg1_18) {
+        return Optic.Set.op_HatEquals_0(arg0_22, arg1_18);
       };
-    }(new Optic.Set("Set", []))(function (arg0) {
-      return function (arg1) {
-        return Compose.Lens.op_GreaterMinusGreater_0(arg0, arg1);
+    }(new Optic.Set("Set", []))(function (arg0_21) {
+      return function (arg1_17) {
+        return Compose.Lens.op_GreaterMinusGreater_0(arg0_21, arg1_17);
       };
-    }(new Compose.Lens("Lens", []))(Model$1.CurrentPage_)(function (arg0) {
-      return function (arg1) {
-        return Compose.Lens.op_GreaterMinusGreater_0(arg0, arg1);
+    }(new Compose.Lens("Lens", []))(Model$1.CurrentPage_)(function (arg0_20) {
+      return function (arg1_16) {
+        return Compose.Lens.op_GreaterMinusGreater_0(arg0_20, arg1_16);
       };
-    }(new Compose.Lens("Lens", []))(SubModels.Navbar_)(Model$$1.SubModels_)))(action.Fields[0])(function (arg0) {
-      return function (arg1) {
-        return Optic.Set.op_HatEquals_0(arg0, arg1);
+    }(new Compose.Lens("Lens", []))(SubModels.Navbar_)(Model$$1.SubModels_)))(action.Fields[0])(function (arg0_25) {
+      return function (arg1_21) {
+        return Optic.Set.op_HatEquals_0(arg0_25, arg1_21);
       };
-    }(new Optic.Set("Set", []))(function (arg0) {
-      return function (arg1) {
-        return Compose.Lens.op_GreaterMinusGreater_0(arg0, arg1);
+    }(new Optic.Set("Set", []))(function (arg0_24) {
+      return function (arg1_20) {
+        return Compose.Lens.op_GreaterMinusGreater_0(arg0_24, arg1_20);
       };
-    }(new Compose.Lens("Lens", []))(Model$2.CurrentPage_)(function (arg0) {
-      return function (arg1) {
-        return Compose.Lens.op_GreaterMinusGreater_0(arg0, arg1);
+    }(new Compose.Lens("Lens", []))(Model$2.CurrentPage_)(function (arg0_23) {
+      return function (arg1_19) {
+        return Compose.Lens.op_GreaterMinusGreater_0(arg0_23, arg1_19);
       };
     }(new Compose.Lens("Lens", []))(SubModels.Header_)(Model$$1.SubModels_)))(action.Fields[0])(model)));
 
     var message = action.Fields[0].Fields[0].Case === "Viewer" ? ofArray([function (h) {
       h(new Actions$$1("DocsDispatcherAction", [new Actions$3("ViewerActions", [new Actions$4("SetDoc", [action.Fields[0].Fields[0].Fields[0]])])]));
     }]) : new List$1();
-    return [_m_5, message];
+    return [m__5, message];
   } else if (action.Fields[0].Case === "Sample") {
-    var _m_6 = function (arg0) {
-      return function (arg1) {
-        return Optic.Set.op_HatEquals_0(arg0, arg1);
+    var m__6 = function (arg0_26) {
+      return function (arg1_22) {
+        return Optic.Set.op_HatEquals_0(arg0_26, arg1_22);
       };
-    }(new Optic.Set("Set", []))(Model$$1.CurrentPage_)(action.Fields[0])(function (arg0) {
-      return function (arg1) {
-        return Optic.Set.op_HatEquals_0(arg0, arg1);
+    }(new Optic.Set("Set", []))(Model$$1.CurrentPage_)(action.Fields[0])(function (arg0_29) {
+      return function (arg1_25) {
+        return Optic.Set.op_HatEquals_0(arg0_29, arg1_25);
       };
-    }(new Optic.Set("Set", []))(function (arg0) {
-      return function (arg1) {
-        return Compose.Lens.op_GreaterMinusGreater_0(arg0, arg1);
+    }(new Optic.Set("Set", []))(function (arg0_28) {
+      return function (arg1_24) {
+        return Compose.Lens.op_GreaterMinusGreater_0(arg0_28, arg1_24);
       };
-    }(new Compose.Lens("Lens", []))(Model$1.CurrentPage_)(function (arg0) {
-      return function (arg1) {
-        return Compose.Lens.op_GreaterMinusGreater_0(arg0, arg1);
+    }(new Compose.Lens("Lens", []))(Model$1.CurrentPage_)(function (arg0_27) {
+      return function (arg1_23) {
+        return Compose.Lens.op_GreaterMinusGreater_0(arg0_27, arg1_23);
       };
-    }(new Compose.Lens("Lens", []))(SubModels.Navbar_)(Model$$1.SubModels_)))(action.Fields[0])(function (arg0) {
-      return function (arg1) {
-        return Optic.Set.op_HatEquals_0(arg0, arg1);
+    }(new Compose.Lens("Lens", []))(SubModels.Navbar_)(Model$$1.SubModels_)))(action.Fields[0])(function (arg0_32) {
+      return function (arg1_28) {
+        return Optic.Set.op_HatEquals_0(arg0_32, arg1_28);
       };
-    }(new Optic.Set("Set", []))(function (arg0) {
-      return function (arg1) {
-        return Compose.Lens.op_GreaterMinusGreater_0(arg0, arg1);
+    }(new Optic.Set("Set", []))(function (arg0_31) {
+      return function (arg1_27) {
+        return Compose.Lens.op_GreaterMinusGreater_0(arg0_31, arg1_27);
       };
-    }(new Compose.Lens("Lens", []))(Model$2.CurrentPage_)(function (arg0) {
-      return function (arg1) {
-        return Compose.Lens.op_GreaterMinusGreater_0(arg0, arg1);
+    }(new Compose.Lens("Lens", []))(Model$2.CurrentPage_)(function (arg0_30) {
+      return function (arg1_26) {
+        return Compose.Lens.op_GreaterMinusGreater_0(arg0_30, arg1_26);
       };
-    }(new Compose.Lens("Lens", []))(SubModels.Header_)(Model$$1.SubModels_)))(action.Fields[0])(function (arg0) {
-      return function (arg1) {
-        return Optic.Set.op_HatEquals_1(arg0, arg1);
+    }(new Compose.Lens("Lens", []))(SubModels.Header_)(Model$$1.SubModels_)))(action.Fields[0])(function (arg0_34) {
+      return function (arg1_30) {
+        return Optic.Set.op_HatEquals_1(arg0_34, arg1_30);
       };
-    }(new Optic.Set("Set", []))(function (arg0) {
-      return function (arg1) {
-        return Compose.Lens.op_GreaterMinusGreater_1(arg0, arg1);
+    }(new Optic.Set("Set", []))(function (arg0_33) {
+      return function (arg1_29) {
+        return Compose.Lens.op_GreaterMinusGreater_1(arg0_33, arg1_29);
       };
     }(new Compose.Lens("Lens", []))(SubModels.Sample_)(Model$$1.SubModels_))(Model$5.Initial(action.Fields[0].Fields[0]))(model))));
 
-    return [_m_6, new List$1()];
+    var message_1 = action.Fields[0].Fields[0].Case === "Viewer" ? ofArray([function (h_1) {
+      h_1(new Actions$$1("SampleDispatcherAction", [new Actions$5("ViewerActions", [new Actions$6("SetDoc", [action.Fields[0].Fields[0].Fields[0]])])]));
+    }]) : new List$1();
+    return [m__6, message_1];
   } else {
-    var _m_7 = function (arg0) {
-      return function (arg1) {
-        return Optic.Set.op_HatEquals_0(arg0, arg1);
+    var m__7 = function (arg0_35) {
+      return function (arg1_31) {
+        return Optic.Set.op_HatEquals_0(arg0_35, arg1_31);
       };
-    }(new Optic.Set("Set", []))(Model$$1.CurrentPage_)(action.Fields[0])(function (arg0) {
-      return function (arg1) {
-        return Optic.Set.op_HatEquals_0(arg0, arg1);
+    }(new Optic.Set("Set", []))(Model$$1.CurrentPage_)(action.Fields[0])(function (arg0_38) {
+      return function (arg1_34) {
+        return Optic.Set.op_HatEquals_0(arg0_38, arg1_34);
       };
-    }(new Optic.Set("Set", []))(function (arg0) {
-      return function (arg1) {
-        return Compose.Lens.op_GreaterMinusGreater_0(arg0, arg1);
+    }(new Optic.Set("Set", []))(function (arg0_37) {
+      return function (arg1_33) {
+        return Compose.Lens.op_GreaterMinusGreater_0(arg0_37, arg1_33);
       };
-    }(new Compose.Lens("Lens", []))(Model$1.CurrentPage_)(function (arg0) {
-      return function (arg1) {
-        return Compose.Lens.op_GreaterMinusGreater_0(arg0, arg1);
+    }(new Compose.Lens("Lens", []))(Model$1.CurrentPage_)(function (arg0_36) {
+      return function (arg1_32) {
+        return Compose.Lens.op_GreaterMinusGreater_0(arg0_36, arg1_32);
       };
-    }(new Compose.Lens("Lens", []))(SubModels.Navbar_)(Model$$1.SubModels_)))(action.Fields[0])(function (arg0) {
-      return function (arg1) {
-        return Optic.Set.op_HatEquals_0(arg0, arg1);
+    }(new Compose.Lens("Lens", []))(SubModels.Navbar_)(Model$$1.SubModels_)))(action.Fields[0])(function (arg0_41) {
+      return function (arg1_37) {
+        return Optic.Set.op_HatEquals_0(arg0_41, arg1_37);
       };
-    }(new Optic.Set("Set", []))(function (arg0) {
-      return function (arg1) {
-        return Compose.Lens.op_GreaterMinusGreater_0(arg0, arg1);
+    }(new Optic.Set("Set", []))(function (arg0_40) {
+      return function (arg1_36) {
+        return Compose.Lens.op_GreaterMinusGreater_0(arg0_40, arg1_36);
       };
-    }(new Compose.Lens("Lens", []))(Model$2.CurrentPage_)(function (arg0) {
-      return function (arg1) {
-        return Compose.Lens.op_GreaterMinusGreater_0(arg0, arg1);
+    }(new Compose.Lens("Lens", []))(Model$2.CurrentPage_)(function (arg0_39) {
+      return function (arg1_35) {
+        return Compose.Lens.op_GreaterMinusGreater_0(arg0_39, arg1_35);
       };
     }(new Compose.Lens("Lens", []))(SubModels.Header_)(Model$$1.SubModels_)))(action.Fields[0])(model)));
 
-    return [_m_7, new List$1()];
+    return [m__7, new List$1()];
   }
 }
 function view$$1(model) {
   var pageHtml = model.CurrentPage.Case === "Docs" ? map$$1(function (arg0) {
     return new Actions$$1("DocsDispatcherAction", [arg0]);
-  }, view$3(model.SubModels.Docs, model.CurrentPage.Fields[0])) : model.CurrentPage.Case === "Sample" ? map$$1(function (arg0) {
-    return new Actions$$1("SampleDispatcherAction", [arg0]);
-  }, view$5(model.SubModels.Sample, model.CurrentPage.Fields[0])) : model.CurrentPage.Case === "About" ? view$11() : view$12();
-  var navbarHtml = map$$1(function (arg0) {
-    return new Actions$$1("NavbarActions", [arg0]);
+  }, view$3(model.SubModels.Docs, model.CurrentPage.Fields[0])) : model.CurrentPage.Case === "Sample" ? map$$1(function (arg0_1) {
+    return new Actions$$1("SampleDispatcherAction", [arg0_1]);
+  }, view$5(model.SubModels.Sample, model.CurrentPage.Fields[0])) : model.CurrentPage.Case === "About" ? view$7() : view$8();
+  var navbarHtml = map$$1(function (arg0_2) {
+    return new Actions$$1("NavbarActions", [arg0_2]);
   }, view$1(model.SubModels.Navbar));
-  var headerHtml = map$$1(function (arg0) {
-    return new Actions$$1("HeaderActions", [arg0]);
+  var headerHtml = map$$1(function (arg0_3) {
+    return new Actions$$1("HeaderActions", [arg0_3]);
   }, view$2(model.SubModels.Header));
   return Tags.div(new List$1())(ofArray([Tags.div(ofArray([Attributes.classy("navbar-bg")]))(ofArray([Tags.div(ofArray([Attributes.classy("container")]))(ofArray([navbarHtml]))])), headerHtml, pageHtml]));
 }
 function op_LessQmarkGreater(p1, p2) {
   return Parsing.op_DotGreaterGreaterDot()(Parsing.op_DotGreaterGreater(p1, Parsing.pchar("?")))(p2);
+}
+function op_LessDotQmarkGreater(p1, p2) {
+  return Parsing.op_DotGreaterGreater(Parsing.op_DotGreaterGreater(p1, Parsing.pchar("?")), p2);
+}
+function op_LessQmarkDotGreater(p1, p2) {
+  return Parsing.op_GreaterGreaterDot(Parsing.op_GreaterGreaterDot(p1, Parsing.pchar("?")), p2);
+}
+function op_LessEqualsGreater(p1, p2) {
+  return Parsing.op_DotGreaterGreaterDot()(Parsing.op_DotGreaterGreater(p1, Parsing.pchar("=")))(p2);
+}
+function op_LessDotEqualsGreater(p1, p2) {
+  return Parsing.op_DotGreaterGreater(Parsing.op_DotGreaterGreater(p1, Parsing.pchar("=")), p2);
 }
 function op_LessEqualsDotGreater(p1, p2) {
   return Parsing.op_GreaterGreaterDot(Parsing.op_GreaterGreaterDot(p1, Parsing.pchar("=")), p2);
@@ -12188,96 +10536,62 @@ function op_LessEqualsDotGreater(p1, p2) {
 var routes = ofArray([function () {
   var map$$1 = new Actions$$1("NavigateTo", [new Route("Index", [])]);
 
-  var route = function ($var1) {
-    return Parsing._end(Parsing.drop($var1));
+  var route = function ($var2) {
+    return Parsing._end(Parsing.drop($var2));
   }(Parsing.pStaticStr("/"));
 
   return function (str) {
     return Parsing.runM(map$$1, route, str);
   };
 }(), function () {
-  var map$$1 = new Actions$$1("NavigateTo", [new Route("Docs", [new DocsApi.Route("Index", [])])]);
-
-  var route = function ($var2) {
-    return Parsing._end(Parsing.drop($var2));
-  }(Parsing.pStaticStr("/docs"));
-
-  return function (str) {
-    return Parsing.runM(map$$1, route, str);
-  };
-}(), function () {
-  var map$$1 = function map$$1(fileName) {
+  var map_1 = function map_1(fileName) {
     return new Actions$$1("NavigateTo", [new Route("Docs", [new DocsApi.Route("Viewer", [fileName])])]);
   };
 
-  var route = op_LessEqualsDotGreater(op_LessQmarkGreater(Parsing.pStaticStr("/docs"), Parsing.pStaticStr("fileName")), Parsing.pString);
-  return function (str) {
-    return Parsing.runM1(map$$1, route, str);
+  var route_1 = op_LessEqualsDotGreater(op_LessQmarkGreater(Parsing.pStaticStr("/docs"), Parsing.pStaticStr("fileName")), Parsing.pString);
+  return function (str_1) {
+    return Parsing.runM1(map_1, route_1, str_1);
   };
 }(), function () {
-  var map$$1 = new Actions$$1("NavigateTo", [new Route("Sample", [new SampleApi.Route("Clock", [])])]);
+  var map_2 = new Actions$$1("NavigateTo", [new Route("Docs", [new DocsApi.Route("Index", [])])]);
 
-  var route = function ($var3) {
+  var route_2 = function ($var3) {
     return Parsing._end(Parsing.drop($var3));
-  }(Parsing.pStaticStr("/sample/clock"));
+  }(Parsing.pStaticStr("/docs"));
 
-  return function (str) {
-    return Parsing.runM(map$$1, route, str);
+  return function (str_2) {
+    return Parsing.runM(map_2, route_2, str_2);
   };
 }(), function () {
-  var map$$1 = new Actions$$1("NavigateTo", [new Route("Sample", [new SampleApi.Route("Counter", [])])]);
+  var map_3 = new Actions$$1("NavigateTo", [new Route("Sample", [new SampleApi.Route("Index", [])])]);
 
-  var route = function ($var4) {
+  var route_3 = function ($var4) {
     return Parsing._end(Parsing.drop($var4));
-  }(Parsing.pStaticStr("/sample/counter"));
+  }(Parsing.pStaticStr("/sample"));
 
-  return function (str) {
-    return Parsing.runM(map$$1, route, str);
+  return function (str_3) {
+    return Parsing.runM(map_3, route_3, str_3);
   };
-}(), function () {
-  var map$$1 = new Actions$$1("NavigateTo", [new Route("Sample", [new SampleApi.Route("HelloWorld", [])])]);
+}(), Parsing.runM2()(function (info) {
+  return new Actions$$1("NavigateTo", [new Route("Sample", [function (tupledArg) {
+    return new SampleApi.Route("Viewer", [tupledArg[0], tupledArg[1]]);
+  }(info)])]);
+})(Parsing._end(op_LessEqualsGreater(Parsing.op_DotGreaterGreater(Parsing.op_LessDivideDotGreater(Parsing.pStaticStr("/sample"), Parsing.pStringTo("?")), Parsing.pStaticStr("height")), Parsing.pint))), function () {
+  var map_4 = new Actions$$1("NavigateTo", [new Route("About", [])]);
 
-  var route = function ($var5) {
+  var route_4 = function ($var5) {
     return Parsing._end(Parsing.drop($var5));
-  }(Parsing.pStaticStr("/sample/hello-world"));
-
-  return function (str) {
-    return Parsing.runM(map$$1, route, str);
-  };
-}(), function () {
-  var map$$1 = new Actions$$1("NavigateTo", [new Route("Sample", [new SampleApi.Route("NestedCounter", [])])]);
-
-  var route = function ($var6) {
-    return Parsing._end(Parsing.drop($var6));
-  }(Parsing.pStaticStr("/sample/nested-counter"));
-
-  return function (str) {
-    return Parsing.runM(map$$1, route, str);
-  };
-}(), function () {
-  var map$$1 = new Actions$$1("NavigateTo", [new Route("Sample", [new SampleApi.Route("Calculator", [])])]);
-
-  var route = function ($var7) {
-    return Parsing._end(Parsing.drop($var7));
-  }(Parsing.pStaticStr("/sample/calculator"));
-
-  return function (str) {
-    return Parsing.runM(map$$1, route, str);
-  };
-}(), function () {
-  var map$$1 = new Actions$$1("NavigateTo", [new Route("About", [])]);
-
-  var route = function ($var8) {
-    return Parsing._end(Parsing.drop($var8));
   }(Parsing.pStaticStr("/about"));
 
-  return function (str) {
-    return Parsing.runM(map$$1, route, str);
+  return function (str_4) {
+    return Parsing.runM(map_4, route_4, str_4);
   };
 }()]);
 function mapToRoute(route) {
   if (route.Case === "NavigateTo") {
     return resolveRoutesToUrl(route.Fields[0]);
+  } else {
+    return null;
   }
 }
 var router = RouteParser.createRouter(routes, function (route) {
@@ -12294,13 +10608,6 @@ var locationHandler = new RouteParser.LocationHandler(function (h) {
 function routerF(m) {
   return router.Route(m.Message);
 }
-function tickProducer(push) {
-  window.setInterval(function (_arg1) {
-    push(new Actions$$1("SampleDispatcherAction", [new Actions$5("ClockActions", [new Actions$6("Tick", [now()])])]));
-    return null;
-  }, 1000);
-  push(new Actions$$1("SampleDispatcherAction", [new Actions$5("ClockActions", [new Actions$6("Tick", [now()])])]));
-}
 AppApi.start(AppApi.withSubscriber(function () {
   var router_1 = function router_1(m) {
     return routerF(m);
@@ -12309,11 +10616,7 @@ AppApi.start(AppApi.withSubscriber(function () {
   return function (message) {
     RouteParser.routeSubscriber(locationHandler, router_1, message);
   };
-}(), function (app) {
-  return AppApi.withProducer(function (push) {
-    tickProducer(push);
-  }, app);
-}(AppApi.withProducer(function (handler) {
+}(), AppApi.withProducer(function (handler) {
   RouteParser.routeProducer(locationHandler, router, handler);
 }, AppApi.withStartNodeSelector("#app", AppApi.createApp(Model$$1.Initial, function (model) {
   return view$$1(model);
@@ -12327,7 +10630,7 @@ AppApi.start(AppApi.withSubscriber(function () {
       return createRender(selector, handler, view_1);
     };
   };
-}))))));
+})))));
 
 if (location.hash === "") {
   location.hash = "/";
@@ -12349,13 +10652,16 @@ exports.Actions = Actions$$1;
 exports.update = update$$1;
 exports.view = view$$1;
 exports.op_LessQmarkGreater = op_LessQmarkGreater;
+exports.op_LessDotQmarkGreater = op_LessDotQmarkGreater;
+exports.op_LessQmarkDotGreater = op_LessQmarkDotGreater;
+exports.op_LessEqualsGreater = op_LessEqualsGreater;
+exports.op_LessDotEqualsGreater = op_LessDotEqualsGreater;
 exports.op_LessEqualsDotGreater = op_LessEqualsDotGreater;
 exports.routes = routes;
 exports.mapToRoute = mapToRoute;
 exports.router = router;
 exports.locationHandler = locationHandler;
 exports.routerF = routerF;
-exports.tickProducer = tickProducer;
 exports.options = options;
 
 }((this.WebApp = this.WebApp || {})));

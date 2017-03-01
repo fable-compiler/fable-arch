@@ -1,0 +1,28 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "node build.js",
+    "build-dev": "node build.js dev",
+    "dev": "concurrently \"npm run serve\" \"npm run watch\"",
+    "serve": "http-server . -c-1 -s",
+    "setup": "node setup.js",
+    "watch": "node build.js dev"
+  },
+  "dependencies": {
+    "babel-runtime": "^6.20.0",
+    "concurrently": "^3.1.0",
+    "fable-core": "^0.7.26",
+    "fable-powerpack": "^0.0.19",
+    "virtual-dom": "^2.1.1"
+  },
+  "devDependencies": {
+    "babel-plugin-transform-runtime": "^6.15.0",
+    "fable-arch": "^0.10.0",
+    "fable-compiler": "^0.7.42",
+    "fs-extra": "^1.0.0",
+    "http-server": "^0.9.0"
+  },
+  "engines": {
+    "fable": "^0.7.42"
+  }
+}
