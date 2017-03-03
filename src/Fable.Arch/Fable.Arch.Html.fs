@@ -233,13 +233,6 @@ module Attributes =
     /// class attribute helper
     let classy value = attribute "class" value
 
-    let className name = attribute "class" name
-    let height (n: int) = attribute "height" (string n)
-    let width (n: int) = attribute "width" (string n)
-    let src url = attribute "src" url
-    let href url = attribute "href" url
-    let placeholder input = attribute "placeholder" input
-
     /// Provides means to interact with inner rendering contex of a canvas 
     let canvasContextHook (ctxHandler: CanvasRenderingContext2D -> unit) = 
         hook "canvas-ctx" (HookHelper.CreateHook (fun el _ _ -> 
