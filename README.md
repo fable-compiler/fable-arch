@@ -1,5 +1,8 @@
 # Fable-Arch
 
+Not more maintained. Please consider using [Elmish](https://fable-elmish.github.io/elmish/) which offer the same architecture.
+=====
+
 Framework for building applications based on the elm architecture. [Docs site](http://fable.io/fable-arch/)
 
 ## Installation
